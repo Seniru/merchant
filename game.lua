@@ -105,7 +105,7 @@ function eventTextAreaCallback(id, name, evt)
  		players[name]:work()	
 		ui.updateTextArea(1, "Money : $" .. players[name]:getMoney(), name)
 	elseif evt == "shop" then
-		ui.addTextArea(100, "The Shop - CLOSED!!!", name, 200, 50, 400, 200, nil, nil, 1, true)
+		ui.addTextArea(100, "The Shop <br><br>" .. medicTxt, name, 200, 50, 400, 200, nil, nil, 1, true)
 		for id, pack in ipairs(healthPacks) do print(tostring(pack)) end
 	end
 end
@@ -115,7 +115,10 @@ end
 
 --game logic
 
-table.insert(healthPacks, HealthPacks("Burger", 10, 0.1, false))
+
+table.insert(healthPacks, HealthPacks("Cheese", 5, 0.05, false))
+table.insert(healthPacks, HealthPacks("Cheese Pizza", 30, 0.25, false))
+
 print("type" .. type(HealthPacks("", 32, 5)))
 
 for name, player in pairs(tfm.get.room.playerList) do
@@ -136,8 +139,9 @@ ui.addTextArea(1, "Money : $0", name, 6, 26, 150, 20, 0x324650, 0x000000, 1, tru
 medicTxt = ""
 for id, medic in ipairs(healthPacks) do
 	--TODO: SET MEDICAL TEXT TO BE DISPLAYED IN THE SHOP
-	--medicTxt = medicTxt .. medic:getName() .. "Power: " .. medic:
+	medicTxt = medicTxt .. medic:getName() .. "     Power: " .. medic:getRegain()  .. "<br>"
 end
+print(medicTxt)
 ui.addTextArea(2, "<a href='event:shop'>Shop</a>", nil, 740, 375, 36, 20, nil, nil, 1, true)
 
 
