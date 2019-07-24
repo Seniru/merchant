@@ -6,7 +6,7 @@ tfm.exec.disableAutoTimeLeft(true)
 
 
 local CONSTANTS = {
-	HEALTH_BAR_WIDTH = 300, HEALTH_BAR_X = 150, STAT_BAR_Y = 30}
+    HEALTH_BAR_WIDTH = 300, HEALTH_BAR_X = 150, STAT_BAR_Y = 30}
 
 local players = {}
 local healthPacks = {}
@@ -21,40 +21,49 @@ Player.__tostring = function(self)
 end
 
 setmetatable(Player, {
-  __call = function (cls, name)
-    return cls.new(name)
-  end,
+    __call = function (cls, name)
+        return cls.new(name)
+    end,
 })
 
 function Player.new(name)
     local self = setmetatable({}, Player)
-	   self.name = name
+    self.name = name
     self.money = 0
     self.health = 1.0
-	  return self
+    self.healthBarId = 1000 + #players
+    print(self.healthBarId)
+    ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.HEALTH_BAR_WIDTH, 30, 0xff0000, 0xee0000, 1, true)
+    return self
 end
 
 function Player:getName() return self.name end
 function Player:getMoney() return self.money end
 function Player:getHealth() return self.health end
+function Player:getHealthBarId() return self.healthBarId end
 
 function Player:work()
-    self.money = self.money + 10
+    if self.health > 0 then
+        self.money = self.money + 10
+        self.health = self.health - 0.05
+        ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.HEALTH_BAR_WIDTH * self.health, 30, 0xff0000, 0xee0000, 1, true)
+        ui.addTextArea(2, "<p align='center'>" .. math.ceil(self.health * 100) .. "%</p>", self.name, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_WIDTH, 40, nil, nil, 0.5, true)
+    end
 end
 
 function Player:setHealth(val, add)
-	if add then
-		self.health = self.health + 10
-	else 
-		self.health = val
-	end
+    if add then
+        self.health = self.health + 10
+    else
+        self.health = val
+    end
 end
 
 function Player:useMed(med)
-	if not self.health >= 1  then 	
-		self:setHealth(med:regainValue(), med:isAdding())
-	end
-		
+    if not self.health >= 1  then
+        self:setHealth(med:regainValue(), med:isAdding())
+    end
+
 end
 
 
@@ -64,24 +73,24 @@ end
 
 local HealthPacks = {}
 HealthPacks.__index = HealthPacks
-HealthPacks.__tostring = function(self) 
-	return "[name=" .. self.name .. ", price=" .. self.price .. ", regain=" .. self.regainVal .. ", add=" .. tostring(self.add) .. "]" 
+HealthPacks.__tostring = function(self)
+    return "[name=" .. self.name .. ", price=" .. self.price .. ", regain=" .. self.regainVal .. ", add=" .. tostring(self.add) .. "]"
 end
 HealthPacks.__type = "HealthPacks"
 
 setmetatable(HealthPacks, {
-  __call = function (cls, name, price, regain, add)
-    return cls.new(name, price, regain, add)
-  end,
+    __call = function (cls, name, price, regain, add)
+        return cls.new(name, price, regain, add)
+    end,
 })
 
 function HealthPacks.new(name, price, regainVal, add)
-	local self = setmetatable({}, HealthPacks)
-	self.name = name
-	self.price = price
-	self.regainVal = regainVal
-	self.add = add
-	return self
+    local self = setmetatable({}, HealthPacks)
+    self.name = name
+    self.price = price
+    self.regainVal = regainVal
+    self.add = add
+    return self
 end
 
 
@@ -99,20 +108,20 @@ end
 function eventPlayerLeft(name)
     for n, player in ipairs(players) do
         if player:getName() == name then
-                table.remove(players, n)
+            table.remove(players, n)
         end
-    end    
+    end
 end
 
 --function for the money clicker c:
 function eventTextAreaCallback(id, name, evt)
- 	if evt == "work" then
- 		players[name]:work()	
-		ui.updateTextArea(1, "Money : $" .. players[name]:getMoney(), name)
-	elseif evt == "shop" then
-		ui.addTextArea(100, "The Shop <br><br>" .. medicTxt, name, 200, 50, 400, 200, nil, nil, 1, true)
-		for id, pack in ipairs(healthPacks) do print(tostring(pack)) end
-	end
+    if evt == "work" then
+        players[name]:work()
+        ui.updateTextArea(1, "Money : $" .. players[name]:getMoney(), name)
+    elseif evt == "shop" then
+        ui.addTextArea(100, "The Shop <br><br>" .. medicTxt, name, 200, 50, 400, 200, nil, nil, 1, true)
+        for id, pack in ipairs(healthPacks) do print(tostring(pack)) end
+    end
 end
 
 
@@ -139,14 +148,14 @@ end
 --work button
 ui.addTextArea(0, "<a href='event:work'>Work!", nil, 7, 375, 36, 20, 0x324650, 0x000000, 1, true)
 --stats
-ui.addTextArea(1, "Money : $0", name, 6, CONSTANTS.STAT_BAR_Y, 790, 40, 0x324650, 0x000000, 1, true)
+ui.addTextArea(1, "Money : $0", name, 6, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_X - 15, 40, 0x324650, 0x000000, 1, true)
 --health bar area
-ui.addTextArea(3, "<p align='center'>100%</p>", nil, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_WIDTH, 40, nil, nil, 0.5, true)
+ui.addTextArea(2, "<p align='center'>100%</p>", nil, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_WIDTH, 40, nil, nil, 0.5, true)
 --shop buttons
 medicTxt = ""
 for id, medic in ipairs(healthPacks) do
-	--TODO: SET MEDICAL TEXT TO BE DISPLAYED IN THE SHOP
-	medicTxt = medicTxt .. medic:getName() .. "     Power: " .. medic:getRegain()  .. "<br>"
+    --TODO: SET MEDICAL TEXT TO BE DISPLAYED IN THE SHOP
+    medicTxt = medicTxt .. medic:getName() .. "     Power: " .. medic:getRegain()  .. "<br>"
 end
 print(medicTxt)
 ui.addTextArea(40, "<a href='event:shop'>Shop</a>", nil, 740, 375, 36, 20, nil, nil, 1, true)
