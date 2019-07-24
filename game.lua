@@ -4,8 +4,13 @@ tfm.exec.disableAutoTimeLeft(true)
 
 --game variables
 
+
+local CONSTANTS = {
+	HEALTH_BAR_WIDTH = 300, HEALTH_BAR_X = 150, STAT_BAR_Y = 30}
+
 local players = {}
 local healthPacks = {}
+
 
 --creating the class Player
 
@@ -134,7 +139,9 @@ end
 --work button
 ui.addTextArea(0, "<a href='event:work'>Work!", nil, 7, 375, 36, 20, 0x324650, 0x000000, 1, true)
 --stats
-ui.addTextArea(1, "Money : $0", name, 6, 26, 150, 20, 0x324650, 0x000000, 1, true)
+ui.addTextArea(1, "Money : $0", name, 6, CONSTANTS.STAT_BAR_Y, 790, 40, 0x324650, 0x000000, 1, true)
+--health bar area
+ui.addTextArea(3, "<p align='center'>100%</p>", nil, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_WIDTH, 40, nil, nil, 0.5, true)
 --shop buttons
 medicTxt = ""
 for id, medic in ipairs(healthPacks) do
@@ -142,6 +149,6 @@ for id, medic in ipairs(healthPacks) do
 	medicTxt = medicTxt .. medic:getName() .. "     Power: " .. medic:getRegain()  .. "<br>"
 end
 print(medicTxt)
-ui.addTextArea(2, "<a href='event:shop'>Shop</a>", nil, 740, 375, 36, 20, nil, nil, 1, true)
+ui.addTextArea(40, "<a href='event:shop'>Shop</a>", nil, 740, 375, 36, 20, nil, nil, 1, true)
 
 
