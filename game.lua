@@ -32,7 +32,7 @@ function Player.new(name)
     self.money = 0
     self.health = 1.0
     self.healthBarId = 1000 + #players
-    print(self.healthBarId)
+	self.healthRate = 0.002
     ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.HEALTH_BAR_WIDTH, 30, 0xff0000, 0xee0000, 1, true)
     return self
 end
@@ -41,29 +41,30 @@ function Player:getName() return self.name end
 function Player:getMoney() return self.money end
 function Player:getHealth() return self.health end
 function Player:getHealthBarId() return self.healthBarId end
+function Player:getHealthRate() return self.healthRate end
 
 function Player:work()
     if self.health > 0 then
         self.money = self.money + 10
-        self.health = self.health - 0.05
-        ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.HEALTH_BAR_WIDTH * self.health, 30, 0xff0000, 0xee0000, 1, true)
-        ui.addTextArea(2, "<p align='center'>" .. math.ceil(self.health * 100) .. "%</p>", self.name, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_WIDTH, 40, nil, nil, 0.5, true)
+		self.setHealth(self, -0.05, true)
     end
 end
 
 function Player:setHealth(val, add)
     if add then
-        self.health = self.health + 10
+        self.health = self.health + val
     else
         self.health = val
     end
+	self.health = self.health > 1  and 1 or self.health < 0 and 0 or self.health
+	ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.HEALTH_BAR_WIDTH * self.health, 30, 0xff0000, 0xee0000, 1, true)
+	ui.addTextArea(2, "<p align='center'>" .. math.ceil(self.health * 100) .. "%</p>", self.name, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_WIDTH, 40, nil, nil, 0.5, true)
 end
 
 function Player:useMed(med)
     if not self.health >= 1  then
         self:setHealth(med:regainValue(), med:isAdding())
     end
-
 end
 
 
@@ -122,6 +123,13 @@ function eventTextAreaCallback(id, name, evt)
         ui.addTextArea(100, "The Shop <br><br>" .. medicTxt, name, 200, 50, 400, 200, nil, nil, 1, true)
         for id, pack in ipairs(healthPacks) do print(tostring(pack)) end
     end
+end
+
+function eventLoop(t,r)
+
+	for name, player in pairs(players) do
+		player:setHealth(player:getHealthRate(), true)
+	end
 end
 
 
