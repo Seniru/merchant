@@ -6,7 +6,11 @@ tfm.exec.disableAutoTimeLeft(true)
 
 
 local CONSTANTS = {
-    HEALTH_BAR_WIDTH = 300, HEALTH_BAR_X = 150, STAT_BAR_Y = 30}
+    BAR_WIDTH = 300,
+    HEALTH_BAR_X = 150,
+    STAT_BAR_Y = 30,
+    XP_BAR_X = 460
+}
 
 local players = {}
 local healthPacks = {}
@@ -32,8 +36,12 @@ function Player.new(name)
     self.money = 0
     self.health = 1.0
     self.healthBarId = 1000 + #players
+    self.xpBarId = 2000 + #players
     self.healthRate = 0.002
-    ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.HEALTH_BAR_WIDTH, 30, 0xff0000, 0xee0000, 1, true)
+    self.xp = 0
+    self.level = 1
+    ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.BAR_WIDTH, 30, 0xff0000, 0xee0000, 1, true)
+    ui.addTextArea(self.xpBarId, "", name, CONSTANTS.XP_BAR_X, 30, 1, 30, 0x00ff00, 0x00ee00, 1, true)
     return self
 end
 
@@ -42,11 +50,16 @@ function Player:getMoney() return self.money end
 function Player:getHealth() return self.health end
 function Player:getHealthBarId() return self.healthBarId end
 function Player:getHealthRate() return self.healthRate end
+function Player:getXP() return self.xp end
+function Player:getLevel() return self.level end
 
 function Player:work()
     if self.health > 0 then
         self.setHealth(self, -0.05, true)
         self:setMoney(10, true)
+        self:setXP(1, true)
+        self:levelUp()
+
     end
 end
 
@@ -57,8 +70,8 @@ function Player:setHealth(val, add)
         self.health = val
     end
     self.health = self.health > 1  and 1 or self.health < 0 and 0 or self.health
-    ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.HEALTH_BAR_WIDTH * self.health, 30, 0xff0000, 0xee0000, 1, true)
-    ui.addTextArea(2, "<p align='center'>" .. math.ceil(self.health * 100) .. "%</p>", self.name, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_WIDTH, 40, nil, nil, 0.5, true)
+    ui.addTextArea(self.healthBarId, "", name, CONSTANTS.HEALTH_BAR_X, 30, CONSTANTS.BAR_WIDTH * self.health, 30, 0xff0000, 0xee0000, 1, true)
+    ui.addTextArea(2, "<p align='center'>" .. math.ceil(self.health * 100) .. "%</p>", self.name, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.BAR_WIDTH, 40, nil, nil, 0.5, true)
 end
 
 function Player:setMoney(val, add)
@@ -69,6 +82,26 @@ function Player:setMoney(val, add)
     end
     self.money = self.money < 0 and 0 or self.money
     ui.updateTextArea(1, "Money : $" .. self.money, self.name)
+end
+
+function Player:setXP(val, add)
+    if add then
+        self.xp = self.xp + val
+    else
+        self.xp = val
+    end
+    ui.addTextArea(self.xpBarId, "", self.name, CONSTANTS.XP_BAR_X, 30,((self.xp - calculateXP(self.level)) / (calculateXP(self.level + 1) - calculateXP(self.level)))  * CONSTANTS.BAR_WIDTH, 30, 0x00ff00, 0x00ee00, 1, true)
+    ui.updateTextArea(3, "<p align='center'>Level " .. self.level .. " - " ..self.xp .. "/" .. calculateXP(self.level + 1) .. "XP", self.name)
+
+end
+
+function Player:levelUp()
+    if self.xp >= calculateXP(self.level + 1) then
+        self.level = self.level + 1
+        self:setHealth(1.0, false)
+        self:setMoney(5 * self.level, true)
+        print("level up !" .. self.level .. " XP: " .. self.xp)
+    end
 end
 
 function Player:useMed(med)
@@ -116,6 +149,23 @@ function HealthPacks:isAdding() return self.add end
 function HealthPacks:getDescription() return self.description end
 function HealthPacks:getUID() return self.uid end
 
+--class creation(HealthPacks) end
+
+--game functions
+
+function displayShop(target)
+    local medicTxt = ""
+    for id, medic in pairs(healthPacks) do
+        --TODO: SET MEDICAL TEXT TO BE DISPLAYED IN THE SHOP
+        medicTxt = medicTxt .. medic:getName() .. "     Power: " .. medic:getRegain()  .. " Price:" .. medic:getPrice() .. "<a href='event:" .. medic:getUID() .."'> Buy</a><br>"
+    end
+    ui.addTextArea(100, "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. medicTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+end
+
+function calculateXP(lvl)
+    return 2.5 * (lvl + 2) * (lvl - 1)
+end
+
 --event handling
 
 function eventNewPlayer(name)
@@ -136,8 +186,7 @@ function eventTextAreaCallback(id, name, evt)
     if evt == "work" then
         players[name]:work()
     elseif evt == "shop" then
-        ui.addTextArea(100, "The Shop <br><br>" .. medicTxt, name, 200, 90, 400, 200, nil, nil, 1, true)
-        for id, pack in ipairs(healthPacks) do print(tostring(pack)) end
+        displayShop(name)
     elseif string.sub(evt, 1, 6) == "health"and players[name]:getMoney() - healthPacks[string.sub(evt, 8)]:getPrice() >= 0 then
         local pack = healthPacks[string.sub(evt, 8)]
         players[name]:useMed(pack)
@@ -178,14 +227,10 @@ ui.addTextArea(0, "<a href='event:work'>Work!", nil, 7, 375, 36, 20, 0x324650, 0
 --stats
 ui.addTextArea(1, "Money : $0", name, 6, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_X - 15, 40, 0x324650, 0x000000, 1, true)
 --health bar area
-ui.addTextArea(2, "<p align='center'>100%</p>", nil, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.HEALTH_BAR_WIDTH, 40, nil, nil, 0.5, true)
---shop buttons
-medicTxt = ""
-for id, medic in pairs(healthPacks) do
-    --TODO: SET MEDICAL TEXT TO BE DISPLAYED IN THE SHOP
-    medicTxt = medicTxt .. medic:getName() .. "     Power: " .. medic:getRegain()  .. " Price:" .. medic:getPrice() .. "<a href='event:" .. medic:getUID() .."'> Buy</a><br>"
-end
-print(medicTxt)
+ui.addTextArea(2, "<p align='center'>100%</p>", nil, CONSTANTS.HEALTH_BAR_X, CONSTANTS.STAT_BAR_Y, CONSTANTS.BAR_WIDTH, 40, nil, nil, 0.5, true)
+--xp bar area
+ui.addTextArea(3, "<p align='center'>Level 1  -  0/" .. calculateXP(2) .. "XP</p>", nil, CONSTANTS.XP_BAR_X, 30, CONSTANTS.BAR_WIDTH, 40, nil, nil, 0.5, true)
+--shop button
 ui.addTextArea(40, "<a href='event:shop'>Shop</a>", nil, 740, 375, 36, 20, nil, nil, 1, true)
 
-
+--for xp = 1, 20, 1 do print(calculateXP(xp)) end
