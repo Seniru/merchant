@@ -4,7 +4,6 @@ tfm.exec.disableAutoTimeLeft(true)
 
 --game variables
 
-
 local CONSTANTS = {
     BAR_WIDTH = 735,
     BAR_X = 60,
@@ -14,7 +13,6 @@ local CONSTANTS = {
 
 local players = {}
 local healthPacks = {}
-
 
 --creating the class Player
 
@@ -63,16 +61,13 @@ function Player:work()
 end
 
 function Player:setHealth(val, add)
-
     if add then
         self.health = self.health + val
     else
         self.health = val
     end
     self.health = self.health > 1  and 1 or self.health < 0 and 0 or self.health
-
     ui.addTextArea(self.healthBarId, "", self.name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH * self.health, 20, 0xff0000, 0xee0000, 1, false)
-
     ui.updateTextArea(2, "<p align='center'>" .. math.ceil(self.health * 100) .. "%</p>", self.name)
 end
 
@@ -108,64 +103,35 @@ end
 
 function Player:useMed(med)
     if not (self.health >= 1) then
-        self:setHealth(med:getRegain(), med:isAdding())
-        print(tostring(med:isAdding()) .. " " .. med:getRegain())
+        self:setHealth(med.regainVal, med.adding)
     end
-
 end
-
 
 --class creation(Player) ends
-
---creating class HealthPacks
-
-local HealthPacks = {}
-HealthPacks.__index = HealthPacks
-HealthPacks.__tostring = function(self)
-    return "[name=" .. self.name .. ", price=" .. self.price .. ", regain=" .. self.regainVal .. ", add=" .. tostring(self.add) .. "]"
-end
-HealthPacks.__type = "HealthPacks"
-
-setmetatable(HealthPacks, {
-    __call = function (cls, name, price, regain, add, uid, desc)
-        return cls.new(name, price, regain, add, uid, desc)
-    end,
-})
-
-function HealthPacks.new(name, price, regainVal, add, uid, desc)
-    local self = setmetatable({}, HealthPacks)
-    self.name = name
-    self.price = price
-    self.regainVal = regainVal
-    self.add = add
-    self.uid = uid
-    self.description =  desc
-    return self
-end
-
-
-function HealthPacks:getName() return self.name end
-function HealthPacks:getPrice() return self.price end
-function HealthPacks:getRegain() return self.regainVal end
-function HealthPacks:isAdding() return self.add end
-function HealthPacks:getDescription() return self.description end
-function HealthPacks:getUID() return self.uid end
-
---class creation(HealthPacks) end
 
 --game functions
 
 function displayShop(target)
     local medicTxt = ""
     for id, medic in pairs(healthPacks) do
-        --TODO: SET MEDICAL TEXT TO BE DISPLAYED IN THE SHOP
-        medicTxt = medicTxt .. medic:getName()  .. " " .. medic:getRegain()  .. " Price:" .. medic:getPrice() .. "<a href='event:" .. medic:getUID() .."'> Buy</a><br>"
+        medicTxt = medicTxt .. medic.name  .. " " .. medic.regainVal  .. " Price:" .. medic.price .. "<a href='event:" .. medic.uid .."'> Buy</a><br>"
     end
     ui.addTextArea(100, "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. medicTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function calculateXP(lvl)
     return 2.5 * (lvl + 2) * (lvl - 1)
+end
+
+function HealthPack(_name, _price, _regainVal, _adding, _desc)
+  healthPacks[_name] = {
+    name = _name,
+    price = _price,
+    regainVal = _regainVal,
+    adding = _adding,
+    uid = "health:" .. _name,
+    desc = _desc
+  }
 end
 
 function setUI(name)
@@ -180,7 +146,6 @@ function setUI(name)
     ui.addTextArea(3, "<p align='center'>Level 1  -  0/" .. calculateXP(2) .. "XP</p>", name, CONSTANTS.BAR_X, 370, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
     --shop button
     ui.addTextArea(40, "<a href='event:shop'>Shop</a>", name, 740, 300, 36, 20, nil, nil, 1, true)
-
 end
 
 --event handling
@@ -200,15 +165,14 @@ end
 
 --function for the money clicker c:
 function eventTextAreaCallback(id, name, evt)
-
     if evt == "work" then
         players[name]:work()
     elseif evt == "shop" then
         displayShop(name)
-    elseif string.sub(evt, 1, 6) == "health"and players[name]:getMoney() - healthPacks[string.sub(evt, 8)]:getPrice() >= 0 then
+    elseif string.sub(evt, 1, 6) == "health" and players[name]:getMoney() - healthPacks[string.sub(evt, 8)].price >= 0 then
         local pack = healthPacks[string.sub(evt, 8)]
         players[name]:useMed(pack)
-        players[name]:setMoney(-pack:getPrice(), true)
+        players[name]:setMoney(-pack.price, true)
     end
 end
 
@@ -218,16 +182,12 @@ function eventLoop(t,r)
     end
 end
 
-
 --event handling ends
 
 --game logic
 
-healthPacks['cheese'] = HealthPacks("Cheese", 5, 0.01, true, "health:cheese", "Just a cheese! to refresh yourself")
-healthPacks['pizza'] =  HealthPacks("Cheese Pizza", 30, 0.05, true, "health:pizza", "dsjfsdlkgjsdk")
-
-
-print("type" .. type(HealthPacks("", 32, 5)))
+HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself")
+HealthPack("Cheese Pizza", 30, 0.05, true, "dsjfsdlkgjsdk")
 
 for name, player in pairs(tfm.get.room.playerList) do
     players[name] = Player(name)
