@@ -11,6 +11,10 @@ local CONSTANTS = {
 
 }
 
+local celebrationEmotes = {
+  tfm.enum.emote.dane, tfm.enum.emote.clap, tfm.enum.emote.confetti, tfm.enum.emote.partyhorn, tfm.enum.emote.carnaval
+}
+
 local players = {}
 local healthPacks = {}
 local courses = {}
@@ -110,6 +114,7 @@ function Player:setCourse(course)
   self.learnProgress = 0
   self.eduLvl = course.level
   self.eduStream = course.stream
+  ui.addTextArea(3000, "Lessons left: 0/" .. find(self.learning, courses).lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, false)
 end
 
 function Player:setJob(job)
@@ -135,6 +140,7 @@ function Player:learn()
 print(self.learning)
     if self.money > find(self.learning, courses).feePerLesson then
       self.learnProgress = self.learnProgress + 1
+      ui.updateTextArea(3000, "Lessons left:" .. self.learnProgress .. "/" .. find(self.learning, courses).lessons, self.name)
       self:setMoney(-find(self.learning, courses).feePerLesson, true)
       if self.learnProgress >= find(self.learning, courses).lessons then
         self:addDegree(self.learning)
@@ -152,12 +158,14 @@ function Player:levelUp()
         self:setHealth(1.0, false)
         self:setMoney(5 * self.level, true)
         print("level up !" .. self.level .. " XP: " .. self.xp)
+        displayParticles(self.name, tfm.enum.particle.star)
     end
 end
 
 function Player:useMed(med)
     if not (self.health >= 1) then
         self:setHealth(med.regainVal, med.adding)
+        displayParticles(self.name, tfm.enum.particle.heart)
     end
 end
 
@@ -199,6 +207,13 @@ end
 
 function calculateXP(lvl)
     return 2.5 * (lvl + 2) * (lvl - 1)
+end
+
+function displayParticles(target, particle)
+  tfm.exec.displayParticle(particle, tfm.get.room.playerList[target].x, tfm.get.room.playerList[target].y, 0, -2, 0, 0, nil)
+  tfm.exec.displayParticle(particle, tfm.get.room.playerList[target].x - 10, tfm.get.room.playerList[target].y, 0, -3, 0, 0, nil)
+  tfm.exec.displayParticle(particle, tfm.get.room.playerList[target].x + 10, tfm.get.room.playerList[target].y, 0, -2, 0, 0, nil)
+  tfm.exec.displayParticle(particle, tfm.get.room.playerList[target].x + math.random(-15, 15) , tfm.get.room.playerList[target].y, 0, -1, 0, 0, nil)
 end
 
 function find(name, tbl)
