@@ -14,7 +14,7 @@ local CONSTANTS = {
 local players = {}
 local healthPacks = {}
 local courses = {}
-
+local closeButton = "<p align='right'><font color='#ff0000' size='13'><b><a href='event:close'>X</a></b></font></p>"
 --creating the class Player
 
 local Player = {}
@@ -155,7 +155,7 @@ function displayShop(target)
     for id, medic in pairs(healthPacks) do
         medicTxt = medicTxt .. medic.name  .. " " .. medic.regainVal  .. " Price:" .. medic.price .. "<a href='event:" .. medic.uid .."'> Buy</a><br>"
     end
-    ui.addTextArea(100, "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. medicTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. medicTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function displayCourses(target)
@@ -166,7 +166,7 @@ function displayCourses(target)
       courseTxt = courseTxt .. id .. " Fee: " .. course.fee .. " Lessons: " .. course.lessons .. " <a href='event:" .. course.uid .. "'>Enroll</a>'<br>"
     end
   end
-  ui.addTextArea(200, "<p align='center'><font size='20'><b><J>Courses</J></b></font></p><br></br>" .. courseTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+  ui.addTextArea(200, closeButton .. "<p align='center'><font size='20'><b><J>Courses</J></b></font></p><br></br>" .. courseTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function calculateXP(lvl)
@@ -226,7 +226,7 @@ function eventPlayerLeft(name)
         end
     end
 end
-
+  
 --function for the money clicker c:
 function eventTextAreaCallback(id, name, evt)
     if evt == "work" then
@@ -239,6 +239,8 @@ function eventTextAreaCallback(id, name, evt)
         else 
           players[name]:learn()
         end
+    elseif evt == "close" then
+        ui.removeTextArea(id, name)
     elseif string.sub(evt, 1, 6) == "health" and players[name]:getMoney() - healthPacks[string.sub(evt, 8)].price >= 0 then
         local pack = healthPacks[string.sub(evt, 8)]
         players[name]:useMed(pack)
