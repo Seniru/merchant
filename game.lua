@@ -14,6 +14,7 @@ local CONSTANTS = {
 local players = {}
 local healthPacks = {}
 local courses = {}
+local jobs = {}
 local closeButton = "<p align='right'><font color='#ff0000' size='13'><b><a href='event:close'>X</a></b></font></p>"
 --creating the class Player
 
@@ -44,6 +45,7 @@ function Player.new(name)
     self.eduLvl = 1
     self.eduStream = ""
     self.degrees = {}
+    self.job = "Cheese collector"
     ui.addTextArea(self.healthBarId, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
     ui.addTextArea(self.xpBarId, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
     return self
@@ -64,8 +66,9 @@ function Player:getDegrees() return self.degrees end
 
 function Player:work()
     if self.health -0.05 > 0 then
-        self.setHealth(self, -0.05, true)
-        self:setMoney(10, true)
+        local job = find(self.job, jobs)
+        self.setHealth(self, -job.energy, true)
+        self:setMoney(job.salary, true)
         self:setXP(1, true)
         self:levelUp()
     end
@@ -109,6 +112,18 @@ function Player:setCourse(course)
   self.eduStream = course.stream
 end
 
+function Player:setJob(job)
+  local jobRef = find(job, jobs)
+  print(jobRef.minLvl < self.level)
+  print(jobRef.qualifications == nil)
+  print(table.indexOf(self.degrees, jobRef.qualifications))
+  if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or table.indexOf(self.degrees, jobRef.qualifications) ~= nil) then
+    self.job = job
+    print(self.job.salary)
+  else print("No qualifications")
+  end
+end
+
 function Player:addDegree(course)
   table.insert(self.degrees, course)
 end
@@ -118,10 +133,10 @@ function Player:learn()
     print("No course!")
   else
 print(self.learning)
-    if self.money > courses[self.learning].feePerLesson then
+    if self.money > find(self.learning, courses).feePerLesson then
       self.learnProgress = self.learnProgress + 1
-      self:setMoney(-courses[self.learning].feePerLesson, true)
-      if self.learnProgress >= courses[self.learning].lessons then
+      self:setMoney(-find(self.learning, courses).feePerLesson, true)
+      if self.learnProgress >= find(self.learning, courses).lessons then
         self:addDegree(self.learning)
         print("Graduated")
         self.learning = ""
@@ -152,7 +167,7 @@ end
 
 function displayShop(target)
     local medicTxt = ""
-    for id, medic in pairs(healthPacks) do
+    for id, medic in ipairs(healthPacks) do
         medicTxt = medicTxt .. medic.name  .. " " .. medic.regainVal  .. " Price:" .. medic.price .. "<a href='event:" .. medic.uid .."'> Buy</a><br>"
     end
     ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. medicTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
@@ -161,20 +176,75 @@ end
 function displayCourses(target)
   local courseTxt = ""
   local p = players[target]
-  for id, course in pairs(courses) do
+  for id, course in ipairs(courses) do
     if p:getEducationLevel() == course.level and (p:getEducationStream() == course.stream or p:getEducationStream() == "") and learning ~= "" then
-      courseTxt = courseTxt .. id .. " Fee: " .. course.fee .. " Lessons: " .. course.lessons .. " <a href='event:" .. course.uid .. "'>Enroll</a>'<br>"
+      courseTxt = courseTxt .. course.name .. " Fee: " .. course.fee .. " Lessons: " .. course.lessons .. " <a href='event:" .. course.uid .. "'>Enroll</a>'<br>"
     end
   end
   ui.addTextArea(200, closeButton .. "<p align='center'><font size='20'><b><J>Courses</J></b></font></p><br></br>" .. courseTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+end
+
+function displayJobs(target)
+  local jobTxt = ""
+  local p = players[target]
+  for id, job in ipairs(jobs) do
+  print(table.tostring(p:getDegrees()))
+  print(job.qualifications)
+    if p:getLevel() >= job.minLvl and (job.qualifications == nil or table.indexOf(p:getDegrees(), job.qualifications) ~= nil) then
+      jobTxt = jobTxt .. job.name .. " Salary: " .. job.salary .. " Energy: " .. (job.energy * 100) .. "% <a href='event:" .. job.uid .. "'>Choose</a><br>"
+    end
+  end
+  ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font><p><br><br>" .. jobTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function calculateXP(lvl)
     return 2.5 * (lvl + 2) * (lvl - 1)
 end
 
+function find(name, tbl)
+  for k,v in ipairs(tbl) do
+    if (v.name == name) then
+      return v
+    end
+  end
+  return nil
+end
+
+--[[copied from the internet. lazy to write it by myself :D
+  Credits: walterlua (https://gist.github.com/walterlua/978150/2742d9479cd5bfb3d08d90cfcb014da94021e271)
+           jakbyte
+]]
+function table.indexOf(t, object)
+    if type(t) ~= "table" then error("table expected, got " .. type(t), 2) end
+    for i, v in pairs(t) do
+        if object == v then
+            return i
+        end
+    end
+end
+
+--[[copied from stackoverflow
+  Credits: https://stackoverflow.com/users/1514861/ivo-beckers
+  Question: https://stackoverflow.com/questions/1426954/split-string-in-lua
+]]
+function split(s, delimiter)
+    result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match);
+    end
+    return result;
+end
+
+function table.tostring(tbl)
+  s = "["
+  for k, v in pairs(tbl) do
+    s = s .. k .. ":" .. v .. ", "
+  end
+  return s .. "]"
+end
+
 function HealthPack(_name, _price, _regainVal, _adding, _desc)
-  healthPacks[_name] = {
+  return {
     name = _name,
     price = _price,
     regainVal = _regainVal,
@@ -185,7 +255,7 @@ function HealthPack(_name, _price, _regainVal, _adding, _desc)
 end
 
 function Course(_name, _fee, _lessons, _level, _stream)
-  courses[_name] = {
+  return {
     name = _name,
     fee = _fee,
     lessons = _lessons,
@@ -193,6 +263,17 @@ function Course(_name, _fee, _lessons, _level, _stream)
     stream = _stream,
     feePerLesson = _fee / _lessons,
     uid = "course:" .. _name 
+  }
+end
+
+function Job(_name, _salary, _energy, _minLvl, _qualifications)
+  return {
+    name = _name,
+    salary = _salary,
+    energy = _energy,
+    minLvl = _minLvl,
+    qualifications = _qualifications,
+    uid = "job:" .. _name
   }
 end
 
@@ -210,6 +291,8 @@ function setUI(name)
     ui.addTextArea(4, "<a href='event:shop'>Shop</a>", name, 740, 300, 36, 20, nil, nil, 1, true)
     --school button
     ui.addTextArea(5, "<a href='event:courses'>Learn</a>", name, 740, 270, 36, 20, nil, nil, 1, true)
+    --jobs button
+    ui.addTextArea(6, "<a href='event:jobs'>Jobs</a>", name, 740, 240, 36, 20, nil, nil, 1, true)
 end
 
 --event handling
@@ -239,15 +322,24 @@ function eventTextAreaCallback(id, name, evt)
         else 
           players[name]:learn()
         end
+    elseif evt == "jobs" then
+        displayJobs(name)
     elseif evt == "close" then
         ui.removeTextArea(id, name)
-    elseif string.sub(evt, 1, 6) == "health" and players[name]:getMoney() - healthPacks[string.sub(evt, 8)].price >= 0 then
-        local pack = healthPacks[string.sub(evt, 8)]
-        players[name]:useMed(pack)
-        players[name]:setMoney(-pack.price, true)
-    elseif string.sub(evt, 1, 6) == "course" then
-        players[name]:setCourse(courses[string.sub(evt, 8)])
-        ui.removeTextArea(id, name)    
+    elseif evt:gmatch("%s+:%s+") then
+        local type = split(evt, ":")[1]
+        local val = split(evt, ":")[2]
+        if type == "health" and players[name]:getMoney() - find(val, healthPacks).price >= 0 then
+          local pack = find(val, healthPacks)
+          players[name]:useMed(pack)
+          players[name]:setMoney(-pack.price, true)
+        elseif type == "course" then
+          players[name]:setCourse(find(val, courses))
+          ui.removeTextArea(id, name)
+        elseif type == "job" then      
+          players[name]:setJob(val)
+          print(val)
+        end 
     end
 end
 
@@ -262,17 +354,26 @@ end
 --game logic
 
 --creating and storing HealthPack tables
-HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself")
-HealthPack("Cheese Pizza", 30, 0.05, true, "dsjfsdlkgjsdk")
+table.insert(healthPacks, HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself"))
+table.insert(healthPacks, HealthPack("Cheese Pizza", 30, 0.05, true, "dsjfsdlkgjsdk"))
 --creating and storing Course tables
-Course("School", 20, 2, 1, "")
-Course("Junior miner", 10, 4, 1, "")
-Course("High School", 500, 20, 2, "")
-Course("Cheese miner", 1000, 30, 3, "admin")
-Course("Cheese trader", 2500, 30, 3, "bs")
-Course("Cheese developer", 2500, 50, 3, "it")
-Course("Cheese trader-II", 90000, 75, 4, "bs")
-Course("Fullstack cheese developer", 10000, 70, 4, "it")
+table.insert(courses, Course("School", 20, 2, 1, ""))
+table.insert(courses, Course("Junior mining", 10, 4, 1, ""))
+table.insert(courses, Course("High School", 500, 20, 2, ""))
+table.insert(courses, Course("Cheese mining", 1000, 30, 3, "admin"))
+table.insert(courses, Course("Cheese trading", 2500, 30, 3, "bs"))
+table.insert(courses, Course("Cheese developing", 2500, 50, 3, "it"))
+table.insert(courses, Course("Cheese trading-II", 90000, 75, 4, "bs"))
+table.insert(courses, Course("Fullstack cheese developing", 10000, 70, 4, "it"))
+--creating and stofing Job tables
+table.insert(jobs, Job("Cheese collector", 10, 0.05, 1, nil))
+table.insert(jobs, Job("Junior miner", 25, 0.1, 3, nil))
+table.insert(jobs, Job("Cheese producer", 50, 0.15, 7, nil))
+table.insert(jobs, Job("Cheese miner", 250, 0.2, 10, "Cheese mining"))
+table.insert(jobs, Job("Cheese trader", 200, 0.2, 12, "Cheese trading"))
+table.insert(jobs, Job("Cheese developer", 300, 0.3, 12, "Cheese developing"))
+table.insert(jobs, Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II"))
+table.insert(jobs, Job("Fullstack cheeese developer", 1000, 0.4, 15, "Fullstack cheese developing"))
 
 for name, player in pairs(tfm.get.room.playerList) do
     players[name] = Player(name)
