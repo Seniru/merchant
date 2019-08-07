@@ -19,6 +19,7 @@ local players = {}
 local healthPacks = {}
 local courses = {}
 local jobs = {}
+local companies = {}
 local closeButton = "<p align='right'><font color='#ff0000' size='13'><b><a href='event:close'>X</a></b></font></p>"
 --creating the class Player
 
@@ -50,6 +51,7 @@ function Player.new(name)
     self.eduStream = ""
     self.degrees = {}
     self.job = "Cheese collector"
+    self.ownedCompanies = {}
     ui.addTextArea(self.healthBarId, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
     ui.addTextArea(self.xpBarId, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
     return self
@@ -67,6 +69,7 @@ function Player:getLearningProgress() return self.learnProgress end
 function Player:getEducationLevel() return self.eduLvl end
 function Player:getEducationStream() return self.eduStream end
 function Player:getDegrees() return self.degrees end
+function Player:getOwnedCompanies() return self.ownedCompanies end
 
 function Player:work()
     if self.health -0.05 > 0 then
@@ -129,6 +132,10 @@ function Player:setJob(job)
   end
 end
 
+function Player:addOwnedCompanies(comName)
+  table.insert(self.ownedCompanies, comName)
+end
+
 function Player:addDegree(course)
   table.insert(self.degrees, course)
 end
@@ -171,6 +178,37 @@ end
 
 --class creation(Player) ends
 
+--class creation(Company)
+local Company = {}
+Company.__index = Company
+Company.__tostring = function(self)
+    return "[name=" .. self.name .. ",owner=" .. self.owner .. "]"
+end
+
+setmetatable(Company, {
+    __call = function (cls, ...)
+        return cls.new(...)
+    end,
+})
+
+function Company.new(name, owner)
+    local self = setmetatable({}, Company)
+    self.name = name
+    self.owner = owner
+    self.members = {}
+    return self
+end
+
+function Company:getName() return self.name end
+function Company:getOwner() return self.owner end
+function Company:getMembers() return self.members end
+
+function Company:addMember(name)
+  table.insert(self.members, name)
+end
+
+--class creation(Company) ends
+
 --game functions
 
 function displayShop(target)
@@ -202,7 +240,21 @@ function displayJobs(target)
       jobTxt = jobTxt .. job.name .. " Salary: " .. job.salary .. " Energy: " .. (job.energy * 100) .. "% <a href='event:" .. job.uid .. "'>Choose</a><br>"
     end
   end
-  ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font><p><br><br>" .. jobTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+  ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font></p><br><br>" .. jobTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+end
+
+function displayCompanyDialog(target)
+  if #players[target]:getOwnedCompanies() == 0 then
+    ui.addPopup(400, 1, "<p align='center'>No owned companies<br>Do you want to own one?</p>", target, 300, 90, 200, true)
+  else
+    local companyTxt = ""
+    local p = players[target]
+    for k, v in ipairs(p:getOwnedCompanies()) do
+      local company = find(v, companies)
+      companyTxt = companyTxt .. "<b>" .. company:getName() .. "</b><br>Members: " .. (#company:getMembers() == 0 and "-" or string.sub(table.tostring(company:getMembers()), 2, -3))
+    end
+    ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)  
+  end
 end
 
 function calculateXP(lvl)
@@ -308,6 +360,8 @@ function setUI(name)
     ui.addTextArea(5, "<a href='event:courses'>Learn</a>", name, 740, 270, 36, 20, nil, nil, 1, true)
     --jobs button
     ui.addTextArea(6, "<a href='event:jobs'>Jobs</a>", name, 740, 240, 36, 20, nil, nil, 1, true)
+    --Company button
+    ui.addTextArea(7, "<a href='event:company'>Company</a>", name, 740, 210, 36, 20, nil, nil, 1, true)
 end
 
 --event handling
@@ -341,6 +395,8 @@ function eventTextAreaCallback(id, name, evt)
         displayJobs(name)
     elseif evt == "close" then
         ui.removeTextArea(id, name)
+    elseif evt == "company" then
+        displayCompanyDialog(name)
     elseif evt:gmatch("%s+:%s+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
@@ -356,6 +412,23 @@ function eventTextAreaCallback(id, name, evt)
           print(val)
         end 
     end
+end
+
+function eventPopupAnswer(id, name, answer)
+  print(id)
+  print(answer)
+  if id == 400 and answer == 'yes' then
+    if players[name]:getMoney() < 10 then
+      ui.addPopup(450, 0, "Not enough money!", name, 300, 90, 200, true)
+    else 
+      ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price = 10<br>Click submit to buy!</p>", name, 300, 90, 200, true)
+    end
+  elseif id == 450 and answer ~= '' then
+    table.insert(companies, Company(answer, name))
+    players[name]:setMoney(-10, true)
+    players[name]:addOwnedCompanies(answer)
+    print(table.tostring(players[name]:getOwnedCompanies()))
+  end
 end
 
 function eventLoop(t,r)
@@ -395,3 +468,4 @@ for name, player in pairs(tfm.get.room.playerList) do
 end
 
 setUI(nil)
+
