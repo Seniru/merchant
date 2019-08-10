@@ -4,6 +4,8 @@ tfm.exec.disableAutoTimeLeft(true)
 
 --game variables
 
+tips = {"<B><J><p align='center'>Tips!\nYou Need $10 To Start A New Company!\n\n\n\n\n\n\n« Page 1 <a href='event:page2'>»</a>", "Another tip for testing"}
+
 local CONSTANTS = {
     BAR_WIDTH = 735,
     BAR_X = 60,
@@ -76,12 +78,12 @@ function Player:getOwnedCompanies() return self.ownedCompanies end
 function Player:getBoss() return self.boss end
 
 function Player:work()
-    if self.health -0.05 > 0 then
+    if self.health - find(self.job, jobs).energy > 0 then
         local job = find(self.job, jobs)
         self.setHealth(self, -job.energy, true)
         self:setMoney(job.salary, true)
         self:setXP(1, true)
-        players[job.owner]:setMoney(job.salary * 0.2)
+        players[job.owner]:setMoney(job.salary * 0.2, true)
         self:levelUp()
     end
 end
@@ -272,7 +274,7 @@ function displayCompanyDialog(target)
       companyTxt = companyTxt .. "<b><a href='event:" .. company:getUID() .. "'>" .. company:getName() .. "</a></b><br>Members: " .. (#company:getMembers() == 0 and "-" or string.sub(table.tostring(company:getMembers()), 2, -3))
     end
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
-    ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", name, 500, 310, 100, 20, nil, nil, 1, true)
+    ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
 
   end
 end
@@ -291,12 +293,12 @@ end
 
 function displayJobWizard(target)
   ui.addTextArea(500, closeButton .. [[<p align='center'><font size='20'><b><J>Job Wizard</J></b></font></p><br><br>
-    <b>Job Name: </b><a href='event:selectJobName'>Select</a>
-    <b>Salary: </b><a href='event:selectJobSalary'>Select</a>
-    <b>Enery: </b><a href='event:selectJobEnergy'>Select</a>
-    <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>Select</a>
+    <b>Job Name: </b><a href='event:selectJobName'>]] ..  (tempData[target].jobName == nil and "Select" or tempData[target].jobName) .. [[</a>
+    <b>Salary: </b><a href='event:selectJobSalary'> ]] .. (tempData[target].jobSalary == nil and "Select" or tempData[target].jobSalary) .. [[</a>
+    <b>Enery: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy) .. [[</a>
+    <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == ni and "Select" or tempData[target].minLvl) .. [[</a>
     <b>Qualifcations: </b> Some degrees<br>
-  ]], name, 200, 90, 400, 200, nil, nil, 1, true)
+  ]], target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function calculateXP(lvl)
@@ -405,12 +407,16 @@ function setUI(name)
     ui.addTextArea(6, "<a href='event:jobs'>Jobs</a>", name, 740, 240, 36, 20, nil, nil, 1, true)
     --Company button
     ui.addTextArea(7, "<a href='event:company'>Company</a>", name, 740, 210, 36, 20, nil, nil, 1, true)
+    --Tips buton
+    ui.addTextArea(8, "<a href='event:tips'>Tips</a>", name, 740, 180, 36, 20, nil, nil, 1, true)
 end
 
 --event handling
 
 function eventNewPlayer(name)
     players[name] = Player(name)
+    tempData[name] = {}
+    print(table.tostring(tempData[name]))
     setUI(name)
 end
 
@@ -422,10 +428,15 @@ function eventPlayerLeft(name)
     end
 end
   
+  
 --function for the money clicker c:
 function eventTextAreaCallback(id, name, evt)
     if evt == "work" then
         players[name]:work()
+    elseif evt == "tips" then
+       ui.addTextArea(9, "<B><J><p align='center'>Tips!\nYou Need $10 To Start A New Company!\n\n\n\n\n\n\n« Page 1 <a href='event:page2'>»</a>", name, 6, 152, 121, 149, 0x324650, 0x000000, 1, true)
+    elseif string.sub(evt, 1, 4) == "page" then
+     ui.updateTextArea(9, tips[tonumber(string.sub(evt, 5))] or "") 
     elseif evt == "shop" then
         displayShop(name)
     elseif evt == "courses" then
@@ -442,7 +453,11 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "company" then
         displayCompanyDialog(name)
     elseif evt == "createJob" then
-        displayJobWizard(name)
+        if tempData[name].jobName == nil and tempData[name].jobSalary == nil and tempData[name].jobEnergy == nil and tempData[name].minLvl == nil then
+          displayJobWizard(name)
+        else
+          table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name))
+        end
     elseif evt == "selectJobName" then
         ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)  
     elseif evt == "selectJobSalary" then
@@ -473,18 +488,31 @@ end
 function eventPopupAnswer(id, name, answer)
   print(id)
   print(answer)
-  if id == 400 and answer == 'yes' then
+  if id == 400 and answer == 'yes' then --for the popup creating a compnay
     if players[name]:getMoney() < 10 then
       ui.addPopup(450, 0, "Not enough money!", name, 300, 90, 200, true)
     else 
       ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price = 10<br>Click submit to buy!</p>", name, 300, 90, 200, true)
     end
-  elseif id == 450 and answer ~= '' then
+  elseif id == 450 and answer ~= '' then --for the popup to submit a name for the company
     table.insert(companies, Company(answer, name))
     players[name]:setMoney(-10, true)
     players[name]:addOwnedCompanies(answer)
     print(table.tostring(players[name]:getOwnedCompanies()))
+  elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
+    tempData[name].jobName = answer
+    displayJobWizard(name)
+  elseif id == 602 and answer:gmatch("^%d+$") then --for the popup to choose the salary for a new job
+    tempData[name].jobSalary = tonumber(answer)
+    displayJobWizard(name)
+  elseif id == 603 and answer:gmatch("^$d+$") and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
+    tempData[name].jobEnergy = tonumber(answer)
+    displayJobWizard(name)
+  elseif id == 604 and answer:gmatch("^%d+$") then --for the popup to choose the minimum level for the job
+    tempData[name].minLvl = tonumber(answer)
+    displayJobWizard(name)
   end
+  print(table.tostring(tempData[name]))
 end
 
 function eventLoop(t,r)
@@ -524,4 +552,5 @@ players["shaman"] = Player("shaman")
 for name, player in pairs(tfm.get.room.playerList) do
     players[name] = Player(name)
     setUI(name)
+    tempData[name] = {}
 end
