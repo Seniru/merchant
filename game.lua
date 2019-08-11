@@ -57,6 +57,7 @@ function Player.new(name)
     self.job = "Cheese collector"
     self.ownedCompanies = {}
     self.boss = "shaman"
+    self.company = "Atelie801"
     ui.addTextArea(self.healthBarId, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
     ui.addTextArea(self.xpBarId, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
     return self
@@ -133,10 +134,13 @@ function Player:setJob(job)
   print(jobRef.qualifications == nil)
   print(table.indexOf(self.degrees, jobRef.qualifications))
   if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or table.indexOf(self.degrees, jobRef.qualifications) ~= nil) then
+    find(self.company, companies):removeMember(self.name)
     self.job = job
     self.boss = jobRef.owner
-    print(self.job.salary)
-  else print("No qualifications")
+    self.company = jobRef.company
+    find(self.company, companies):addMember(self.name)
+  else
+    print("No qualifications")
   end
 end
 
@@ -220,11 +224,21 @@ function Company:getJobs() return self.jobs end
 function Company:getUID() return self.uid end
 
 function Company:addMember(name)
-  table.insert(self.members, name)
+  local hasThisMember = false
+  for k, v in ipairs(self.members) do
+    if v == name then hasThisMember = true end
+  end
+  if not hasThisMember then
+    table.insert(self.members, name)
+  end
 end
 
-function Company:createJob()
-  --table.insert(jobs, Job( ,self.name))
+function Company:removeMember(name)
+  for k, v in ipairs(self.members) do
+      if v == name then
+        table.remove(self.members, k)
+      end
+  end
 end
 
 --class creation(Company) ends
@@ -274,20 +288,22 @@ function displayCompanyDialog(target)
       companyTxt = companyTxt .. "<b><a href='event:" .. company:getUID() .. "'>" .. company:getName() .. "</a></b><br>Members: " .. (#company:getMembers() == 0 and "-" or string.sub(table.tostring(company:getMembers()), 2, -3))
     end
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
-    ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
-
   end
 end
 
 function displayCompany(name, target)
   if find(name, companies) ~= nil then
     local com = find(name, companies)
+    tempData[target].jobCompany = name
+
     local companyTxt = ""
     local members = ""
     for k, v in ipairs(com:getMembers()) do
       members = members .. v .. "<br>"
     end
-    ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)   
+    
+    ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
   end
 end
 
@@ -299,6 +315,7 @@ function displayJobWizard(target)
     <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == ni and "Select" or tempData[target].minLvl) .. [[</a>
     <b>Qualifcations: </b> Some degrees<br>
   ]], target, 200, 90, 400, 200, nil, nil, 1, true)
+  
 end
 
 function calculateXP(lvl)
@@ -377,7 +394,7 @@ function Course(_name, _fee, _lessons, _level, _stream)
   }
 end
 
-function Job(_name, _salary, _energy, _minLvl, _qualifications, _owner)
+function Job(_name, _salary, _energy, _minLvl, _qualifications, _owner, _company)
   return {
     name = _name,
     salary = _salary,
@@ -385,6 +402,7 @@ function Job(_name, _salary, _energy, _minLvl, _qualifications, _owner)
     minLvl = _minLvl,
     qualifications = _qualifications,
     owner = _owner,
+    company = _company,
     uid = "job:" .. _name
   }
 end
@@ -456,7 +474,10 @@ function eventTextAreaCallback(id, name, evt)
         if tempData[name].jobName == nil and tempData[name].jobSalary == nil and tempData[name].jobEnergy == nil and tempData[name].minLvl == nil then
           displayJobWizard(name)
         else
-          table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name))
+          print("job company")
+          print(tempData[name].jobCompany)
+          table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany))
+          tempData[name] = {}
         end
     elseif evt == "selectJobName" then
         ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)  
@@ -478,7 +499,6 @@ function eventTextAreaCallback(id, name, evt)
           ui.removeTextArea(id, name)
         elseif type == "job" then      
           players[name]:setJob(val)
-          print(val)
         elseif type == "com" then
           displayCompany(val, name)
         end 
@@ -525,6 +545,8 @@ end
 
 --game logic
 
+players["shaman"] = Player("shaman")
+table.insert(companies, Company("Atelie801", "shaman"))
 --creating and storing HealthPack tables
 table.insert(healthPacks, HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself"))
 table.insert(healthPacks, HealthPack("Cheese Pizza", 30, 0.05, true, "dsjfsdlkgjsdk"))
@@ -538,16 +560,14 @@ table.insert(courses, Course("Cheese developing", 2500, 50, 3, "it"))
 table.insert(courses, Course("Cheese trading-II", 90000, 75, 4, "bs"))
 table.insert(courses, Course("Fullstack cheese developing", 10000, 70, 4, "it"))
 --creating and stofing Job tables
-table.insert(jobs, Job("Cheese collector", 10, 0.05, 1, nil, "shaman"))
-table.insert(jobs, Job("Junior miner", 25, 0.1, 3, nil, "shaman"))
-table.insert(jobs, Job("Cheese producer", 50, 0.15, 7, nil))
-table.insert(jobs, Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman"))
+table.insert(jobs, Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelie801"))
+table.insert(jobs, Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelie801"))
+table.insert(jobs, Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelie801"))
+table.insert(jobs, Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman", "Atelie801"))
 table.insert(jobs, Job("Cheese trader", 200, 0.2, 12, "Cheese trading", "shaman"))
-table.insert(jobs, Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman"))
-table.insert(jobs, Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman"))
-table.insert(jobs, Job("Fullstack cheeese developer", 1000, 0.4, 15, "Fullstack cheese developing", "shaman"))
-
-players["shaman"] = Player("shaman")
+table.insert(jobs, Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelie801"))
+table.insert(jobs, Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman", "Atelie801"))
+table.insert(jobs, Job("Fullstack cheeese developer", 1000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelie801"))
 
 for name, player in pairs(tfm.get.room.playerList) do
     players[name] = Player(name)
