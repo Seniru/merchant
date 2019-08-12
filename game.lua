@@ -4,7 +4,7 @@ tfm.exec.disableAutoTimeLeft(true)
 
 --game variables
 
-tips = {"<B><J><p align='center'>Tips!\nYou Need $10 To Start A New Company!\n\n\n\n\n\n\n« Page 1 <a href='event:page2'>»</a>", "Another tip for testing"}
+tips = {}
 
 local CONSTANTS = {
     BAR_WIDTH = 735,
@@ -335,6 +335,10 @@ function find(name, tbl)
   return nil
 end
 
+function createTip(tip, index)
+  tips[index] = "<p align='center'><J><b>Tips!</b></J><br><br>" .. tip .. "<br><br><br><br><br><br><a href='event:page" .. (index - 1) .. "'>«</a> Page " .. index .. " <a href='event:page".. (index + 1) .. "'>»</a>"
+end
+
 --[[copied from the internet. lazy to write it by myself :D
   Credits: walterlua (https://gist.github.com/walterlua/978150/2742d9479cd5bfb3d08d90cfcb014da94021e271)
            jakbyte
@@ -449,9 +453,12 @@ function eventTextAreaCallback(id, name, evt)
     if evt == "work" then
         players[name]:work()
     elseif evt == "tips" then
-       ui.addTextArea(9, "<B><J><p align='center'>Tips!\nYou Need $10 To Start A New Company!\n\n\n\n\n\n\n« Page 1 <a href='event:page2'>»</a>", name, 6, 152, 121, 149, 0x324650, 0x000000, 1, true)
+       ui.addTextArea(9, tips[1], name, 6, 152, 121, 149, 0x324650, 0x000000, 1, true)
     elseif string.sub(evt, 1, 4) == "page" then
-     ui.updateTextArea(9, tips[tonumber(string.sub(evt, 5))] or "") 
+        local tipId = tonumber(string.sub(evt, 5))
+        if not (tipId < 1 or tipId > #tips) then
+          ui.updateTextArea(9, tips[tipId] or "") 
+        end
     elseif evt == "shop" then
         displayShop(name)
     elseif evt == "courses" then
@@ -541,6 +548,9 @@ end
 --event handling ends
 
 --game logic
+--creating tips
+createTip("You Need $10 To Start A New Company!", 1)
+createTip("Another tip for testing", 2)
 
 players["shaman"] = Player("shaman")
 table.insert(companies, Company("Atelie801", "shaman"))
