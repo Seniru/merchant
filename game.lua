@@ -44,8 +44,6 @@ function Player.new(name)
     self.name = name
     self.money = 0
     self.health = 1.0
-    self.healthBarId = 1000 + #players
-    self.xpBarId = 2000 + #players
     self.healthRate = 0.002
     self.xp = 0
     self.level = 1
@@ -58,15 +56,14 @@ function Player.new(name)
     self.ownedCompanies = {}
     self.boss = "shaman"
     self.company = "Atelie801"
-    ui.addTextArea(self.healthBarId, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
-    ui.addTextArea(self.xpBarId, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
+    ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
+    ui.addTextArea(2000, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
     return self
 end
 
 function Player:getName() return self.name end
 function Player:getMoney() return self.money end
 function Player:getHealth() return self.health end
-function Player:getHealthBarId() return self.healthBarId end
 function Player:getHealthRate() return self.healthRate end
 function Player:getXP() return self.xp end
 function Player:getLevel() return self.level end
@@ -96,7 +93,7 @@ function Player:setHealth(val, add)
         self.health = val
     end
     self.health = self.health > 1  and 1 or self.health < 0 and 0 or self.health
-    ui.addTextArea(self.healthBarId, "", self.name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH * self.health, 20, 0xff0000, 0xee0000, 1, false)
+    ui.addTextArea(1000, "", self.name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH * self.health, 20, 0xff0000, 0xee0000, 1, false)
     ui.updateTextArea(2, "<p align='center'>" .. math.ceil(self.health * 100) .. "%</p>", self.name)
 end
 
@@ -116,7 +113,7 @@ function Player:setXP(val, add)
     else
         self.xp = val
     end
-    ui.addTextArea(self.xpBarId, "", self.name, CONSTANTS.BAR_X, 370, ((self.xp - calculateXP(self.level)) / (calculateXP(self.level + 1) - calculateXP(self.level)))  * CONSTANTS.BAR_WIDTH, 17, 0x00ff00, 0x00ee00, 1, false)
+    ui.addTextArea(2000, "", self.name, CONSTANTS.BAR_X, 370, ((self.xp - calculateXP(self.level)) / (calculateXP(self.level + 1) - calculateXP(self.level)))  * CONSTANTS.BAR_WIDTH, 17, 0x00ff00, 0x00ee00, 1, false)
     ui.updateTextArea(3, "<p align='center'>Level " .. self.level .. " - " ..self.xp .. "/" .. calculateXP(self.level + 1) .. "XP", self.name)
 end
 
