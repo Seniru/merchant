@@ -550,7 +550,7 @@ end
 --event handling ends
 
 --game logic
---creating tips
+--creating tips 
 createTip("You Need $10 To Start A New Company!", 1)
 createTip("You Gain Money From Your Workers!", 2)
 createTip("Look At The Stats of The Company Before You Apply for it!", 3)
