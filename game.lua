@@ -336,7 +336,7 @@ function find(name, tbl)
 end
 
 function createTip(tip, index)
-  tips[index] = "<p align='center'><J><b>Tips!</b></J><br><br>" .. tip .. "<br><br><br><br><br><br><a href='event:page" .. (index - 1) .. "'>«</a> Page " .. index .. " <a href='event:page".. (index + 1) .. "'>»</a>"
+  tips[index] = closeButton .. "<p align='center'><J><b>Tips!</b></J><br><br>" .. tip .. "<br><br><a href='event:page" .. (index - 1) .. "'>«</a> Page " .. index .. " <a href='event:page".. (index + 1) .. "'>»</a>"
 end
 
 --[[copied from the internet. lazy to write it by myself :D
@@ -482,6 +482,7 @@ function eventTextAreaCallback(id, name, evt)
           print(tempData[name].jobCompany)
           table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany))
           tempData[name] = {}
+          ui.removeTextArea(500, name)
         end
     elseif evt == "selectJobName" then
         ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)  
@@ -503,6 +504,7 @@ function eventTextAreaCallback(id, name, evt)
           ui.removeTextArea(id, name)
         elseif type == "job" then      
           players[name]:setJob(val)
+          ui.removeTextArea(id, name)
         elseif type == "com" then
           displayCompany(val, name)
         end 
@@ -550,7 +552,35 @@ end
 --game logic
 --creating tips
 createTip("You Need $10 To Start A New Company!", 1)
-createTip("Another tip for testing", 2)
+createTip("You Gain Money From Your Workers!", 2)
+createTip("Look At The Stats of The Company Before You Apply for it!", 3)
+createTip("The Better The Job The Better The Income!", 4)
+createTip("Buy Items From The Shop To Gain Health!", 5)
+createTip("Some Jobs Needs A Specific Degree", 6)
+createTip("To Level Up You Need To Work!", 7)
+createTip("The Higher The Level The Higher The Health", 8)
+createTip("The Stats Of A Company Can Be Seen By Anyone", 9)
+createTip("While Working Your Health Bar Goes Down", 10)
+createTip("Patience is The Key To This Game.", 11)
+createTip("Your Stats Can Be Seen At The Top Of The Map!", 12)
+createTip("You Can Buy Multiple Companies!", 13)
+createTip("Once You Have A Job You Can't Quit!", 14)
+createTip("Your Health will be Refreshed when You Level Up", 15)
+createTip("Recruit More Players to Have More Salary!", 16)
+createTip("Try your Best to Own a Company", 17)
+createTip("Make Sure You Consider About Energy and Salary When Choosing a Job", 18)
+createTip("The Red Bar Displays Your Health Percentage, While the Green Bar Displays your XP Percentage", 19)
+createTip("Chat With Your Friends When You Are Out of Health", 20)
+createTip("Use Your Brain and Take Correct Decisions!", 21)
+createTip("If Your Job Seems to Take More Energy, Try to Choose Another!", 22)
+createTip("Consider About Your Health When Working", 23)
+createTip("When Taking A Course, You will Need to Pay Per Lesson Only. So Try to Enroll For the One With Higher Lessons", 24)
+createTip("You Can Apply to Jobs According to Your Level and Degrees", 25)
+createTip("The Better Stats You Have The Better The Job You Can Have!", 26)
+createTip("Report Bugs To Developers", 27)
+createTip("The Game is More Fun with More Players", 28)
+createTip("Click Tips When You Need Help", 29)
+createTip("The Health Refreshes Every Moment <3", 30)
 
 players["shaman"] = Player("shaman")
 table.insert(companies, Company("Atelie801", "shaman"))
