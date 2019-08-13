@@ -186,7 +186,7 @@ function Player:useMed(med)
 end
 
 function Player:updateStatsBar()
-  ui.updateTextArea(1, self.name .. "<br>Money: $"  .. self.money .. " | Level " .. self.level, self.name)
+  ui.updateTextArea(1, self.name .. "<br>Money: $"  .. formatNumber(self.money) .. " | Level " .. self.level, self.name)
 end
 
 --class creation(Player) ends
@@ -309,10 +309,17 @@ function displayJobWizard(target)
     <b>Job Name: </b><a href='event:selectJobName'>]] ..  (tempData[target].jobName == nil and "Select" or tempData[target].jobName) .. [[</a>
     <b>Salary: </b><a href='event:selectJobSalary'> ]] .. (tempData[target].jobSalary == nil and "Select" or tempData[target].jobSalary) .. [[</a>
     <b>Enery: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy) .. [[</a>
-    <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == ni and "Select" or tempData[target].minLvl) .. [[</a>
-    <b>Qualifcations: </b> Some degrees<br>
-  ]], target, 200, 90, 400, 200, nil, nil, 1, true)
-  
+    <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == nil and "Select" or tempData[target].minLvl) .. [[</a>
+    <b>Qualifcations: </b><a href='event:chooseJobDegree'>]] .. (tempData[target].qualification == nil and "Select" or tempData[target].qualification) .. [[</a><br>
+  ]], target, 200, 90, 400, 200, nil, nil, 1, true) 
+end
+
+function displayAllDegrees(target)
+  local degreeTxt = ""
+  for k, v in ipairs(courses) do
+    degreeTxt = degreeTxt .. "<a href='event:degree:" .. v.name .. "'>" .. v.name .. "</a><br>"
+  end
+  ui.addTextArea(600, closeButton .. "<p align='center'><font size='20'><b><J>Choose a Degree</J></b></font></p>" .. degreeTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function calculateXP(lvl)
@@ -370,6 +377,19 @@ function table.tostring(tbl)
     s = s .. k .. ":" .. v .. ", "
   end
   return s .. "]"
+end
+
+function formatNumber(n)
+  if n >= 1000000000000 then
+    return math.floor(n / 100000000000) .. "T"
+  elseif n >= 1000000000 then
+    return math.floor(n / 100000000) .. "B"
+  elseif n >= 1000000 then
+    return math.floor(n / 100000) .. "M"
+  elseif n >= 10000 then
+    return math.floor(n / 1000) .. "K"
+  end
+  return n
 end
 
 function HealthPack(_name, _price, _regainVal, _adding, _desc)
@@ -479,19 +499,21 @@ function eventTextAreaCallback(id, name, evt)
           displayJobWizard(name)
         else
           print("job company")
-          print(tempData[name].jobCompany)
+          local tempCompany = tempData[name].jobCompany
           table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany))
-          tempData[name] = {}
+          tempData[name] = {jobCompany = tempCompany}
           ui.removeTextArea(500, name)
         end
     elseif evt == "selectJobName" then
         ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)  
     elseif evt == "selectJobSalary" then
-        ui.addPopup(602, 2, "<p align='center'>Please choose the salary (<i>Should be numbers!</i>)", name, 300, 90, 200, true)  
+        ui.addPopup(602, 2, "<p align='center'>Please choose the salary (<i>Should be a number lesser that 1000000</i>)", name, 300, 90, 200, true)  
     elseif evt == "selectJobEnergy" then
         ui.addPopup(603, 2, "<p align='center'>Please select the energy (<i>Should be a number in range 0 - 100</i>)", name, 300, 90, 200, true)  
     elseif evt == "chooseJobMinLvl" then
-        ui.addPopup(604, 2, "<p align='center'>Please select the minimum level (<i>Should be a number</i>", name, 300, 90, 200, true)  
+        ui.addPopup(604, 2, "<p align='center'>Please select the minimum level (<i>Should be a number</i>", name, 300, 90, 200, true)
+    elseif evt == "chooseJobDegree" then
+        displayAllDegrees(name)
     elseif evt:gmatch("%s+:%s+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
@@ -507,6 +529,9 @@ function eventTextAreaCallback(id, name, evt)
           ui.removeTextArea(id, name)
         elseif type == "com" then
           displayCompany(val, name)
+        elseif type == "degree" then
+          tempData[name].qualification = val
+          ui.removeTextArea(id, name)
         end 
     end
 end
@@ -528,7 +553,7 @@ function eventPopupAnswer(id, name, answer)
   elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
     tempData[name].jobName = answer
     displayJobWizard(name)
-  elseif id == 602 and answer:gmatch("^%d+$") then --for the popup to choose the salary for a new job
+  elseif id == 602 and answer:gmatch("^%d+$") and tonumber(answer) < 1000000 then --for the popup to choose the salary for a new job
     tempData[name].jobSalary = tonumber(answer)
     displayJobWizard(name)
   elseif id == 603 and answer:gmatch("^$d+$") and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
@@ -550,7 +575,7 @@ end
 --event handling ends
 
 --game logic
---creating tips 
+--creating tips
 createTip("You Need $10 To Start A New Company!", 1)
 createTip("You Gain Money From Your Workers!", 2)
 createTip("Look At The Stats of The Company Before You Apply for it!", 3)
