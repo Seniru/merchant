@@ -99,3 +99,7 @@ This class contains fields and different methods to create a new company,  creat
 | :getUID() | `string` | | Returns the Unique ID of the company |
 | :addMember(name) | `void` | name:`string` The name of the member which should be added | Adds a member to the company |
 | :removeMember(name) | `void` | name:`string` The name of the member which should be removed from the company | Removes a member from the company |
+
+### Game Variables
+
+### Methods
