@@ -86,3 +86,16 @@ This class contains fields and different methods to create a new company,  creat
  - Args
    - name: The name of the company
    - owner: The owner of the company.
+
+
+### Instance methods
+
+| Name | Return type | Parameters | Description |
+| --- | --- | --- | --- |
+| :getName() | `string` | | Returns the name of the company |
+| :getOwner() | `string` | | Returns the owner of the company |
+| :getMembers() | `table` | | Returns a table of strings which contain the names of the members |
+| :getJobs() | `table` | | Returns a table of strings which contain the jobs created by the company |
+| :getUID() | `string` | | Returns the Unique ID of the company |
+| :addMember(name) | `void` | name:`string` The name of the member which should be added | Adds a member to the company |
+| :removeMember(name) | `void` | name:`string` The name of the member which should be removed from the company | Removes a member from the company |
