@@ -4,8 +4,6 @@ tfm.exec.disableAutoTimeLeft(true)
 
 --game variables
 
-tips = {}
-
 local CONSTANTS = {
     BAR_WIDTH = 735,
     BAR_X = 60,
@@ -56,6 +54,7 @@ function Player.new(name)
     self.ownedCompanies = {}
     self.boss = "shaman"
     self.company = "Atelie801"
+    self.inventory = {}
     ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
     ui.addTextArea(2000, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
     return self
@@ -74,6 +73,7 @@ function Player:getEducationStream() return self.eduStream end
 function Player:getDegrees() return self.degrees end
 function Player:getOwnedCompanies() return self.ownedCompanies end
 function Player:getBoss() return self.boss end
+function Player:getInventory() return self.inventory end
 
 function Player:work()
     if self.health - find(self.job, jobs).energy > 0 then
@@ -189,6 +189,21 @@ function Player:updateStatsBar()
   ui.updateTextArea(1, self.name .. "<br>Money: $"  .. formatNumber(self.money) .. " | Level " .. self.level, self.name)
 end
 
+function Player:grabItem(item)
+  if self.inventory[item] == nil then
+    self.inventory[item] = 1
+  else 
+    self.inventory[item] = self.inventory[item] + 1
+  end
+end
+
+function Player:useItem(item)
+  self.inventory[item] = self.inventory[item] - 1
+  if self.inventory[item] < 1 then
+    self.inventory[item] = nil
+  end
+end
+
 --class creation(Player) ends
 
 --class creation(Company)
@@ -245,7 +260,7 @@ end
 function displayShop(target)
     local medicTxt = ""
     for id, medic in ipairs(healthPacks) do
-        medicTxt = medicTxt .. medic.name  .. " " .. medic.regainVal  .. " Price:" .. medic.price .. "<a href='event:" .. medic.uid .."'> Buy</a><br>"
+        medicTxt = medicTxt .. medic.name  .. " " .. medic.regainVal  .. " Price:" .. medic.price .. "<a href='event:buy:" .. medic.uid .."'> Buy</a><br>"
     end
     ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. medicTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
@@ -320,6 +335,14 @@ function displayAllDegrees(target)
     degreeTxt = degreeTxt .. "<a href='event:degree:" .. v.name .. "'>" .. v.name .. "</a><br>"
   end
   ui.addTextArea(600, closeButton .. "<p align='center'><font size='20'><b><J>Choose a Degree</J></b></font></p>" .. degreeTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+end
+
+function displayInventory(target)
+  local invTxt = ""
+  for k, v in pairs(players[target]:getInventory()) do
+    invTxt = invTxt .. k .. ": x" .. v .. " <a href='event:use:" .. k .."'>Use</a><br>"
+  end
+  ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p>" .. invTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function calculateXP(lvl)
@@ -448,6 +471,8 @@ function setUI(name)
     ui.addTextArea(7, "<a href='event:company'>Company</a>", name, 740, 210, 36, 20, nil, nil, 1, true)
     --Tips buton
     ui.addTextArea(8, "<a href='event:tips'>Tips</a>", name, 740, 180, 36, 20, nil, nil, 1, true)
+    --Inventory button
+    ui.addTextArea(9, "<a href='event:inv'>Inventory</a>", name, 740, 150, 36, 20, nil, nil, 1, true)
 end
 
 --event handling
@@ -489,6 +514,8 @@ function eventTextAreaCallback(id, name, evt)
         end
     elseif evt == "jobs" then
         displayJobs(name)
+    elseif evt == "inv" then
+      displayInventory(name)    
     elseif evt == "close" then
         ui.removeTextArea(id, name)
         if id == 400 then ui.removeTextArea(401, name) end
@@ -517,10 +544,12 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt:gmatch("%s+:%s+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
-        if type == "health" and players[name]:getMoney() - find(val, healthPacks).price >= 0 then
-          local pack = find(val, healthPacks)
-          players[name]:useMed(pack)
+        if type == "buy" and players[name]:getMoney() - find(split(evt, ":")[3], healthPacks).price >= 0 then
+          local pack = find(split(evt, ":")[3], healthPacks)
+          --players[name]:useMed(pack)
           players[name]:setMoney(-pack.price, true)
+          players[name]:grabItem(pack.name)
+          print((players[name]:getInventory()))
         elseif type == "course" then
           players[name]:setCourse(find(val, courses))
           ui.removeTextArea(id, name)
@@ -532,6 +561,10 @@ function eventTextAreaCallback(id, name, evt)
         elseif type == "degree" then
           tempData[name].qualification = val
           ui.removeTextArea(id, name)
+        elseif type == "use" then
+          players[name]:useItem(val)
+          players[name]:useMed(find(val, healthPacks))
+          displayInventory(name)
         end 
     end
 end
@@ -594,7 +627,7 @@ createTip("Your Health will be Refreshed when You Level Up", 15)
 createTip("Recruit More Players to Have More Salary!", 16)
 createTip("Try your Best to Own a Company", 17)
 createTip("Make Sure You Consider About Energy and Salary When Choosing a Job", 18)
-createTip("The Red Bar Displays Your Health Percentage, While the Green Bar Displays your XP Percentage", 19)
+createTip("The Red Bar Displays Your Health, While the Green Bar Displays your XP Percentage", 19)
 createTip("Chat With Your Friends When You Are Out of Health", 20)
 createTip("Use Your Brain and Take Correct Decisions!", 21)
 createTip("If Your Job Seems to Take More Energy, Try to Choose Another!", 22)
