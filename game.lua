@@ -1,10 +1,11 @@
 tfm.exec.disableAutoNewGame(true)
 tfm.exec.disableAutoShaman(true)
 tfm.exec.disableAutoTimeLeft(true)
-
+tfm.exec.newGame([[<C><P F="0" /><Z><S><S X="79" o="aac4d2" L="162" Y="199" c="4" H="343" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="169" o="6d9bb3" L="144" Y="240" c="4" H="285" P="0,0,0.3,0.2,-10,0,0,0" T="12" /><S X="400" o="a18600" L="797" Y="388" H="40" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="296" o="285b74" L="52" Y="248" c="4" H="240" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="367" o="b5d8ea" L="113" Y="219" c="4" H="300" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="528" o="3d657a" L="61" Y="278" c="4" H="182" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="653" o="a5c5d6" L="197" Y="196" c="4" H="345" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="485" o="dfb218" L="78" Y="335" c="4" H="69" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="435" o="5a4c06" L="75" Y="319" c="4" H="104" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="e67e7" L="12" Y="303" c="4" H="131" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="fa5f1" L="36" Y="239" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="337" o="b56c2" L="28" Y="295" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="324650" L="10" Y="197" H="22" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="b56c2" L="17" Y="192" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="e67e7" L="10" Y="170" c="4" H="38" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="721" o="7c99a7" L="111" Y="250" c="4" H="235" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="56" o="480312" L="10" Y="352" c="4" H="36" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="765" o="480312" L="10" Y="334" c="4" H="71" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="592" o="480312" L="10" Y="321" c="4" H="94" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="241" o="480312" L="10" Y="337" c="4" H="62" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="753" o="55111" L="26" Y="290" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="755" o="58419" L="10" Y="257" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="730" o="5be22" L="10" Y="298" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="560" o="83ae0b" L="20" Y="278" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="576" o="129226" L="10" Y="237" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="617" o="129226" L="29" Y="261" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="595" o="58419" L="35" Y="274" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="211" o="58419" L="15" Y="295" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="253" o="5be22" L="15" Y="330" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="234" o="58419" L="31" Y="314" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="54" o="5be22" L="20" Y="281" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="56" o="83ae0b" L="26" Y="308" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="79" o="5be22" L="10" Y="321" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="34" o="58419" L="20" Y="306" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="774" o="58419" L="28" Y="285" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /></S><D><DS X="431" Y="351" /></D><O /></Z></C>]])
 --game variables
 
 tips = {}
+opt = {"win" , "lose"}
 
 local CONSTANTS = {
     BAR_WIDTH = 735,
@@ -56,6 +57,7 @@ function Player.new(name)
     self.ownedCompanies = {}
     self.boss = "shaman"
     self.company = "Atelie801"
+    self.inventory = {}
     ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
     ui.addTextArea(2000, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
     return self
@@ -74,7 +76,14 @@ function Player:getEducationStream() return self.eduStream end
 function Player:getDegrees() return self.degrees end
 function Player:getOwnedCompanies() return self.ownedCompanies end
 function Player:getBoss() return self.boss end
+function Player:getInventory() return self.inventory end
+--function Player:gambleWin() return self.money end
+--function Player:gambleLose() return self.money end
 
+--[[function Player:gamble()
+    print(opt[math.random(1, #opt)])
+  end
+  --]]
 function Player:work()
     if self.health - find(self.job, jobs).energy > 0 then
         local job = find(self.job, jobs)
@@ -189,6 +198,21 @@ function Player:updateStatsBar()
   ui.updateTextArea(1, self.name .. "<br>Money: $"  .. formatNumber(self.money) .. " | Level " .. self.level, self.name)
 end
 
+function Player:grabItem(item)
+  if self.inventory[item] == nil then
+    self.inventory[item] = 1
+  else 
+    self.inventory[item] = self.inventory[item] + 1
+  end
+end
+
+function Player:useItem(item)
+  self.inventory[item] = self.inventory[item] - 1
+  if self.inventory[item] < 1 then
+    self.inventory[item] = nil
+  end
+end
+
 --class creation(Player) ends
 
 --class creation(Company)
@@ -245,7 +269,7 @@ end
 function displayShop(target)
     local medicTxt = ""
     for id, medic in ipairs(healthPacks) do
-        medicTxt = medicTxt .. medic.name  .. " " .. medic.regainVal  .. " Price:" .. medic.price .. "<a href='event:" .. medic.uid .."'> Buy</a><br>"
+        medicTxt = medicTxt .. medic.name  .. " " .. medic.regainVal  .. " Price:" .. medic.price .. "<a href='event:buy:" .. medic.uid .."'> Buy</a><br>"
     end
     ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. medicTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
@@ -320,6 +344,14 @@ function displayAllDegrees(target)
     degreeTxt = degreeTxt .. "<a href='event:degree:" .. v.name .. "'>" .. v.name .. "</a><br>"
   end
   ui.addTextArea(600, closeButton .. "<p align='center'><font size='20'><b><J>Choose a Degree</J></b></font></p>" .. degreeTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+end
+
+function displayInventory(target)
+  local invTxt = ""
+  for k, v in pairs(players[target]:getInventory()) do
+    invTxt = invTxt .. k .. ": x" .. v .. " <a href='event:use:" .. k .."'>Use</a><br>"
+  end
+  ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p>" .. invTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function calculateXP(lvl)
@@ -448,6 +480,8 @@ function setUI(name)
     ui.addTextArea(7, "<a href='event:company'>Company</a>", name, 740, 210, 36, 20, nil, nil, 1, true)
     --Tips buton
     ui.addTextArea(8, "<a href='event:tips'>Tips</a>", name, 740, 180, 36, 20, nil, nil, 1, true)
+    --Inventory button
+    ui.addTextArea(9, "<a href='event:inv'>Inventory</a>", name, 740, 150, 36, 20, nil, nil, 1, true)
 end
 
 --event handling
@@ -489,6 +523,8 @@ function eventTextAreaCallback(id, name, evt)
         end
     elseif evt == "jobs" then
         displayJobs(name)
+    elseif evt == "inv" then
+      displayInventory(name)    
     elseif evt == "close" then
         ui.removeTextArea(id, name)
         if id == 400 then ui.removeTextArea(401, name) end
@@ -517,10 +553,12 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt:gmatch("%s+:%s+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
-        if type == "health" and players[name]:getMoney() - find(val, healthPacks).price >= 0 then
-          local pack = find(val, healthPacks)
-          players[name]:useMed(pack)
+        if type == "buy" and players[name]:getMoney() - find(split(evt, ":")[3], healthPacks).price >= 0 then
+          local pack = find(split(evt, ":")[3], healthPacks)
+          --players[name]:useMed(pack)
           players[name]:setMoney(-pack.price, true)
+          players[name]:grabItem(pack.name)
+          print((players[name]:getInventory()))
         elseif type == "course" then
           players[name]:setCourse(find(val, courses))
           ui.removeTextArea(id, name)
@@ -532,6 +570,10 @@ function eventTextAreaCallback(id, name, evt)
         elseif type == "degree" then
           tempData[name].qualification = val
           ui.removeTextArea(id, name)
+        elseif type == "use" then
+          players[name]:useItem(val)
+          players[name]:useMed(find(val, healthPacks))
+          displayInventory(name)
         end 
     end
 end
@@ -594,7 +636,7 @@ createTip("Your Health will be Refreshed when You Level Up", 15)
 createTip("Recruit More Players to Have More Salary!", 16)
 createTip("Try your Best to Own a Company", 17)
 createTip("Make Sure You Consider About Energy and Salary When Choosing a Job", 18)
-createTip("The Red Bar Displays Your Health Percentage, While the Green Bar Displays your XP Percentage", 19)
+createTip("The Red Bar Displays Your Health, While the Green Bar Displays your XP Percentage", 19)
 createTip("Chat With Your Friends When You Are Out of Health", 20)
 createTip("Use Your Brain and Take Correct Decisions!", 21)
 createTip("If Your Job Seems to Take More Energy, Try to Choose Another!", 22)

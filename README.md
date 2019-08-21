@@ -1,5 +1,7 @@
 # TFM Clicker 
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ## Section 1: Introduction
 
 TFM clicker is a transformice module built with lua. This is a simple **clicker** which is based in a office/working environment.

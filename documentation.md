@@ -99,3 +99,42 @@ This class contains fields and different methods to create a new company,  creat
 | :getUID() | `string` | | Returns the Unique ID of the company |
 | :addMember(name) | `void` | name:`string` The name of the member which should be added | Adds a member to the company |
 | :removeMember(name) | `void` | name:`string` The name of the member which should be removed from the company | Removes a member from the company |
+
+### Other Fields
+
+| Name | Type | Value(s) | Description |
+| --- | --- | --- | --- |
+| CONSTANTS | `table` | `BAR_WIDTH`: 735<br> `BAR_X`: 60<br> `STAT_BAR_Y`: 30 | Defines a table of constants that are used oftenly in the srcipt |
+| players | `table` | | Holds `Player` objects |
+| healthPacks | `table` | | Holds `HealthPack` tables |
+| courses | `table` | | Holds `Course` tables |
+| jobs | `table` | | Holds `Job` tables |
+| companies | `table` | | Holds `Company` objects |
+| tempData | `table` | | Holds temporary data of players |
+| closeButton | `string` | `"<p align='right'><font color='#ff0000' size='13'><b><a href='event:close'>X</a></b></font></p>"` | String containing data for close buttons which can be used inside textareas to close them. |
+| 
+
+
+### Other Methods
+
+| Name | Return type | Parameters | Description |
+| --- | --- | --- | ---- |
+| displayShop(target) | `void` | target:`string` The player which the shop should be displayed | Displays the shop to the target |
+| displayCourses(target) | `void` | target:`string` The playre which the courses should be displayed | Displays the courses to the target |
+| displayJobs(target) | `void` | target:`string` The player which the jobs should be displayed | Displays the jobs to the target |
+| displayCompanyDialog(target) | `void` | target:`string` The player which the company dialog should be displayed | Displays the company dialog to the target |
+| displayCompany(name, target) | `void` |  name:`string` The name of the company <br> target:`string` The player which the company should be displayed | Displays the company to the target |
+| displayJobWizard(target) | `void` | target:`string` The name of the player which the job wizard should be displayed | Displays the job wizard to the player |
+| displayAllDegrees(target) | `void` | target:`string` The name of the player which the degrees whould be displayed | Displays all the degrees to the player. Purpose of this is to used in creating a new job |
+| calculateXP(lvl) | `number` | lvl:`integer` The level | Calculates and returns the XP corresponding to the given level |
+| displayParticles(target, particle) | `void` | target:`string` The target player <br> particle:`integer` The particle ID | Displays particle near the target |
+| find(name, tbl) | `object|nil` | name:`object` The object<br> tbl:`table` The table to be checked | Finds the given name in the given table and returns the object related to the name in it. Returns `nil` if not found |
+| createTip(tip, index) |  `void` | tip:`string` The tip <br> index:`integer` The index that the tip should occupy in the tips table | Create and stores a tip |
+| table.indexOf(t, object) | `integer` | t:`table`: The table to be searched <br>object:`object` The object | Returns the index of the object in the specified table |
+| split(s, delimeter) | `table` | s:`string` The input string<br> delimeter:`regex|string` The pattern which the string should be splitted | Splits the string according to the pattern |
+| table.tostring(tbl) | `string` | tbl:`table` The input table | Returns a key, value string version of the input table |
+| formatNumber(n) | `string` | n:`number` The input number | Formats and returns the number in more readable format |
+| HealthPack(\_name, \_price, \_regainVal, \_adding, \_desc) | `table` | \_name:`string` The name of the health pack<br>\_price:`integer` The price<br>\_regainVal:`number` The regain value<br>\_adding:`boolean` If `true` this pack will add health to the player. Otherwise it will set the health to the regain value<br> \_desc:`string` Description | Creates and returns a HealthPack table |
+| Course(\_name, \fee, \lessons, \level, \stream) | `table` | \_name:`string` The name of the course<br>\_fee:`integer` The fee of the course<br>\_lessons:`integer` Number of lessons<br>\_level:`integer` The education level corresponding to this course<br> \_stream:`string` The stream which the course follows | Creates and returns a Course table |
+| Job(\_name, \_salary, \_energy, \_minLvl, \_qualifications, \_owner, \_company) | `table` | \_name:`string` The name of the job<br>\_salary:`integer` The salary<br>\_energy:`number` Energy cost for the work<br>\_minLvl:`integer` Minimum level of a player to do the work<br> \_qualifications:`string` The qualification of the player to do this job <br>\_owner:`string` The player who renders the job<br>\_company:`string` The company which renders the job | Creates and returns a Job table |
+| setUI(name) | `void` | name:`string` The name of the player which the UI should be set | Sets the UI for the player |
