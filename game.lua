@@ -1,11 +1,11 @@
 tfm.exec.disableAutoNewGame(true)
 tfm.exec.disableAutoShaman(true)
 tfm.exec.disableAutoTimeLeft(true)
+tfm.exec.disableAfkDeath(true)
 tfm.exec.newGame([[<C><P F="0" /><Z><S><S X="79" o="aac4d2" L="162" Y="199" c="4" H="343" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="169" o="6d9bb3" L="144" Y="240" c="4" H="285" P="0,0,0.3,0.2,-10,0,0,0" T="12" /><S X="400" o="a18600" L="797" Y="388" H="40" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="296" o="285b74" L="52" Y="248" c="4" H="240" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="367" o="b5d8ea" L="113" Y="219" c="4" H="300" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="528" o="3d657a" L="61" Y="278" c="4" H="182" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="653" o="a5c5d6" L="197" Y="196" c="4" H="345" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="485" o="dfb218" L="78" Y="335" c="4" H="69" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="435" o="5a4c06" L="75" Y="319" c="4" H="104" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="e67e7" L="12" Y="303" c="4" H="131" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="fa5f1" L="36" Y="239" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="337" o="b56c2" L="28" Y="295" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="324650" L="10" Y="197" H="22" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="b56c2" L="17" Y="192" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="e67e7" L="10" Y="170" c="4" H="38" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="721" o="7c99a7" L="111" Y="250" c="4" H="235" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="56" o="480312" L="10" Y="352" c="4" H="36" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="765" o="480312" L="10" Y="334" c="4" H="71" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="592" o="480312" L="10" Y="321" c="4" H="94" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="241" o="480312" L="10" Y="337" c="4" H="62" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="753" o="55111" L="26" Y="290" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="755" o="58419" L="10" Y="257" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="730" o="5be22" L="10" Y="298" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="560" o="83ae0b" L="20" Y="278" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="576" o="129226" L="10" Y="237" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="617" o="129226" L="29" Y="261" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="595" o="58419" L="35" Y="274" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="211" o="58419" L="15" Y="295" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="253" o="5be22" L="15" Y="330" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="234" o="58419" L="31" Y="314" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="54" o="5be22" L="20" Y="281" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="56" o="83ae0b" L="26" Y="308" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="79" o="5be22" L="10" Y="321" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="34" o="58419" L="20" Y="306" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="774" o="58419" L="28" Y="285" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /></S><D><DS X="431" Y="351" /></D><O /></Z></C>]])
 --game variables
 
 tips = {}
-opt = {"win" , "lose"}
 
 local CONSTANTS = {
     BAR_WIDTH = 735,
@@ -77,13 +77,7 @@ function Player:getDegrees() return self.degrees end
 function Player:getOwnedCompanies() return self.ownedCompanies end
 function Player:getBoss() return self.boss end
 function Player:getInventory() return self.inventory end
---function Player:gambleWin() return self.money end
---function Player:gambleLose() return self.money end
 
---[[function Player:gamble()
-    print(opt[math.random(1, #opt)])
-  end
-  --]]
 function Player:work()
     if self.health - find(self.job, jobs).energy > 0 then
         local job = find(self.job, jobs)
@@ -354,6 +348,13 @@ function displayInventory(target)
   ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p>" .. invTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
+function displayTips(target)
+  ui.addTextArea(800, tips[1], target, 6, 150, 120, 150, 0x324650, 0x000000, 1, true)
+  ui.addTextArea(801, "«", target, 10, 315, 10, 15, nil, nil, 1, true)
+  ui.addTextArea(802, "Page 1", target, 35, 315, 50, 15, nil, nil, 1, true)
+  ui.addTextArea(803, "<p align='center'><a href='event:page2'>»</a></p>", target, 100, 315, 15, 15, nil, nil, 1, true)
+end
+
 function calculateXP(lvl)
     return 2.5 * (lvl + 2) * (lvl - 1)
 end
@@ -375,7 +376,7 @@ function find(name, tbl)
 end
 
 function createTip(tip, index)
-  tips[index] = closeButton .. "<p align='center'><J><b>Tips!</b></J><br><br>" .. tip .. "<br><br><a href='event:page" .. (index - 1) .. "'>«</a> Page " .. index .. " <a href='event:page".. (index + 1) .. "'>»</a>"
+  tips[index] = closeButton .. "<p align='center'><J><b>Tips!</b></J><br><br>" .. tip
 end
 
 --[[copied from the internet. lazy to write it by myself :D
@@ -507,11 +508,14 @@ function eventTextAreaCallback(id, name, evt)
     if evt == "work" then
         players[name]:work()
     elseif evt == "tips" then
-       ui.addTextArea(9, tips[1], name, 6, 152, 121, 149, 0x324650, 0x000000, 1, true)
+       displayTips(name)
     elseif string.sub(evt, 1, 4) == "page" then
         local tipId = tonumber(string.sub(evt, 5))
         if not (tipId < 1 or tipId > #tips) then
-          ui.updateTextArea(9, tips[tipId] or "") 
+          ui.updateTextArea(800, tips[tipId] or "", name)
+          ui.updateTextArea(801, "<a href='event:page" .. (tipId - 1) .. "'>«</a>", name)
+          ui.updateTextArea(802, "<p align='center'>Page " .. tipId .. "</p>", name)
+          ui.updateTextArea(803, "<a href='event:page" .. (tipId + 1) .. "'>»</a>", name)
         end
     elseif evt == "shop" then
         displayShop(name)
@@ -527,7 +531,13 @@ function eventTextAreaCallback(id, name, evt)
       displayInventory(name)    
     elseif evt == "close" then
         ui.removeTextArea(id, name)
-        if id == 400 then ui.removeTextArea(401, name) end
+        if id == 400 then 
+          ui.removeTextArea(401, name) 
+        elseif id == 800 then
+          ui.removeTextArea(801, name)
+          ui.removeTextArea(802, name)
+          ui.removeTextArea(803, name)
+        end
     elseif evt == "company" then
         displayCompanyDialog(name)
     elseif evt == "createJob" then
@@ -555,7 +565,6 @@ function eventTextAreaCallback(id, name, evt)
         local val = split(evt, ":")[2]
         if type == "buy" and players[name]:getMoney() - find(split(evt, ":")[3], healthPacks).price >= 0 then
           local pack = find(split(evt, ":")[3], healthPacks)
-          --players[name]:useMed(pack)
           players[name]:setMoney(-pack.price, true)
           players[name]:grabItem(pack.name)
           print((players[name]:getInventory()))
