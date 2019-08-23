@@ -199,9 +199,11 @@ function Player:grabItem(item)
 end
 
 function Player:useItem(item)
-  self.inventory[item] = self.inventory[item] - 1
-  if self.inventory[item] < 1 then
-    self.inventory[item] = nil
+  if self.inventory[item] ~= nil then
+    self.inventory[item] = self.inventory[item] - 1
+    if self.inventory[item] < 1 then
+      self.inventory[item] = nil
+    end
   end
 end
 
