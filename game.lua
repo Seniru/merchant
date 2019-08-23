@@ -14,9 +14,6 @@ local CONSTANTS = {
 
 }
 
-local celebrationEmotes = {
-  tfm.enum.emote.dane, tfm.enum.emote.clap, tfm.enum.emote.confetti, tfm.enum.emote.partyhorn, tfm.enum.emote.carnaval
-}
 
 local players = {}
 local healthPacks = {}
@@ -26,6 +23,7 @@ local companies = {}
 local tempData = {} --this table stores temporary data of players when they are creating a new job. Generally contains data in this order: tempPlayer = {jobName = 'MouseClick', jobSalary = 1000, jobEnergy = 0, minLvl = 100, qualification = "a pro"}
 
 local closeButton = "<p align='right'><font color='#ff0000' size='13'><b><a href='event:close'>X</a></b></font></p>"
+local nothing = "<br><br><br><br><p align='center'><b><R><font size='15'>Nothing to display!"
 --creating the class Player
 
 local Player = {}
@@ -260,12 +258,15 @@ end
 
 --game functions
 
-function displayShop(target)
+function displayShop(target, page)
     local medicTxt = ""
-    for id, medic in ipairs(healthPacks) do
-        medicTxt = medicTxt .. medic.name  .. " " .. medic.regainVal  .. " Price:" .. medic.price .. "<a href='event:buy:" .. medic.uid .."'> Buy</a><br>"
+    for id, medic in next, {healthPacks[((page - 1) * 2) + 1], healthPacks[page * 2]} do
+        medicTxt = medicTxt .. "<b><font size='13'>" .. medic.name  .. "</font></b><br><p align='right'><VP><a href='event:buy:" .. medic.uid .."'><b>| Buy |</b></a></VP></p>Price: " .. medic.price .. "  Energy: " .. (medic.regainVal * 100) .. "%<br>" .. medic.desc .. "<br><br>"    
     end
-    ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. medicTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. (medicTxt == "" and nothing or medicTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(101, "<p align='center'><a href='event:page:shop:" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
+    ui.addTextArea(102, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
+    ui.addTextArea(103, "<p align='center'><a href='event:page:shop:" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
 end
 
 function displayCourses(target)
@@ -276,7 +277,7 @@ function displayCourses(target)
       courseTxt = courseTxt .. course.name .. " Fee: " .. course.fee .. " Lessons: " .. course.lessons .. " <a href='event:" .. course.uid .. "'>Enroll</a>'<br>"
     end
   end
-  ui.addTextArea(200, closeButton .. "<p align='center'><font size='20'><b><J>Courses</J></b></font></p><br></br>" .. courseTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+  ui.addTextArea(200, closeButton .. "<p align='center'><font size='20'><b><J>Courses</J></b></font></p><br></br>" .. (courseTxt == "" and nothing or courseTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function displayJobs(target)
@@ -289,7 +290,7 @@ function displayJobs(target)
       jobTxt = jobTxt .. job.name .. " Salary: " .. job.salary .. " Energy: " .. (job.energy * 100) .. "% <a href='event:" .. job.uid .. "'>Choose</a><br>"
     end
   end
-  ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font></p><br><br>" .. jobTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+  ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font></p><br><br>" .. (jobTxt == "" and nothing or jobTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function displayCompanyDialog(target)
@@ -316,9 +317,12 @@ function displayCompany(name, target)
     for k, v in ipairs(com:getMembers()) do
       members = members .. v .. "<br>"
     end
-    
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
-    ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
+    if com:getOwner() == target then 
+      ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
+    end
+  else
+    ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
   end
 end
 
@@ -345,14 +349,14 @@ function displayInventory(target)
   for k, v in pairs(players[target]:getInventory()) do
     invTxt = invTxt .. k .. ": x" .. v .. " <a href='event:use:" .. k .."'>Use</a><br>"
   end
-  ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p>" .. invTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+  ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p>" .. (invTxt == "" and nothing or invTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function displayTips(target)
   ui.addTextArea(800, tips[1], target, 6, 150, 120, 150, 0x324650, 0x000000, 1, true)
   ui.addTextArea(801, "«", target, 10, 315, 10, 15, nil, nil, 1, true)
   ui.addTextArea(802, "Page 1", target, 35, 315, 50, 15, nil, nil, 1, true)
-  ui.addTextArea(803, "<p align='center'><a href='event:page2'>»</a></p>", target, 100, 315, 15, 15, nil, nil, 1, true)
+  ui.addTextArea(803, "<p align='center'><a href='event:page:tip:2'>»</a></p>", target, 100, 315, 15, 15, nil, nil, 1, true)
 end
 
 function calculateXP(lvl)
@@ -425,6 +429,29 @@ function formatNumber(n)
   return n
 end
 
+function getTotalPages(type)
+  if type == 'tip' then
+    return #tips
+  elseif type == 'shop' then
+    return #healthPacks / 2 + (#healthPacks % 2)
+  end
+  print("Error: cannot get pages")
+  return 0
+end
+
+function updatePages(name, type, page)
+  if not (page < 1 or page > getTotalPages(type)) then         
+      if type == 'tip' then
+        ui.updateTextArea(800, tips[page] or "", name)
+        ui.updateTextArea(801, "<a href='event:page:tip:" .. (page - 1) .. "'>«</a>", name)
+        ui.updateTextArea(802, "<p align='center'>Page " .. page .. "</p>", name)
+        ui.updateTextArea(803, "<a href='event:page:tip:" .. (page + 1) .. "'>»</a>", name)
+      elseif type == 'shop' then
+        displayShop(name, page)
+      end
+  end
+end
+
 function HealthPack(_name, _price, _regainVal, _adding, _desc)
   return {
     name = _name,
@@ -494,6 +521,7 @@ function eventNewPlayer(name)
     setUI(name)
 end
 
+--[[Function removed because it affects UX
 function eventPlayerLeft(name)
     for n, player in ipairs(players) do
         if player:getName() == name then
@@ -501,7 +529,11 @@ function eventPlayerLeft(name)
         end
     end
 end
-  
+]]
+
+function eventPlayerDied(name)
+  tfm.exec.respawnPlayer(name)
+end
   
 --function for the money clicker c:
 function eventTextAreaCallback(id, name, evt)
@@ -510,15 +542,10 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "tips" then
        displayTips(name)
     elseif string.sub(evt, 1, 4) == "page" then
-        local tipId = tonumber(string.sub(evt, 5))
-        if not (tipId < 1 or tipId > #tips) then
-          ui.updateTextArea(800, tips[tipId] or "", name)
-          ui.updateTextArea(801, "<a href='event:page" .. (tipId - 1) .. "'>«</a>", name)
-          ui.updateTextArea(802, "<p align='center'>Page " .. tipId .. "</p>", name)
-          ui.updateTextArea(803, "<a href='event:page" .. (tipId + 1) .. "'>»</a>", name)
-        end
+        local args = split(evt, ":")
+        updatePages(name, args[2], tonumber(args[3]))
     elseif evt == "shop" then
-        displayShop(name)
+        displayShop(name, 1)
     elseif evt == "courses" then
         if players[name]:getLearningCourse() == "" then
           displayCourses(name)
@@ -537,6 +564,10 @@ function eventTextAreaCallback(id, name, evt)
           ui.removeTextArea(801, name)
           ui.removeTextArea(802, name)
           ui.removeTextArea(803, name)
+        elseif id == 100 then
+          ui.removeTextArea(101, name)
+          ui.removeTextArea(102, name)
+          ui.removeTextArea(103, name)
         end
     elseif evt == "company" then
         displayCompanyDialog(name)
@@ -592,7 +623,7 @@ function eventPopupAnswer(id, name, answer)
   print(answer)
   if id == 400 and answer == 'yes' then --for the popup creating a compnay
     if players[name]:getMoney() < 10 then
-      ui.addPopup(450, 0, "Not enough money!", name, 300, 90, 200, true)
+      ui.addPopup(450, 0, "<p align='center'><b><font color='#CB546B'>Not enough money!", name, 300, 90, 200, true)
     else 
       ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price = 10<br>Click submit to buy!</p>", name, 300, 90, 200, true)
     end
@@ -615,6 +646,12 @@ function eventPopupAnswer(id, name, answer)
     displayJobWizard(name)
   end
   print(table.tostring(tempData[name]))
+end
+
+function eventChatCommand(name, msg)
+  if string.sub(msg, 1, 7) == "company" then
+    displayCompany(string.sub(msg, 9), name)
+  end
 end
 
 function eventLoop(t,r)
@@ -660,9 +697,23 @@ createTip("The Health Refreshes Every Moment <3", 30)
 
 players["shaman"] = Player("shaman")
 table.insert(companies, Company("Atelie801", "shaman"))
+
 --creating and storing HealthPack tables
 table.insert(healthPacks, HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself"))
-table.insert(healthPacks, HealthPack("Cheese Pizza", 30, 0.05, true, "dsjfsdlkgjsdk"))
+table.insert(healthPacks, HealthPack("Candy", 10, 0.02, true, "Halloween Treat!"))
+table.insert(healthPacks, HealthPack("Apple", 15, 0.025, true, "A nutritious diet from shaman"))
+table.insert(healthPacks, HealthPack("Pastry", 30, 0.06, true, "King's favourite food"))
+table.insert(healthPacks, HealthPack("Lasagne", 100, 0.1, true, "Shh!!! Beware of Garfield :D"))
+table.insert(healthPacks, HealthPack("Cheese Pizza", 130, 0.15, true, "Treat from Italy - with lots of cheeese inside !!!"))
+table.insert(healthPacks, HealthPack("Magician`s Portion", 250, 0.25, true, "Restores 1/4 th of your health."))
+table.insert(healthPacks, HealthPack("Rotten Cheese", 300, 0.35, true, "Gives you the power of vampire <font size='5'>(disclaimer)This won't make you a vampire</font>"))
+table.insert(healthPacks, HealthPack("Cheef`s food", 500, 0.5, true, "Restores half of your health (Powered by Shaman)"))
+table.insert(healthPacks, HealthPack("Cheese Pizza - Large", 550, 0.55, true, "More Pizza Power!"))
+table.insert(healthPacks, HealthPack("Vito`s Pizza", 700, 0.6, true, "World's best pizza!"))
+table.insert(healthPacks, HealthPack("Vito`s Lasagne", 750, 0.8, true, "World's best lasagne!"))
+table.insert(healthPacks, HealthPack("Ambulance!", 999, 0.05, false, "Restores your health back! (Powered by Shaman!)"))
+
+
 --creating and storing Course tables
 table.insert(courses, Course("School", 20, 2, 1, ""))
 table.insert(courses, Course("Junior mining", 10, 4, 1, ""))
@@ -686,4 +737,8 @@ for name, player in pairs(tfm.get.room.playerList) do
     players[name] = Player(name)
     setUI(name)
     tempData[name] = {}
+end
+
+for id, cmd in next, {"company", "p", "profile", "help"} do
+  system.disableChatCommandDisplay(cmd, true)
 end
