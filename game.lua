@@ -612,6 +612,7 @@ function eventTextAreaCallback(id, name, evt)
         elseif type == "degree" then
           tempData[name].qualification = val
           ui.removeTextArea(id, name)
+          displayJobWizard(name)
         elseif type == "use" then
           players[name]:useItem(val)
           players[name]:useMed(find(val, healthPacks))
@@ -637,13 +638,13 @@ function eventPopupAnswer(id, name, answer)
   elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
     tempData[name].jobName = answer
     displayJobWizard(name)
-  elseif id == 602 and answer:gmatch("^%d+$") and tonumber(answer) < 1000000 then --for the popup to choose the salary for a new job
+  elseif id == 602 and tonumber(answer) and tonumber(answer) < 1000000 then --for the popup to choose the salary for a new job
     tempData[name].jobSalary = tonumber(answer)
     displayJobWizard(name)
-  elseif id == 603 and answer:gmatch("^$d+$") and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
+  elseif id == 603 and tonumber(answer) and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
     tempData[name].jobEnergy = tonumber(answer)
     displayJobWizard(name)
-  elseif id == 604 and answer:gmatch("^%d+$") then --for the popup to choose the minimum level for the job
+  elseif id == 604 and tonumber(answer) then --for the popup to choose the minimum level for the job
     tempData[name].minLvl = tonumber(answer)
     displayJobWizard(name)
   end
