@@ -38,7 +38,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- prettier-ignore -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/Seniru"><img src="https://avatars2.githubusercontent.com/u/34127015?v=4" width="100px;" alt="Seniru Pasan Indira"/><br /><sub><b>Seniru Pasan Indira</b></sub></a><br /><a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Seniru"><img src="https://avatars2.githubusercontent.com/u/34127015?v=4" width="100px;" alt="Seniru Pasan Indira"/><br /><sub><b>Seniru Pasan Indira</b></sub></a><br /><a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Code">💻</a> <a href="#design-Seniru" title="Design">🎨</a> <a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Documentation">📖</a></td>
   </tr>
 </table>
 
