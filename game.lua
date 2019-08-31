@@ -276,23 +276,23 @@ function displayCourses(target)
   local p = players[target]
   for id, course in ipairs(courses) do
     if p:getEducationLevel() == course.level and (p:getEducationStream() == course.stream or p:getEducationStream() == "") and learning ~= "" then
-      courseTxt = courseTxt .. course.name .. " Fee: " .. course.fee .. " Lessons: " .. course.lessons .. " <a href='event:" .. course.uid .. "'>Enroll</a>'<br>"
+      courseTxt = courseTxt .. "<b><font size='13'>" .. course.name .. "</font></b><VP><a href='event:" .. course.uid .. "'><b> | Enroll |</b></a></VP><br><font size='10'>(Fee: " .. course.fee .. " Lessons: " .. course.lessons .. ")</font><br>"
     end
   end
   ui.addTextArea(200, closeButton .. "<p align='center'><font size='20'><b><J>Courses</J></b></font></p><br></br>" .. (courseTxt == "" and nothing or courseTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
-function displayJobs(target)
+function displayJobs(target, page)
   local jobTxt = ""
   local p = players[target]
-  for id, job in ipairs(jobs) do
-  print(table.tostring(p:getDegrees()))
-  print(job.qualifications)
-    if p:getLevel() >= job.minLvl and (job.qualifications == nil or table.indexOf(p:getDegrees(), job.qualifications) ~= nil) then
-      jobTxt = jobTxt .. job.name .. " Salary: " .. job.salary .. " Energy: " .. (job.energy * 100) .. "% <a href='event:" .. job.uid .. "'>Choose</a><br>"
-    end
+  local qJobs = getQualifiedJobs(target)
+  for id, job in next, {qJobs[((page - 1) * 2) + 1], qJobs[page * 2]} do
+      jobTxt = jobTxt .. "<b><font size='13'>" .. job.name .. "</font></b><br><p align='right'><b><VP><a href='event:" .. job.uid .. "'> | Choose | </a></VP></b></p>Salary: " .. job.salary .. " Energy: " .. (job.energy * 100) .. "%<br>Offered by <b>" .. job.owner .. "</b> of <b>" .. job.company .. "</b><br><br>"
   end
   ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font></p><br><br>" .. (jobTxt == "" and nothing or jobTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
+  ui.addTextArea(301, "<p align='center'><a href='event:page:jobs:" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
+  ui.addTextArea(302, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
+  ui.addTextArea(303, "<p align='center'><a href='event:page:jobs:" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
 end
 
 function displayCompanyDialog(target)
@@ -372,6 +372,17 @@ function displayParticles(target, particle)
   tfm.exec.displayParticle(particle, tfm.get.room.playerList[target].x + math.random(-15, 15) , tfm.get.room.playerList[target].y, 0, -1, 0, 0, nil)
 end
 
+function getQualifiedJobs(player)
+    local p = players[player]
+    local qjobs = {}
+    for id, job in ipairs(jobs) do
+        if p:getLevel() >= job.minLvl and (job.qualifications == nil or table.indexOf(p:getDegrees(), job.qualifications) ~= nil) then
+                table.insert(qjobs, job)
+        end
+    end
+    return qjobs
+end
+
 function find(name, tbl)
   for k,v in ipairs(tbl) do
     if (v.name == name) then
@@ -431,18 +442,20 @@ function formatNumber(n)
   return n
 end
 
-function getTotalPages(type)
+function getTotalPages(type, target)
   if type == 'tip' then
     return #tips
   elseif type == 'shop' then
     return #healthPacks / 2 + (#healthPacks % 2)
+  elseif type == 'jobs' then
+      return #getQualifiedJobs(target) / 2 + (#getQualifiedJobs(target) % 2)
   end
   print("Error: cannot get pages")
   return 0
 end
 
 function updatePages(name, type, page)
-  if not (page < 1 or page > getTotalPages(type)) then         
+  if not (page < 1 or page > getTotalPages(type, name)) then         
       if type == 'tip' then
         ui.updateTextArea(800, tips[page] or "", name)
         ui.updateTextArea(801, "<a href='event:page:tip:" .. (page - 1) .. "'>«</a>", name)
@@ -450,6 +463,8 @@ function updatePages(name, type, page)
         ui.updateTextArea(803, "<a href='event:page:tip:" .. (page + 1) .. "'>»</a>", name)
       elseif type == 'shop' then
         displayShop(name, page)
+      elseif type == 'jobs' then
+          displayJobs(name, page)
       end
   end
 end
@@ -555,7 +570,7 @@ function eventTextAreaCallback(id, name, evt)
           players[name]:learn()
         end
     elseif evt == "jobs" then
-        displayJobs(name)
+        displayJobs(name, 1)
     elseif evt == "inv" then
       displayInventory(name)    
     elseif evt == "close" then
@@ -570,6 +585,10 @@ function eventTextAreaCallback(id, name, evt)
           ui.removeTextArea(101, name)
           ui.removeTextArea(102, name)
           ui.removeTextArea(103, name)
+        elseif id == 300 then
+            ui.removeTextArea(301, name)
+            ui.removeTextArea(302, name)
+            ui.removeTextArea(303, name)
         end
     elseif evt == "company" then
         displayCompanyDialog(name)
@@ -714,12 +733,14 @@ table.insert(healthPacks, HealthPack("Cheef`s food", 500, 0.5, true, "Restores h
 table.insert(healthPacks, HealthPack("Cheese Pizza - Large", 550, 0.55, true, "More Pizza Power!"))
 table.insert(healthPacks, HealthPack("Vito`s Pizza", 700, 0.6, true, "World's best pizza!"))
 table.insert(healthPacks, HealthPack("Vito`s Lasagne", 750, 0.8, true, "World's best lasagne!"))
-table.insert(healthPacks, HealthPack("Ambulance!", 999, 0.05, false, "Restores your health back! (Powered by Shaman!)"))
+table.insert(healthPacks, HealthPack("Ambulance!", 999, 1, false, "Restores your health back! (Powered by Shaman!)"))
 
 
 --creating and storing Course tables
 table.insert(courses, Course("School", 20, 2, 1, ""))
 table.insert(courses, Course("Junior mining", 10, 4, 1, ""))
+table.insert(courses, Course("Test", 10, 4, 1, ""))
+table.insert(courses, Course("Test2", 10, 4, 1, ""))
 table.insert(courses, Course("High School", 500, 20, 2, ""))
 table.insert(courses, Course("Cheese mining", 1000, 30, 3, "admin"))
 table.insert(courses, Course("Cheese trading", 2500, 30, 3, "bs"))
