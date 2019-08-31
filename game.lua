@@ -349,9 +349,9 @@ end
 function displayInventory(target)
   local invTxt = ""
   for k, v in pairs(players[target]:getInventory()) do
-    invTxt = invTxt .. k .. ": x" .. v .. " <a href='event:use:" .. k .."'>Use</a><br>"
+    invTxt = invTxt .. "<b><font size='12'>".. k .. "</font><a href='event:use:" .. k .."'><VP> | Use x" .. v .. " |</VP> </a></b> : <font size='10'>(Energy: " .. (find(k, healthPacks).regainVal * 100) .. "%)</font><br>"
   end
-  ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p>" .. (invTxt == "" and nothing or invTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
+  ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p><br>" .. (invTxt == "" and nothing or invTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function displayTips(target)
