@@ -24,6 +24,8 @@ local tempData = {} --this table stores temporary data of players when they are 
 
 local closeButton = "<p align='right'><font color='#ff0000' size='13'><b><a href='event:close'>X</a></b></font></p>"
 local nothing = "<br><br><br><br><p align='center'><b><R><font size='15'>Nothing to display!"
+local cmds = "<p align='center'><B>Help</p>\n\n!p (player name) - Displays The Player's Stats\n!help - Displays This Tab\n!help - Displays This Menu\n!company (company name) - Displays The Company's Stats"
+local gameplay = "<p align='center'><B>Gameplay</p>\n\nWe suggest to make companies for more benefits"
 --creating the class Player
 
 local Player = {}
@@ -75,6 +77,7 @@ function Player:getDegrees() return self.degrees end
 function Player:getOwnedCompanies() return self.ownedCompanies end
 function Player:getBoss() return self.boss end
 function Player:getInventory() return self.inventory end
+function Player:getJob() return self.job end
 
 function Player:work()
     if self.health - find(self.job, jobs).energy > 0 then
@@ -361,6 +364,19 @@ function displayTips(target)
   ui.addTextArea(803, "<p align='center'><a href='event:page:tip:2'>»</a></p>", target, 100, 315, 15, 15, nil, nil, 1, true)
 end
 
+function displayProfile(name, target)
+  local p = players[name] or players[name .. "#0000"]
+  if p then
+    ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. p:getMoney() .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
+  end
+end
+
+function displayHelp(target, mode)
+  ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 125, 130, 75, 20, 0x324650, 0x000000, 1, true)
+  ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 125, 95, 75, 20, 0x324650, 0x000000, 1, true)
+  ui.addTextArea(952, closeButton .. (mode == "game" and gameplay or cmds), target, 200, 90, 400, 200, 0x324650, 0x000000, 1, true)
+end
+
 function calculateXP(lvl)
     return 2.5 * (lvl + 2) * (lvl - 1)
 end
@@ -536,6 +552,7 @@ function eventNewPlayer(name)
     tempData[name] = {}
     print(table.tostring(tempData[name]))
     setUI(name)
+    tfm.exec.respawnPlayer(name)
 end
 
 --[[Function removed because it affects UX
@@ -558,6 +575,10 @@ function eventTextAreaCallback(id, name, evt)
         players[name]:work()
     elseif evt == "tips" then
        displayTips(name)
+    elseif evt == "cmds" then
+        displayHelp(name, "cmds")
+    elseif evt == "game" then
+        displayHelp(name, "game")
     elseif string.sub(evt, 1, 4) == "page" then
         local args = split(evt, ":")
         updatePages(name, args[2], tonumber(args[3]))
@@ -589,6 +610,9 @@ function eventTextAreaCallback(id, name, evt)
             ui.removeTextArea(301, name)
             ui.removeTextArea(302, name)
             ui.removeTextArea(303, name)
+        elseif id == 952 then
+            ui.removeTextArea(950, name)
+            ui.removeTextArea(951, name)
         end
     elseif evt == "company" then
         displayCompanyDialog(name)
@@ -673,6 +697,12 @@ end
 function eventChatCommand(name, msg)
   if string.sub(msg, 1, 7) == "company" then
     displayCompany(string.sub(msg, 9), name)
+  elseif string.sub(msg, 1, 1) == "p"  then
+    displayProfile(string.sub(msg, 3), name)
+  elseif string.sub(msg, 1, 7) == "profile" then
+    displayProfile(string.sub(msg, 9), name)
+  elseif msg == "help" then
+    displayHelp(name, "game")
   end
 end
 
