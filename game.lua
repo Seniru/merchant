@@ -24,8 +24,20 @@ local tempData = {} --this table stores temporary data of players when they are 
 
 local closeButton = "<p align='right'><font color='#ff0000' size='13'><b><a href='event:close'>X</a></b></font></p>"
 local nothing = "<br><br><br><br><p align='center'><b><R><font size='15'>Nothing to display!"
-local cmds = "<p align='center'><B>Help</p>\n\n!p (player name) - Displays The Player's Stats\n!help - Displays This Tab\n!help - Displays This Menu\n!company (company name) - Displays The Company's Stats"
-local gameplay = "<p align='center'><B>Gameplay</p>\n\nWe suggest to make companies for more benefits"
+local cmds = [[
+  <p align='center'><font size='20'><b><J>Commands</J></b></font></p>
+  <b>!help:</b>  Displays this dialogue
+  <b>!company <i>[company name]:</i></b> Displays the specified compnay
+  <b>!p <i>[player name]</i> or !profile <i>[player name]</i></b> Displays information about the specified player
+]]
+local gameplay = [[
+    <p align='center'><font size='20'><b><J>Game Play</J></b></font></p>
+    TFM Clicker is a game <b>clicker</b> which is based on an office/working environment. Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!   
+    <b><u>Working:</u></b> You have to work to earn money. You just need to click the 'Work' button in the corner! When you work, it will result in reduction of your health. And also increase in your money. Different jobs have different salaries and energy costs!
+    <b><u>Shop:</u></b>  Shop is the place you can buy usesful stuff <font size='8'>(that you all know ^_^)</font>. Bought items are stored temporarily in the inventory. You can use them to increase your health when neaded.
+    <b><u>Learning:</u></b> Learning is the only way to get qualifications for some jobs. Higher educational qualifications would result in better jobs. 
+    <b><u>Companies:</u></b>  You can buy a company when you have enough money for it. You can use your company to create jobs and recruit workers. (And that will increase your profit more and more!!).  
+  ]]
 --creating the class Player
 
 local Player = {}
@@ -372,9 +384,9 @@ function displayProfile(name, target)
 end
 
 function displayHelp(target, mode)
-  ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 125, 130, 75, 20, 0x324650, 0x000000, 1, true)
-  ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 125, 95, 75, 20, 0x324650, 0x000000, 1, true)
-  ui.addTextArea(952, closeButton .. (mode == "game" and gameplay or cmds), target, 200, 90, 400, 200, 0x324650, 0x000000, 1, true)
+ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 130, 75, 20, 0x324650, 0x000000, 1, true)
+ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 95, 75, 20, 0x324650, 0x000000, 1, true)
+ui.addTextArea(952, closeButton .. (mode == "game" and gameplay or cmds), target, 100, 90, 600, 230, 0x324650, 0x000000, 1, true)
 end
 
 function calculateXP(lvl)
