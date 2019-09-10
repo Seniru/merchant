@@ -685,16 +685,16 @@ function eventPopupAnswer(id, name, answer)
   
   
   if id == 400 and answer == 'yes' then --for the popup creating a compnay
-    if players[name]:getMoney() < 10 then
+    if players[name]:getMoney() < 5000 then
       ui.addPopup(450, 0, "<p align='center'><b><font color='#CB546B'>Not enough money!", name, 300, 90, 200, true)
     else 
-      ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price = 10<br>Click submit to buy!</p>", name, 300, 90, 200, true)
+      ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price: $5000<br>Click submit to buy!</p>", name, 300, 90, 200, true)
     end
   elseif id == 450 and answer ~= '' then --for the popup to submit a name for the company
     table.insert(companies, Company(answer, name))
-    players[name]:setMoney(-10, true)
+    players[name]:setMoney(-5000, true)
     players[name]:addOwnedCompanies(answer)
-    
+    displayCompany(answer, name)
   elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
     tempData[name].jobName = answer
     displayJobWizard(name)
@@ -785,15 +785,14 @@ table.insert(healthPacks, HealthPack("Ambulance!", 999, 1, false, "Restores your
 
 --creating and storing Course tables
 table.insert(courses, Course("School", 20, 2, 1, ""))
-table.insert(courses, Course("Junior mining", 10, 4, 1, ""))
-table.insert(courses, Course("Test", 10, 4, 1, ""))
-table.insert(courses, Course("Test2", 10, 4, 1, ""))
-table.insert(courses, Course("High School", 500, 20, 2, ""))
-table.insert(courses, Course("Cheese mining", 1000, 30, 3, "admin"))
-table.insert(courses, Course("Cheese trading", 2500, 30, 3, "bs"))
-table.insert(courses, Course("Cheese developing", 2500, 50, 3, "it"))
-table.insert(courses, Course("Cheese trading-II", 90000, 75, 4, "bs"))
-table.insert(courses, Course("Fullstack cheese developing", 10000, 70, 4, "it"))
+table.insert(courses, Course("Junior Sports Club", 10, 4, 2, ""))
+table.insert(courses, Course("High School", 500, 20, 3, ""))
+table.insert(courses, Course("Cheese mining", 1000, 30, 4, "admin"))
+table.insert(courses, Course("Cheese trading", 2500, 30, 4, "bs"))
+table.insert(courses, Course("Cheese developing", 2500, 50, 4, "it"))
+table.insert(courses, Course("Law", 35000, 80, 5, "admin"))
+table.insert(courses, Course("Cheese trading-II", 90000, 75, 5, "bs"))
+table.insert(courses, Course("Fullstack cheese developing", 40000, 70, 5, "it"))
 --creating and stofing Job tables
 table.insert(jobs, Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelie801"))
 table.insert(jobs, Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelie801"))
@@ -802,7 +801,7 @@ table.insert(jobs, Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman", 
 table.insert(jobs, Job("Cheese trader", 200, 0.2, 12, "Cheese trading", "shaman"))
 table.insert(jobs, Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelie801"))
 table.insert(jobs, Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman", "Atelie801"))
-table.insert(jobs, Job("Fullstack cheeese developer", 1000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelie801"))
+table.insert(jobs, Job("Fullstack cheeese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelie801"))
 
 for name, player in pairs(tfm.get.room.playerList) do
     players[name] = Player(name)
