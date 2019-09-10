@@ -666,7 +666,7 @@ function eventTextAreaCallback(id, name, evt)
           ui.removeTextArea(id, name)
         elseif type == "job" then      
           players[name]:setJob(val)
-          ui.removeTextArea(id, name)
+          eventTextAreaCallback(id, name, "close")
         elseif type == "com" then
           displayCompany(val, name)
         elseif type == "degree" then
