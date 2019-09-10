@@ -143,9 +143,9 @@ end
 
 function Player:setJob(job)
   local jobRef = find(job, jobs)
-  print(jobRef.minLvl < self.level)
-  print(jobRef.qualifications == nil)
-  print(table.indexOf(self.degrees, jobRef.qualifications))
+  
+  
+  
   if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or table.indexOf(self.degrees, jobRef.qualifications) ~= nil) then
     find(self.company, companies):removeMember(self.name)
     self.job = job
@@ -153,7 +153,7 @@ function Player:setJob(job)
     self.company = jobRef.company
     find(self.company, companies):addMember(self.name)
   else
-    print("No qualifications")
+    
   end
 end
 
@@ -167,16 +167,16 @@ end
 
 function Player:learn()
   if learning == "" then
-    print("No course!")
+    
   else
-print(self.learning)
+
     if self.money > find(self.learning, courses).feePerLesson then
       self.learnProgress = self.learnProgress + 1
       ui.updateTextArea(3000, "Lessons left:" .. self.learnProgress .. "/" .. find(self.learning, courses).lessons, self.name)
       self:setMoney(-find(self.learning, courses).feePerLesson, true)
       if self.learnProgress >= find(self.learning, courses).lessons then
         self:addDegree(self.learning)
-        print("Graduated")
+        
         self.learning = ""
         self.eduLvl = self.eduLvl + 1
       end
@@ -189,7 +189,7 @@ function Player:levelUp()
         self.level = self.level + 1
         self:setHealth(1.0, false)
         self:setMoney(5 * self.level, true)
-        print("level up !" .. self.level .. " XP: " .. self.xp)
+        
         displayParticles(self.name, tfm.enum.particle.star)
     end
 end
@@ -202,7 +202,9 @@ function Player:useMed(med)
 end
 
 function Player:updateStatsBar()
-  ui.updateTextArea(1, self.name .. "<br>Money: $"  .. formatNumber(self.money) .. " | Level " .. self.level, self.name)
+  ui.updateTextArea(10, "<p align='right'>Money: $" .. self.money .." </p> ", self.name)
+  ui.updateTextArea(11, " Level: " .. self.level, self.name)
+  ui.updateTextArea(1, "<br><p align='center'><b>" .. self.name .. "</b></p>", self.name)
 end
 
 function Player:grabItem(item)
@@ -379,7 +381,7 @@ end
 function displayProfile(name, target)
   local p = players[name] or players[name .. "#0000"]
   if p then
-    ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. p:getMoney() .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
+    ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
   end
 end
 
@@ -478,7 +480,7 @@ function getTotalPages(type, target)
   elseif type == 'jobs' then
       return #getQualifiedJobs(target) / 2 + (#getQualifiedJobs(target) % 2)
   end
-  print("Error: cannot get pages")
+  
   return 0
 end
 
@@ -538,7 +540,10 @@ function setUI(name)
     --work
     ui.addTextArea(0, "<a href='event:work'><br><p align='center'><b>Work!</b></p>", name, 5, 340, 45, 50, 0x324650, 0x000000, 1, true)
     --stats
-    ui.addTextArea(1, name .. "<br>Money : $0 | Level 1", name, 6, CONSTANTS.STAT_BAR_Y, 785, 40, 0x324650, 0x000000, 1, true)
+    --ui.addTextArea(1, name .. "<br>Money : $0 | Level 1", name, 6, CONSTANTS.STAT_BAR_Y, 785, 40, 0x324650, 0x000000, 1, true)
+    ui.addTextArea(10, "<p align='right'>Money: $0 </p> ", name, 200, 25, 120, 20, nil, nil, 1, true)
+    ui.addTextArea(11, " Level: 1", name, 480, 25, 120, 20, nil, nil, 1, true)
+    ui.addTextArea(1, "<br><p align='center'><b>" .. name .. "</b></p>", name, 325, 20, 150, 30, nil, nil, 1, true )
     --health bar area
     ui.addTextArea(2, "<p align='center'>100%</p>", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, false)
     --xp bar area
@@ -562,7 +567,7 @@ end
 function eventNewPlayer(name)
     players[name] = Player(name)
     tempData[name] = {}
-    print(table.tostring(tempData[name]))
+    
     setUI(name)
     tfm.exec.respawnPlayer(name)
 end
@@ -632,7 +637,7 @@ function eventTextAreaCallback(id, name, evt)
         if tempData[name].jobName == nil and tempData[name].jobSalary == nil and tempData[name].jobEnergy == nil and tempData[name].minLvl == nil then
           displayJobWizard(name)
         else
-          print("job company")
+          
           local tempCompany = tempData[name].jobCompany
           table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany))
           tempData[name] = {jobCompany = tempCompany}
@@ -655,7 +660,7 @@ function eventTextAreaCallback(id, name, evt)
           local pack = find(split(evt, ":")[3], healthPacks)
           players[name]:setMoney(-pack.price, true)
           players[name]:grabItem(pack.name)
-          print((players[name]:getInventory()))
+          
         elseif type == "course" then
           players[name]:setCourse(find(val, courses))
           ui.removeTextArea(id, name)
@@ -677,8 +682,8 @@ function eventTextAreaCallback(id, name, evt)
 end
 
 function eventPopupAnswer(id, name, answer)
-  print(id)
-  print(answer)
+  
+  
   if id == 400 and answer == 'yes' then --for the popup creating a compnay
     if players[name]:getMoney() < 10 then
       ui.addPopup(450, 0, "<p align='center'><b><font color='#CB546B'>Not enough money!", name, 300, 90, 200, true)
@@ -689,7 +694,7 @@ function eventPopupAnswer(id, name, answer)
     table.insert(companies, Company(answer, name))
     players[name]:setMoney(-10, true)
     players[name]:addOwnedCompanies(answer)
-    print(table.tostring(players[name]:getOwnedCompanies()))
+    
   elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
     tempData[name].jobName = answer
     displayJobWizard(name)
@@ -703,16 +708,16 @@ function eventPopupAnswer(id, name, answer)
     tempData[name].minLvl = tonumber(answer)
     displayJobWizard(name)
   end
-  print(table.tostring(tempData[name]))
+  
 end
 
 function eventChatCommand(name, msg)
   if string.sub(msg, 1, 7) == "company" then
     displayCompany(string.sub(msg, 9), name)
-  elseif string.sub(msg, 1, 1) == "p"  then
-    displayProfile(string.sub(msg, 3), name)
   elseif string.sub(msg, 1, 7) == "profile" then
     displayProfile(string.sub(msg, 9), name)
+  elseif string.sub(msg, 1, 1) == "p"  then
+    displayProfile(string.sub(msg, 3), name)
   elseif msg == "help" then
     displayHelp(name, "game")
   end
