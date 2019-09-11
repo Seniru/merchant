@@ -1,20 +1,24 @@
-# TFM Clicker 
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+# TFM Clicker
 
-## Section 1: Introduction
+<p align='center'><img width=95% src='https://i.ibb.co/G2Jc9dP/Captu1re.png' alt='TFM Clicker'></p>
 
-TFM clicker is a transformice module built with lua. This is a simple **clicker** which is based in a office/working environment.
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+##  Introduction
+
+> Disclaimer: This game is still in beta stage! Contribute to make it more awesome
+
+TFM *(aka Transformice)* Clicker is a clicker game for transformice based on an office or a working environment. Your goal is to earn money, buy companies and recruit other players and be the best businessman in transformice!
 
 ### How to play?
 
-To run a lua script you must have atleast 1000 gathered cheese and the power to run scripts in your tribe house (and a tfm account of course!)
-If you haven't fulfilled the above requirments, ask somebody with the right powers 👍
+There are few requirements in order to run a lua script in your tribe house
+- Gathered Cheese: 1000
+- Permissions to run /np @code in tribe house
 
-**Step 1:** 
-type */lua* in the chat box and paste the script in it.
-**Step 2:**
-Submit the code to play the game. More information about the game can be found inside the game.
+If you already fulfilled these requirements, then run */lua* and enter [this](https://github.com/Seniru/TFM_Clicker/raw/master/game.lua) code in the box and submit it. More information about the game can be found by typing *!help* in the chat.
+
+*If  you don't have the above requirements then ask a member in your tribe to run this for you*
 
 ### Contributing
 
@@ -24,10 +28,10 @@ Here are few ways that you can add contributions
 - PR (with improvements or bug fixes)
 - Code reviews
 - Improving the documentation
-- **Creating maps for the game**
+- Suggestions
 
 **References for contributors**
- - https://github.com/Seniru/TFM_Clicker/blob/documentation/documentation.md
+ - [Documentation](https://github.com/Seniru/TFM_Clicker/blob/documentation/documentation.md)
 
 ## Contributors ✨
 
