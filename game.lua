@@ -68,7 +68,7 @@ function Player.new(name)
     self.job = "Cheese collector"
     self.ownedCompanies = {}
     self.boss = "shaman"
-    self.company = "Atelie801"
+    self.company = "Atelier801"
     self.inventory = {}
     ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
     ui.addTextArea(2000, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
@@ -138,7 +138,7 @@ function Player:setCourse(course)
   self.learnProgress = 0
   self.eduLvl = course.level
   self.eduStream = course.stream
-  ui.addTextArea(3000, "Lessons left: 0/" .. find(self.learning, courses).lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, false)
+  ui.addTextArea(3000, "Lessons left:\n0/" .. find(self.learning, courses).lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, false)
 end
 
 function Player:setJob(job)
@@ -172,7 +172,7 @@ function Player:learn()
 
     if self.money > find(self.learning, courses).feePerLesson then
       self.learnProgress = self.learnProgress + 1
-      ui.updateTextArea(3000, "Lessons left:" .. self.learnProgress .. "/" .. find(self.learning, courses).lessons, self.name)
+      ui.updateTextArea(3000, "Lessons left:\n" .. self.learnProgress .. "/" .. find(self.learning, courses).lessons, self.name)
       self:setMoney(-find(self.learning, courses).feePerLesson, true)
       if self.learnProgress >= find(self.learning, courses).lessons then
         self:addDegree(self.learning)
@@ -202,7 +202,7 @@ function Player:useMed(med)
 end
 
 function Player:updateStatsBar()
-  ui.updateTextArea(10, "<p align='right'>Money: $" .. float(self.money,1) .." </p> ", self.name)
+  ui.updateTextArea(10, "<p align='right'>Money: $" .. formatNumber(self.money) .." </p> ", self.name)
   ui.updateTextArea(11, " Level: " .. self.level, self.name)
   ui.updateTextArea(1, "<br><p align='center'><b>" .. self.name .. "</b></p>", self.name)
 end
@@ -379,9 +379,10 @@ function displayTips(target)
 end
 
 function displayProfile(name, target)
-  local p = players[upper(name)] or players[upper(name) .. "#0000"]
+  name = upper(name)
+  local p = players[name] or players[name .. "#0000"]
   if p then
-    ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(float(p:getMoney())) .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
+    ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
   end
 end
 
@@ -459,25 +460,26 @@ function table.tostring(tbl)
   return s .. "]"
 end
 
-function formatNumber(n)
-  if n >= 1000000000000 then
-    return math.floor(n / 100000000000) .. "T"
-  elseif n >= 1000000000 then
-    return math.floor(n / 100000000) .. "B"
-  elseif n >= 1000000 then
-    return math.floor(n / 100000) .. "M"
-  elseif n >= 10000 then
-    return math.floor(n / 1000) .. "K"
-  end
-  return n
-end
-
 function float(n, digits)
+	digits = digits or 1
 	return math.ceil(n * 10^digits) / 10^digits
 end
 
+function formatNumber(n)
+  if n >= 1000000000000 then
+    return float(math.floor(n / 100000000000),1) .. "T"
+  elseif n >= 1000000000 then
+    return float(math.floor(n / 100000000),1) .. "B"
+  elseif n >= 1000000 then
+    return float(math.floor(n / 100000),1) .. "M"
+  elseif n >= 10000 then
+    return float(math.floor(n / 1000),1) .. "K"
+  end
+  return float(n,1)
+end
+
 function upper(str)
-	return string.upper(string.sub(str,1,1)) .. string.sub(str,2,#str)
+	return string.upper(string.sub(str,1,1)) .. string.lower(string.sub(str,2))
 end
 
 function getTotalPages(type, target)
@@ -773,7 +775,7 @@ createTip("Click Tips When You Need Help", 29)
 createTip("The Health Refreshes Every Moment <3", 30)
 
 players["shaman"] = Player("shaman")
-table.insert(companies, Company("Atelie801", "shaman"))
+table.insert(companies, Company("Atelier801", "shaman"))
 
 --creating and storing HealthPack tables
 table.insert(healthPacks, HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself"))
@@ -802,14 +804,14 @@ table.insert(courses, Course("Law", 35000, 80, 5, "admin"))
 table.insert(courses, Course("Cheese trading-II", 90000, 75, 5, "bs"))
 table.insert(courses, Course("Fullstack cheese developing", 40000, 70, 5, "it"))
 --creating and stofing Job tables
-table.insert(jobs, Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelie801"))
-table.insert(jobs, Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelie801"))
-table.insert(jobs, Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelie801"))
-table.insert(jobs, Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman", "Atelie801"))
+table.insert(jobs, Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelier801"))
+table.insert(jobs, Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801"))
+table.insert(jobs, Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelier801"))
+table.insert(jobs, Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman", "Atelier801"))
 table.insert(jobs, Job("Cheese trader", 200, 0.2, 12, "Cheese trading", "shaman"))
-table.insert(jobs, Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelie801"))
-table.insert(jobs, Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman", "Atelie801"))
-table.insert(jobs, Job("Fullstack cheeese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelie801"))
+table.insert(jobs, Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelier801"))
+table.insert(jobs, Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman", "Atelier801"))
+table.insert(jobs, Job("Fullstack cheeese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801"))
 
 for name, player in pairs(tfm.get.room.playerList) do
     players[name] = Player(name)
