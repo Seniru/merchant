@@ -202,7 +202,7 @@ function Player:useMed(med)
 end
 
 function Player:updateStatsBar()
-  ui.updateTextArea(10, "<p align='right'>Money: $" .. self.money .." </p> ", self.name)
+  ui.updateTextArea(10, "<p align='right'>Money: $" .. float(self.money,1) .." </p> ", self.name)
   ui.updateTextArea(11, " Level: " .. self.level, self.name)
   ui.updateTextArea(1, "<br><p align='center'><b>" .. self.name .. "</b></p>", self.name)
 end
@@ -379,9 +379,9 @@ function displayTips(target)
 end
 
 function displayProfile(name, target)
-  local p = players[name] or players[name .. "#0000"]
+  local p = players[upper(name)] or players[upper(name) .. "#0000"]
   if p then
-    ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
+    ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(float(p:getMoney())) .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
   end
 end
 
@@ -470,6 +470,14 @@ function formatNumber(n)
     return math.floor(n / 1000) .. "K"
   end
   return n
+end
+
+function float(n, digits)
+	return math.ceil(n * 10^digits) / 10^digits
+end
+
+function upper(str)
+	return string.upper(string.sub(str,1,1)) .. string.sub(str,2,#str)
 end
 
 function getTotalPages(type, target)
@@ -733,7 +741,7 @@ end
 
 --game logic
 --creating tips
-createTip("You Need $10 To Start A New Company!", 1)
+createTip("You Need $5000 To Start A New Company!", 1)
 createTip("You Gain Money From Your Workers!", 2)
 createTip("Look At The Stats of The Company Before You Apply for it!", 3)
 createTip("The Better The Job The Better The Income!", 4)
