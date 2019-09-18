@@ -2,7 +2,7 @@
 
 <p align='center'><img width=95% src='https://i.ibb.co/G2Jc9dP/Captu1re.png' alt='TFM Clicker'></p>
 
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ##  Introduction
 
@@ -43,6 +43,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/Seniru"><img src="https://avatars2.githubusercontent.com/u/34127015?v=4" width="100px;" alt="Seniru Pasan Indira"/><br /><sub><b>Seniru Pasan Indira</b></sub></a><br /><a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Code">💻</a> <a href="#design-Seniru" title="Design">🎨</a> <a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/Overjoy06-Creator"><img src="https://avatars3.githubusercontent.com/u/53297297?v=4" width="100px;" alt="Overjoy06"/><br /><sub><b>Overjoy06</b></sub></a><br /><a href="#ideas-Overjoy06-Creator" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/Seniru/TFM_Clicker/commits?author=Overjoy06-Creator" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/kaborja"><img src="https://avatars0.githubusercontent.com/u/36646591?v=4" width="100px;" alt="kaborja"/><br /><sub><b>kaborja</b></sub></a><br /><a href="https://github.com/Seniru/TFM_Clicker/commits?author=kaborja" title="Code">💻</a></td>
   </tr>
 </table>
 
