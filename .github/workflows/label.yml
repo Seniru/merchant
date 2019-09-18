@@ -11,4 +11,4 @@ jobs:
       uses: estrada9166/labeler@v1
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        CONFIG_PATH: ../labeler-config.yml
+        CONFIG_PATH: labeler-config.yml
