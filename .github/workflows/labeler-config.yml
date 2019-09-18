@@ -1,0 +1,20 @@
+onComment:
+  set:
+    - help wanted
+    - WIP
+
+onApproved:
+  remove:
+    - help wanted
+  set:
+    - First review
+    - Ready to merge
+
+onChangesRequested:
+  remove:
+    - bug
+    - invalid
+    - duplicate
+    - help wanted
+  set:
+    - Ready to merge
