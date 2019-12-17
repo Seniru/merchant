@@ -411,6 +411,10 @@ function calculateXP(lvl)
     return 2.5 * (lvl + 2) * (lvl - 1)
 end
 
+function getMaxSalary(comp)
+    return find(comp, companies):getCapital() * 0.1
+end
+
 function displayParticles(target, particle)
   tfm.exec.displayParticle(particle, tfm.get.room.playerList[target].x, tfm.get.room.playerList[target].y, 0, -2, 0, 0, nil)
   tfm.exec.displayParticle(particle, tfm.get.room.playerList[target].x - 10, tfm.get.room.playerList[target].y, 0, -3, 0, 0, nil)
@@ -671,7 +675,7 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "selectJobName" then
         ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)  
     elseif evt == "selectJobSalary" then
-        ui.addPopup(602, 2, "<p align='center'>Please choose the salary (<i>Should be a number lesser that 1000000</i>)", name, 300, 90, 200, true)  
+        ui.addPopup(602, 2, "<p align='center'>Please choose the salary (<i>Should be a number lesser than " .. getMaxSalary(tempData[name].jobCompany) .."</i>)", name, 300, 90, 200, true)  
     elseif evt == "selectJobEnergy" then
         ui.addPopup(603, 2, "<p align='center'>Please select the energy (<i>Should be a number in range 0 - 100</i>)", name, 300, 90, 200, true)  
     elseif evt == "chooseJobMinLvl" then
@@ -727,7 +731,7 @@ function eventPopupAnswer(id, name, answer)
   elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
     tempData[name].jobName = answer
     displayJobWizard(name)
-  elseif id == 602 and tonumber(answer) and tonumber(answer) < 1000000 then --for the popup to choose the salary for a new job
+  elseif id == 602 and tonumber(answer) and tonumber(answer) < getMaxSalary(tempData[name].jobCompany) then --for the popup to choose the salary for a new job
     tempData[name].jobSalary = tonumber(answer)
     displayJobWizard(name)
   elseif id == 603 and tonumber(answer) and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
