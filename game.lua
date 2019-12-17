@@ -95,7 +95,7 @@ function Player:work()
     if self.health - find(self.job, jobs).energy > 0 then
         local job = find(self.job, jobs)
         self.setHealth(self, -job.energy, true)
-        self:setMoney(job.salary, true)
+        self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
         players[job.owner]:setMoney(job.salary * 0.2, true)
         self:levelUp()
