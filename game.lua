@@ -55,7 +55,7 @@ setmetatable(Player, {
 function Player.new(name)
     local self = setmetatable({}, Player)
     self.name = name
-    self.money = 0
+    self.money = name == 'King_seniru#5890' and 100000 or 0
     self.health = 1.0
     self.healthRate = 0.002
     self.xp = 0
@@ -161,6 +161,15 @@ function Player:addOwnedCompanies(comName)
   table.insert(self.ownedCompanies, comName)
 end
 
+function Player:investTo(comName, amount)
+    if self.money < amount then
+        tfm.exec.chatMessage('Not Enough money!')
+    else
+        find(comName, companies):addCapital(amount)
+        self:setMoney(-amount, true)
+    end
+end
+
 function Player:addDegree(course)
   table.insert(self.degrees, course)
 end
@@ -243,6 +252,7 @@ function Company.new(name, owner)
     local self = setmetatable({}, Company)
     self.name = name
     self.owner = owner
+    self.capital = 5000
     self.members = {}
     self.jobs = {}
     self.uid = "com:" .. name
@@ -254,6 +264,7 @@ function Company:getOwner() return self.owner end
 function Company:getMembers() return self.members end
 function Company:getJobs() return self.jobs end
 function Company:getUID() return self.uid end
+function Company:getCapital() return self.capital end
 
 function Company:addMember(name)
   local hasThisMember = false
@@ -271,6 +282,10 @@ function Company:removeMember(name)
         table.remove(self.members, k)
       end
   end
+end
+
+function Company:addCapital(amount)
+    self.capital = self.capital + amount
 end
 
 --class creation(Company) ends
@@ -336,7 +351,7 @@ function displayCompany(name, target)
     for k, v in ipairs(com:getMembers()) do
       members = members .. v .. "<br>"
     end
-    ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<a href='event:invest:" .. com:getName() .. "'> | Invest! | </a><br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
     if com:getOwner() == target then 
       ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
     end
@@ -687,6 +702,10 @@ function eventTextAreaCallback(id, name, evt)
           players[name]:useItem(val)
           players[name]:useMed(find(val, healthPacks))
           displayInventory(name)
+        elseif type == "invest" then
+            ui.addPopup(700, 2, "Please enter the amount to invest. (Should be a valid number)", name, 300, 90, 200, true)
+            tempData[name].investing = val
+            print(tempData[name].investing)
         end 
     end
 end
@@ -717,6 +736,9 @@ function eventPopupAnswer(id, name, answer)
   elseif id == 604 and tonumber(answer) then --for the popup to choose the minimum level for the job
     tempData[name].minLvl = tonumber(answer)
     displayJobWizard(name)
+  elseif id == 700 and tonumber(answer) then --for the investment popups
+    print(tempData[name].investing)
+    players[name]:investTo(tempData[name].investing, tonumber(answer))
   end
   
 end
