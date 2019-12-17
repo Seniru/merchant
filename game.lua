@@ -351,9 +351,11 @@ function displayCompany(name, target)
     for k, v in ipairs(com:getMembers()) do
       members = members .. v .. "<br>"
     end
-    ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<a href='event:invest:" .. com:getName() .. "'> | Invest! | </a><br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
     if com:getOwner() == target then 
       ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
+      --TODO: Make this button visible to all and give them dividends according to their investments
+      ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
     end
   else
     ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
@@ -643,7 +645,8 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "close" then
         ui.removeTextArea(id, name)
         if id == 400 then 
-          ui.removeTextArea(401, name) 
+          ui.removeTextArea(401, name)
+          ui.removeTextArea(402, name)
         elseif id == 800 then
           ui.removeTextArea(801, name)
           ui.removeTextArea(802, name)
