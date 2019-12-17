@@ -32,11 +32,11 @@ local cmds = [[
 ]]
 local gameplay = [[
     <p align='center'><font size='20'><b><J>Game Play</J></b></font></p>
-    TFM Clicker is a game <b>clicker</b> which is based on an office/working environment. Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!   
+    TFM Clicker is a game <b>clicker</b> which is based on an office/working environment. Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
     <b><u>Working:</u></b> You have to work to earn money. You just need to click the 'Work' button in the corner! When you work, it will result in reduction of your health. And also increase in your money. Different jobs have different salaries and energy costs!
     <b><u>Shop:</u></b>  Shop is the place you can buy usesful stuff <font size='8'>(that you all know ^_^)</font>. Bought items are stored temporarily in the inventory. You can use them to increase your health when neaded.
-    <b><u>Learning:</u></b> Learning is the only way to get qualifications for some jobs. Higher educational qualifications would result in better jobs. 
-    <b><u>Companies:</u></b>  You can buy a company when you have enough money for it. You can use your company to create jobs and recruit workers. (And that will increase your profit more and more!!).  
+    <b><u>Learning:</u></b> Learning is the only way to get qualifications for some jobs. Higher educational qualifications would result in better jobs.
+    <b><u>Companies:</u></b>  You can buy a company when you have enough money for it. You can use your company to create jobs and recruit workers. (And that will increase your profit more and more!!).
   ]]
 --creating the class Player
 
@@ -55,7 +55,7 @@ setmetatable(Player, {
 function Player.new(name)
     local self = setmetatable({}, Player)
     self.name = name
-    self.money = 0
+    self.money = name == 'King_seniru#5890' and 100000 or 0
     self.health = 1.0
     self.healthRate = 0.002
     self.xp = 0
@@ -95,7 +95,7 @@ function Player:work()
     if self.health - find(self.job, jobs).energy > 0 then
         local job = find(self.job, jobs)
         self.setHealth(self, -job.energy, true)
-        self:setMoney(job.salary, true)
+        self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
         players[job.owner]:setMoney(job.salary * 0.2, true)
         self:levelUp()
@@ -143,9 +143,9 @@ end
 
 function Player:setJob(job)
   local jobRef = find(job, jobs)
-  
-  
-  
+
+
+
   if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or table.indexOf(self.degrees, jobRef.qualifications) ~= nil) then
     find(self.company, companies):removeMember(self.name)
     self.job = job
@@ -153,12 +153,21 @@ function Player:setJob(job)
     self.company = jobRef.company
     find(self.company, companies):addMember(self.name)
   else
-    
+
   end
 end
 
 function Player:addOwnedCompanies(comName)
   table.insert(self.ownedCompanies, comName)
+end
+
+function Player:investTo(comName, amount)
+    if self.money < amount then
+        tfm.exec.chatMessage('Not Enough money!')
+    else
+        find(comName, companies):addCapital(amount)
+        self:setMoney(-amount, true)
+    end
 end
 
 function Player:addDegree(course)
@@ -167,7 +176,7 @@ end
 
 function Player:learn()
   if learning == "" then
-    
+
   else
 
     if self.money > find(self.learning, courses).feePerLesson then
@@ -176,7 +185,7 @@ function Player:learn()
       self:setMoney(-find(self.learning, courses).feePerLesson, true)
       if self.learnProgress >= find(self.learning, courses).lessons then
         self:addDegree(self.learning)
-        
+
         self.learning = ""
         self.eduLvl = self.eduLvl + 1
       end
@@ -189,7 +198,7 @@ function Player:levelUp()
         self.level = self.level + 1
         self:setHealth(1.0, false)
         self:setMoney(5 * self.level, true)
-        
+
         displayParticles(self.name, tfm.enum.particle.star)
     end
 end
@@ -210,7 +219,7 @@ end
 function Player:grabItem(item)
   if self.inventory[item] == nil then
     self.inventory[item] = 1
-  else 
+  else
     self.inventory[item] = self.inventory[item] + 1
   end
 end
@@ -243,6 +252,7 @@ function Company.new(name, owner)
     local self = setmetatable({}, Company)
     self.name = name
     self.owner = owner
+    self.capital = 5000
     self.members = {}
     self.jobs = {}
     self.uid = "com:" .. name
@@ -254,6 +264,7 @@ function Company:getOwner() return self.owner end
 function Company:getMembers() return self.members end
 function Company:getJobs() return self.jobs end
 function Company:getUID() return self.uid end
+function Company:getCapital() return self.capital end
 
 function Company:addMember(name)
   local hasThisMember = false
@@ -273,6 +284,10 @@ function Company:removeMember(name)
   end
 end
 
+function Company:addCapital(amount)
+    self.capital = self.capital + amount
+end
+
 --class creation(Company) ends
 
 --game functions
@@ -280,7 +295,7 @@ end
 function displayShop(target, page)
     local medicTxt = ""
     for id, medic in next, {healthPacks[((page - 1) * 2) + 1], healthPacks[page * 2]} do
-        medicTxt = medicTxt .. "<b><font size='13'>" .. medic.name  .. "</font></b><br><p align='right'><VP><a href='event:buy:" .. medic.uid .."'><b>| Buy |</b></a></VP></p>Price: " .. medic.price .. "  Energy: " .. (medic.regainVal * 100) .. "%<br>" .. medic.desc .. "<br><br>"    
+        medicTxt = medicTxt .. "<b><font size='13'>" .. medic.name  .. "</font></b><br><p align='right'><VP><a href='event:buy:" .. medic.uid .."'><b>| Buy |</b></a></VP></p>Price: " .. medic.price .. "  Energy: " .. (medic.regainVal * 100) .. "%<br>" .. medic.desc .. "<br><br>"
     end
     ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. (medicTxt == "" and nothing or medicTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
     ui.addTextArea(101, "<p align='center'><a href='event:page:shop:" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
@@ -339,6 +354,8 @@ function displayCompany(name, target)
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
     if com:getOwner() == target then 
       ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
+      --TODO: Make this button visible to all and give them dividends according to their investments
+      ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
     end
   else
     ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
@@ -352,7 +369,7 @@ function displayJobWizard(target)
     <b>Enery: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy) .. [[</a>
     <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == nil and "Select" or tempData[target].minLvl) .. [[</a>
     <b>Qualifcations: </b><a href='event:chooseJobDegree'>]] .. (tempData[target].qualification == nil and "Select" or tempData[target].qualification) .. [[</a><br>
-  ]], target, 200, 90, 400, 200, nil, nil, 1, true) 
+  ]], target, 200, 90, 400, 200, nil, nil, 1, true)
 end
 
 function displayAllDegrees(target)
@@ -394,6 +411,10 @@ end
 
 function calculateXP(lvl)
     return 2.5 * (lvl + 2) * (lvl - 1)
+end
+
+function getMaxSalary(comp)
+    return find(comp, companies):getCapital() * 0.1
 end
 
 function displayParticles(target, particle)
@@ -490,12 +511,12 @@ function getTotalPages(type, target)
   elseif type == 'jobs' then
       return #getQualifiedJobs(target) / 2 + (#getQualifiedJobs(target) % 2)
   end
-  
+
   return 0
 end
 
 function updatePages(name, type, page)
-  if not (page < 1 or page > getTotalPages(type, name)) then         
+  if not (page < 1 or page > getTotalPages(type, name)) then
       if type == 'tip' then
         ui.updateTextArea(800, tips[page] or "", name)
         ui.updateTextArea(801, "<a href='event:page:tip:" .. (page - 1) .. "'>«</a>", name)
@@ -528,7 +549,7 @@ function Course(_name, _fee, _lessons, _level, _stream)
     level = _level,
     stream = _stream,
     feePerLesson = _fee / _lessons,
-    uid = "course:" .. _name 
+    uid = "course:" .. _name
   }
 end
 
@@ -577,7 +598,7 @@ end
 function eventNewPlayer(name)
     players[name] = Player(name)
     tempData[name] = {}
-    
+
     setUI(name)
     tfm.exec.respawnPlayer(name)
 end
@@ -595,7 +616,7 @@ end
 function eventPlayerDied(name)
   tfm.exec.respawnPlayer(name)
 end
-  
+
 --function for the money clicker c:
 function eventTextAreaCallback(id, name, evt)
     if evt == "work" then
@@ -614,17 +635,18 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "courses" then
         if players[name]:getLearningCourse() == "" then
           displayCourses(name)
-        else 
+        else
           players[name]:learn()
         end
     elseif evt == "jobs" then
         displayJobs(name, 1)
     elseif evt == "inv" then
-      displayInventory(name)    
+      displayInventory(name)
     elseif evt == "close" then
         ui.removeTextArea(id, name)
         if id == 400 then 
-          ui.removeTextArea(401, name) 
+          ui.removeTextArea(401, name)
+          ui.removeTextArea(402, name)
         elseif id == 800 then
           ui.removeTextArea(801, name)
           ui.removeTextArea(802, name)
@@ -647,18 +669,18 @@ function eventTextAreaCallback(id, name, evt)
         if tempData[name].jobName == nil and tempData[name].jobSalary == nil and tempData[name].jobEnergy == nil and tempData[name].minLvl == nil then
           displayJobWizard(name)
         else
-          
+
           local tempCompany = tempData[name].jobCompany
           table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany))
           tempData[name] = {jobCompany = tempCompany}
           ui.removeTextArea(500, name)
         end
     elseif evt == "selectJobName" then
-        ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)  
+        ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)
     elseif evt == "selectJobSalary" then
-        ui.addPopup(602, 2, "<p align='center'>Please choose the salary (<i>Should be a number lesser that 1000000</i>)", name, 300, 90, 200, true)  
+        ui.addPopup(602, 2, "<p align='center'>Please choose the salary (<i>Should be a number lesser than " .. getMaxSalary(tempData[name].jobCompany) .."</i>)", name, 300, 90, 200, true)
     elseif evt == "selectJobEnergy" then
-        ui.addPopup(603, 2, "<p align='center'>Please select the energy (<i>Should be a number in range 0 - 100</i>)", name, 300, 90, 200, true)  
+        ui.addPopup(603, 2, "<p align='center'>Please select the energy (<i>Should be a number in range 0 - 100</i>)", name, 300, 90, 200, true)
     elseif evt == "chooseJobMinLvl" then
         ui.addPopup(604, 2, "<p align='center'>Please select the minimum level (<i>Should be a number</i>", name, 300, 90, 200, true)
     elseif evt == "chooseJobDegree" then
@@ -670,11 +692,11 @@ function eventTextAreaCallback(id, name, evt)
           local pack = find(split(evt, ":")[3], healthPacks)
           players[name]:setMoney(-pack.price, true)
           players[name]:grabItem(pack.name)
-          
+
         elseif type == "course" then
           players[name]:setCourse(find(val, courses))
           ui.removeTextArea(id, name)
-        elseif type == "job" then      
+        elseif type == "job" then
           players[name]:setJob(val)
           eventTextAreaCallback(id, name, "close")
         elseif type == "com" then
@@ -687,17 +709,21 @@ function eventTextAreaCallback(id, name, evt)
           players[name]:useItem(val)
           players[name]:useMed(find(val, healthPacks))
           displayInventory(name)
-        end 
+        elseif type == "invest" then
+            ui.addPopup(700, 2, "Please enter the amount to invest. (Should be a valid number)", name, 300, 90, 200, true)
+            tempData[name].investing = val
+            print(tempData[name].investing)
+        end
     end
 end
 
 function eventPopupAnswer(id, name, answer)
-  
-  
+
+
   if id == 400 and answer == 'yes' then --for the popup creating a compnay
     if players[name]:getMoney() < 5000 then
       ui.addPopup(450, 0, "<p align='center'><b><font color='#CB546B'>Not enough money!", name, 300, 90, 200, true)
-    else 
+    else
       ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price: $5000<br>Click submit to buy!</p>", name, 300, 90, 200, true)
     end
   elseif id == 450 and answer ~= '' then --for the popup to submit a name for the company
@@ -708,7 +734,7 @@ function eventPopupAnswer(id, name, answer)
   elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
     tempData[name].jobName = answer
     displayJobWizard(name)
-  elseif id == 602 and tonumber(answer) and tonumber(answer) < 1000000 then --for the popup to choose the salary for a new job
+  elseif id == 602 and tonumber(answer) and tonumber(answer) < getMaxSalary(tempData[name].jobCompany) then --for the popup to choose the salary for a new job
     tempData[name].jobSalary = tonumber(answer)
     displayJobWizard(name)
   elseif id == 603 and tonumber(answer) and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
@@ -717,8 +743,11 @@ function eventPopupAnswer(id, name, answer)
   elseif id == 604 and tonumber(answer) then --for the popup to choose the minimum level for the job
     tempData[name].minLvl = tonumber(answer)
     displayJobWizard(name)
+  elseif id == 700 and tonumber(answer) then --for the investment popups
+    print(tempData[name].investing)
+    players[name]:investTo(tempData[name].investing, tonumber(answer))
   end
-  
+
 end
 
 function eventChatCommand(name, msg)
