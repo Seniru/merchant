@@ -123,7 +123,10 @@ function Player:work()
         self.setHealth(self, -job.energy, true)
         self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
-        players[job.owner]:setMoney(job.salary * 0.2, true)
+        for name, shares in next, find(self.company, companies):getShareHolders() do
+            print(shares)
+            players[name]:setMoney(shares.shares * job.salary * 0.1, true)
+        end
         self:levelUp()
     end
 end
@@ -278,6 +281,7 @@ function Company.new(name, owner)
     local self = setmetatable({}, Company)
     self.name = name
     self.owner = owner
+    self.shareholders = {[owner]={capital=5000, shares=1.0}}
     self.capital = 5000
     self.members = {}
     self.jobs = {}
@@ -287,6 +291,7 @@ end
 
 function Company:getName() return self.name end
 function Company:getOwner() return self.owner end
+function Company:getShareHolders() return self.shareholders end
 function Company:getMembers() return self.members end
 function Company:getJobs() return self.jobs end
 function Company:getUID() return self.uid end
@@ -308,6 +313,16 @@ function Company:removeMember(name)
         table.remove(self.members, k)
       end
   end
+end
+
+function Company:addShareHolder(name, basicCapital)
+    if not self.shareholders[name] then
+        self.capital = self.capital + basicCapital
+        self.shareholders[name] = {capital=basicCapital, shares=basicCapital / capital}
+        for n, d in next, self.shareholders do
+            self.shareholders[name] = {capital=d.capital, shares=d.capital / self.capital}
+        end
+    end
 end
 
 function Company:addCapital(amount)
@@ -422,8 +437,8 @@ function displayTips(target)
 end
 
 function displayProfile(name, target)
-  name = upper(name)
-  local p = players[name] or players[name .. "#0000"]
+  local up = upper(name)
+  local p = players[name] or players[up] or players[up .. "#0000"]
   if p then
     ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
   end
