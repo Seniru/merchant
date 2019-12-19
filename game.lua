@@ -124,7 +124,7 @@ function Player:work()
         self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
         for name, shares in next, find(self.company, companies):getShareHolders() do
-            print(shares)
+            print(name .. ' ' .. shares.shares)
             players[name]:setMoney(shares.shares * job.salary * 0.1, true)
         end
         self:levelUp()
@@ -194,7 +194,7 @@ function Player:investTo(comName, amount)
     if self.money < amount then
         tfm.exec.chatMessage('Not Enough money!')
     else
-        find(comName, companies):addCapital(amount)
+        find(comName, companies):addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
     end
 end
@@ -315,13 +315,12 @@ function Company:removeMember(name)
   end
 end
 
-function Company:addShareHolder(name, basicCapital)
-    if not self.shareholders[name] then
-        self.capital = self.capital + basicCapital
-        self.shareholders[name] = {capital=basicCapital, shares=basicCapital / capital}
-        for n, d in next, self.shareholders do
-            self.shareholders[name] = {capital=d.capital, shares=d.capital / self.capital}
-        end
+function Company:addShareHolder(name, inCapital)
+    self.capital = self.capital + inCapital
+    local newCap = self.shareholders[name] == nil and inCapital or self.shareholders[name].capital + inCapital
+    self.shareholders[name] = {capital=newCap, shares=newCap/self.capital}
+    for n, d in next, self.shareholders do
+        self.shareholders[n] = {capital=d.capital, shares=d.capital/self.capital}
     end
 end
 
@@ -385,6 +384,7 @@ end
 function displayCompany(name, target)
   if find(name, companies) ~= nil then
     local com = find(name, companies)
+    local isOwner = false
     tempData[target].jobCompany = name
 
     local companyTxt = ""
@@ -393,11 +393,15 @@ function displayCompany(name, target)
       members = members .. v .. "<br>"
     end
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
-    if com:getOwner() == target then 
-      ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
-      --TODO: Make this button visible to all and give them dividends according to their investments
-      ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
+    
+    for n, _ in next, com:getShareHolders() do
+        if n == target then isOwner = true end
     end
+
+    if isOwner then 
+      ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
+    end
+    ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
   else
     ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
   end
@@ -758,7 +762,6 @@ function eventTextAreaCallback(id, name, evt)
         elseif type == "invest" then
             ui.addPopup(700, 2, "Please enter the amount to invest. (Should be a valid number)", name, 300, 90, 200, true)
             tempData[name].investing = val
-            print(tempData[name].investing)
         end
     end
 end
@@ -790,7 +793,6 @@ function eventPopupAnswer(id, name, answer)
     tempData[name].minLvl = tonumber(answer)
     displayJobWizard(name)
   elseif id == 700 and tonumber(answer) then --for the investment popups
-    print(tempData[name].investing)
     players[name]:investTo(tempData[name].investing, tonumber(answer))
   end
 
