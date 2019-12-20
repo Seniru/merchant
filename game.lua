@@ -93,7 +93,6 @@ function Player.new(name)
     self.degrees = {}
     self.job = "Cheese collector"
     self.ownedCompanies = {}
-    self.boss = "shaman"
     self.company = "Atelier801"
     self.inventory = {}
     ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
@@ -113,7 +112,6 @@ function Player:getEducationLevel() return self.eduLvl end
 function Player:getEducationStream() return self.eduStream end
 function Player:getDegrees() return self.degrees end
 function Player:getOwnedCompanies() return self.ownedCompanies end
-function Player:getBoss() return self.boss end
 function Player:getInventory() return self.inventory end
 function Player:getJob() return self.job end
 
@@ -173,12 +171,9 @@ end
 function Player:setJob(job)
   local jobRef = find(job, jobs)
 
-
-
   if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or table.indexOf(self.degrees, jobRef.qualifications) ~= nil) then
     find(self.company, companies):removeMember(self.name)
     self.job = job
-    self.boss = jobRef.owner
     self.company = jobRef.company
     find(self.company, companies):addMember(self.name)
   else
@@ -196,6 +191,7 @@ function Player:investTo(comName, amount)
     else
         find(comName, companies):addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
+        self:addOwnedCompanies(comName)
     end
 end
 
@@ -378,6 +374,7 @@ function displayCompanyDialog(target)
       companyTxt = companyTxt .. "<b><a href='event:" .. company:getUID() .. "'>" .. company:getName() .. "</a></b><br>Members: " .. (#company:getMembers() == 0 and "-" or string.sub(table.tostring(company:getMembers()), 2, -3))
     end
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(401, "<a href='event:createCompany'>New Company</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
   end
 end
 
@@ -393,7 +390,6 @@ function displayCompany(name, target)
       members = members .. v .. "<br>"
     end
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
-
     for n, _ in next, com:getShareHolders() do
         if n == target then isOwner = true end
     end
@@ -724,6 +720,8 @@ function eventTextAreaCallback(id, name, evt)
           tempData[name] = {jobCompany = tempCompany}
           ui.removeTextArea(500, name)
         end
+    elseif evt == "createCompany" then
+        ui.addPopup(400, 1, "<p align='center'>Do you want to own a new company</p>", name, 300, 90, 200, true)
     elseif evt == "selectJobName" then
         ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)
     elseif evt == "selectJobSalary" then
@@ -768,8 +766,6 @@ function eventTextAreaCallback(id, name, evt)
 end
 
 function eventPopupAnswer(id, name, answer)
-
-
   if id == 400 and answer == 'yes' then --for the popup creating a compnay
     if players[name]:getMoney() < 5000 then
       ui.addPopup(450, 0, "<p align='center'><b><font color='#CB546B'>Not enough money!", name, 300, 90, 200, true)
@@ -777,6 +773,10 @@ function eventPopupAnswer(id, name, answer)
       ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price: $5000<br>Click submit to buy!</p>", name, 300, 90, 200, true)
     end
   elseif id == 450 and answer ~= '' then --for the popup to submit a name for the company
+    if find(answer, companies) then
+        tfm.exec.chatMessage('Company already exists!')
+        return
+    end
     table.insert(companies, Company(answer, name))
     players[name]:setMoney(-5000, true)
     players[name]:addOwnedCompanies(answer)
