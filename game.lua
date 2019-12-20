@@ -752,7 +752,7 @@ function eventTextAreaCallback(id, name, evt)
           displayCompany(val, name)
         elseif type == "degree" then
           tempData[name].qualification = val
-          local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - find(val, courses).level * 2 
+          local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - find(val, courses).level * 2
           tempData[name].jobEnergy = e < 0 and 1 or e
           ui.removeTextArea(id, name)
           displayJobWizard(name)
