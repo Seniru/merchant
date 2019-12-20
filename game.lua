@@ -411,7 +411,7 @@ function displayJobWizard(target)
   ui.addTextArea(500, closeButton .. [[<p align='center'><font size='20'><b><J>Job Wizard</J></b></font></p><br><br>
     <b>Job Name: </b><a href='event:selectJobName'>]] ..  (tempData[target].jobName == nil and "Select" or tempData[target].jobName) .. [[</a>
     <b>Salary: </b><a href='event:selectJobSalary'> ]] .. (tempData[target].jobSalary == nil and "Select" or tempData[target].jobSalary) .. [[</a>
-    <b>Enery: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy) .. [[</a>
+    <b>Enery: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy .. "%") .. [[</a>
     <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == nil and "Select" or tempData[target].minLvl) .. [[</a>
     <b>Qualifcations: </b><a href='event:chooseJobDegree'>]] .. (tempData[target].qualification == nil and "Select" or tempData[target].qualification) .. [[</a><br>
   ]], target, 200, 90, 400, 200, nil, nil, 1, true)
@@ -716,10 +716,9 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "company" then
         displayCompanyDialog(name)
     elseif evt == "createJob" then
-        if tempData[name].jobName == nil and tempData[name].jobSalary == nil and tempData[name].jobEnergy == nil and tempData[name].minLvl == nil then
+        if tempData[name].jobName == nil or tempData[name].jobSalary == nil or tempData[name].jobEnergy == nil or tempData[name].minLvl == nil then
           displayJobWizard(name)
         else
-
           local tempCompany = tempData[name].jobCompany
           table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany))
           tempData[name] = {jobCompany = tempCompany}
@@ -753,6 +752,8 @@ function eventTextAreaCallback(id, name, evt)
           displayCompany(val, name)
         elseif type == "degree" then
           tempData[name].qualification = val
+          local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - find(val, courses).level * 2 
+          tempData[name].jobEnergy = e < 0 and 1 or e
           ui.removeTextArea(id, name)
           displayJobWizard(name)
         elseif type == "use" then
@@ -785,12 +786,16 @@ function eventPopupAnswer(id, name, answer)
     displayJobWizard(name)
   elseif id == 602 and tonumber(answer) and tonumber(answer) < getMaxSalary(tempData[name].jobCompany) then --for the popup to choose the salary for a new job
     tempData[name].jobSalary = tonumber(answer)
+    tempData[name].jobEnergy = math.ceil(tempData[name].jobSalary / getMaxSalary(tempData[name].jobCompany) * 100)
     displayJobWizard(name)
   elseif id == 603 and tonumber(answer) and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
     tempData[name].jobEnergy = tonumber(answer)
+    tempData[name].jobSalary = tempData[name].jobEnergy * getMaxSalary(tempData[name].jobCompany) / 100
     displayJobWizard(name)
   elseif id == 604 and tonumber(answer) then --for the popup to choose the minimum level for the job
     tempData[name].minLvl = tonumber(answer)
+    local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - tempData[name].minLvl
+    tempData[name].jobEnergy = e < 0 and 1 or e
     displayJobWizard(name)
   elseif id == 700 and tonumber(answer) then --for the investment popups
     players[name]:investTo(tempData[name].investing, tonumber(answer))
