@@ -393,12 +393,12 @@ function displayCompany(name, target)
       members = members .. v .. "<br>"
     end
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
-    
+
     for n, _ in next, com:getShareHolders() do
         if n == target then isOwner = true end
     end
 
-    if isOwner then 
+    if isOwner then
       ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
     end
     ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
@@ -694,7 +694,7 @@ function eventTextAreaCallback(id, name, evt)
       displayInventory(name)
     elseif evt == "close" then
         ui.removeTextArea(id, name)
-        if id == 400 then 
+        if id == 400 then
           ui.removeTextArea(401, name)
           ui.removeTextArea(402, name)
         elseif id == 800 then
