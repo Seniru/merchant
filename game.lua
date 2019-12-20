@@ -1,8 +1,16 @@
+--[[Dependencies]]--
+--LineGraph-TFM
+local a,b,c,d,e,f;local g='0123456789abcdef'function num2hex(h)local i=''while h>0 do local j=math.fmod(h,16)i=string.sub(g,j+1,j+1)..i;h=math.floor(h/16)end;return string.upper(i==''and'0'or i)end;function split(i,k)result={}for l in(i..k):gmatch("(.-)"..k)do table.insert(result,l)end;return result end;function c(m)local n=m[1]for o=1,#m do o=m[o]if o<n then n=o end end;return n end;function d(m)local p=m[1]for o=1,#m do o=m[o]if o>p then p=o end end;return p end;function e(m,q)local r={}for s,o in next,m do r[s]=q(o)end;return r end;function f(t,u,v)local w=table.insert;local r={}for x=t,u,v do w(r,x)end;return r end;local function y(z)return 400-z end;a={}a.__index=a;setmetatable(a,{__call=function(A,...)return A.new(...)end})function a.new(B,C,D,E)assert(#B==#C,"Expected same number of data for both axis")local self=setmetatable({},a)self.name=D;self:setData(B,C)self.col=E or math.random(0x000000,0xFFFFFF)return self end;function a:getName()return self.name end;function a:getDX()return self.dx end;function a:getDY()return self.dy end;function a:getColor()return self.col end;function a:getMinX()return self.minX end;function a:getMinY()return self.minY end;function a:getMaxX()return self.maxX end;function a:getMaxY()return self.maxY end;function a:getDataLength()return#self.dx end;function a:getLineWidth()return self.lWidth or 3 end;function a:setName(D)self.name=D end;function a:setData(B,C)self.dx=B;self.dy=C;self.minX=c(B)self.minY=c(C)self.maxX=d(B)self.maxY=d(C)end;function a:setColor(E)self.col=E end;function a:setLineWidth(F)self.lWidth=F end;b={}b.__index=b;b._joints=10000;setmetatable(b,{__call=function(A,...)return A.new(...)end})function b.init()tfm.exec.addPhysicObject(-1,0,0,{type=14,miceCollision=false,groundCollision=false})end;function b.handleClick(G,H,I)if I:sub(0,("lchart:data:["):len())=='lchart:data:['then local J=split(I:sub(("lchart:data:["):len()+1,-2),",")local K,L,M,N=split(J[1],":")[2],split(J[2],":")[2],split(J[3],":")[2],split(J[4],":")[2]ui.addTextArea(18000,"<a href='event:close'>X: "..M.."<br>Y: "..N.."</a>",H,K,L,80,30,nil,nil,0.5,false)elseif I=="close"then ui.removeTextArea(G)end end;function b.new(G,O,z,F,P)local self=setmetatable({},b)self.id=G;self.x=O;self.y=z;self.w=F;self.h=P;self.showing=false;self.joints=b._joints;b._joints=b._joints+10000;self.series={}return self end;function b:getId()return self.id end;function b:getDimension()return{x=self.x,y=self.y,w=self.w,h=self.h}end;function b:getMinX()return self.minX end;function b:getMaxX()return self.maxX end;function b:getMinY()return self.minY end;function b:getMaxY()return self.maxY end;function b:getXRange()return self.xRange end;function b:getYRange()return self.yRange end;function b:getGraphColor()return{bgColor=self.bg or 0x324650,borderColor=self.border or 0x212F36}end;function b:getAlpha()return self.alpha or 0.5 end;function b:isShowing()return self.showing end;function b:getDataLength()local Q=0;for R,i in next,self.series do Q=Q+i:getDataLength()end;return Q end;function b:show()self:refresh()local S,T=math.floor,math.ceil;ui.addTextArea(10000+self.id,"",nil,self.x,self.y,self.w,self.h,self.bg,self.border,self:getAlpha(),false)ui.addTextArea(11000+self.id,"<b>["..S(self.minX)..", "..S(self.minY).."]</b>",nil,self.x-15,self.y+self.h+5,50,50,nil,nil,0,false)ui.addTextArea(12000+self.id,"<b>"..T(self.maxX).."</b>",nil,self.x+self.w+10,self.y+self.h+5,50,50,nil,nil,0,false)ui.addTextArea(13000+self.id,"<b>"..T(self.maxY).."</b>",nil,self.x-15,self.y-10,50,50,nil,nil,0,false)ui.addTextArea(14000+self.id,"<b>"..T((self.maxX+self.minX)/2).."</b>",nil,self.x+self.w/2,self.y+self.h+5,50,50,nil,nil,0,false)ui.addTextArea(15000+self.id,"<br><br><b>"..T((self.maxY+self.minY)/2).."</b>",nil,self.x-15,self.y+(self.h-self.y)/2,50,50,nil,nil,0,false)local U=self.joints;local V=self.w/self.xRange;local W=self.h/self.yRange;for G,X in next,self.series do for Y=1,X:getDataLength(),1 do local Z=S(X:getDX()[Y]*V+self.x-self.minX*V)local _=S(y(X:getDY()[Y]*W)+self.y-y(self.h)+self.minY*W)local a0=S((X:getDX()[Y+1]or X:getDX()[Y])*V+self.x-self.minX*V)local a1=S(y((X:getDY()[Y+1]or X:getDY()[Y])*W)+self.y-y(self.h)+self.minY*W)tfm.exec.addJoint(self.id+6+U,-1,-1,{type=0,point1=Z..",".._,point2=a0 ..","..a1,damping=0.2,line=X:getLineWidth(),color=X:getColor(),alpha=1,foreground=true})if self.showDPoints then ui.addTextArea(16000+self.id+U,"<font color='#"..num2hex(X:getColor()).."'><a href='event:lchart:data:[x:"..Z..",y:".._..",dx:"..X:getDX()[Y]..",dy:"..X:getDY()[Y].."]'>█</a></font>",nil,Z,_,10,10,nil,nil,0,false)end;U=U+1 end end;self.showing=true end;function b:setGraphColor(a2,a3)self.bg=a2;self.border=a3 end;function b:setShowDataPoints(a4)self.showDPoints=a4 end;function b:setAlpha(a5)self.alpha=a5 end;function b:addSeries(X)table.insert(self.series,X)self:refresh()end;function b:removeSeries(D)for x=1,#self.series do if self.series[x]:getName()==D then table.remove(self.series,x)break end end;self:refresh()end;function b:refresh()self.minX,self.minY,self.maxX,self.maxY=nil;for s,i in next,self.series do self.minX=math.min(i:getMinX(),self.minX or i:getMinX())self.minY=math.min(i:getMinY(),self.minY or i:getMinY())self.maxX=math.max(i:getMaxX(),self.maxX or i:getMaxX())self.maxY=math.max(i:getMaxY(),self.maxY or i:getMaxY())end;self.xRange=self.maxX-self.minX;self.yRange=self.maxY-self.minY end;function b:resize(F,P)self.w=F;self.h=P end;function b:move(O,z)self.x=O;self.y=z end;function b:hide()for G=10000,17000,1000 do ui.removeTextArea(G+self.id)end;for G=self.id+16000,self.joints,1 do ui.removeTextArea(G+self.id)end;for Y=self.joints,self.joints+self:getDataLength()+5,1 do tfm.exec.removeJoint(Y)end;self.showing=false end;function b:showLabels(a4)if a4 or a4==nil then local a6=""for R,X in next,self.series do a6=a6 .."<font color='#"..num2hex(X:getColor()).."'> ▉<b> "..X:getName().."</b></font><br>"end;ui.addTextArea(16000+self.id,a6,nil,self.x+self.w+15,self.y,100,18*#self.series,self:getGraphColor().bgColor,self:getGraphColor().borderColor,self:getAlpha(),false)else ui.removeTextArea(16000+self.id,nil)end end;function b:displayGrids(a4)if a4 or a4==nil then local a7=self.h/5;for G,z in next,f(self.y+a7,self.y+self.h-a7,a7)do tfm.exec.addJoint(self.id+G,-1,-1,{type=0,point1=self.x..","..z,point2=self.x+self.w..","..z,damping=0.2,line=1,alpha=1,foreground=true,color=0xFFFFFF})end;tfm.exec.addJoint(self.id+5,-1,-1,{type=0,point1=self.x+self.w/2 ..","..self.y,point2=self.x+self.w/2 ..","..self.y+self.h,damping=0.2,line=2,alpha=1,foreground=true,color=0xFFFFFF})tfm.exec.addJoint(self.id+6,-1,-1,{type=0,point1=self.x..","..self.y+self.h/2,point2=self.x+self.w..","..self.y+self.h/2,damping=0.2,line=2,alpha=1,foreground=true,color=0xFFFFFF})end end;Series=a;LineChart=b;getMin=c;getMax=d;map=e;range=f
+--Timers4TFM
+local a={}a.__index=a;a._timers={}a._init=false;a._clock=0;setmetatable(a,{__call=function(b,...)return b.new(...)end})function a.init(c)if not a._init then a._init=true;a._clock=c end end;function a.process(d)a._clock=d;for e,f in next,a._timers do if f:isAlive()and f:getMatureTime()<=a._clock then f:call()if f.loop then f:reset()else f:kill()end end end end;function a.run(d)a.init(d)a.process(d)end;function a.new(g,h,i,j,...)local self=setmetatable({},a)self.id=g;self.callback=h;self.timeout=i;self.mature=a._clock+i;self.loop=j;self.args={...}self.alive=true;a._timers[g]=self;return self end;function a:getId()return self.id end;function a:getTimeout()return self.timeout end;function a:isLooping()return self.loop end;function a:getMatureTime()return self.mature end;function a:isAlive()return self.alive end;function a:setCallback(k)self.callback=k end;function a:addTime(c)self.mature=self.mature+c end;function a:setLoop(j)self.loop=j end;function a:setArgs(...)self.args={...}end;function a:call()self.callback(table.unpack(self.args))end;function a:kill()self.alive=false;self=nil end;function a:reset()self.mature=a._clock+self.timeout end;Timer=a
+
 tfm.exec.disableAutoNewGame(true)
 tfm.exec.disableAutoShaman(true)
 tfm.exec.disableAutoTimeLeft(true)
 tfm.exec.disableAfkDeath(true)
-tfm.exec.newGame([[<C><P F="0"/><Z><S><S X="79" o="aac4d2" L="162" Y="165" c="4" H="334" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="169" o="6d9bb3" L="144" Y="201" c="4" H="285" P="0,0,0.3,0.2,-10,0,0,0" T="12"/><S X="400" o="a18600" L="803" Y="364" H="78" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="296" o="285b74" L="52" Y="207" c="4" H="240" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="367" o="b5d8ea" L="113" Y="178" c="4" H="300" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="528" o="3d657a" L="61" Y="236" c="4" H="182" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="653" o="a5c5d6" L="197" Y="164" c="4" H="332" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="485" o="dfb218" L="78" Y="293" c="4" H="69" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="435" o="5a4c06" L="75" Y="277" c="4" H="104" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="338" o="0e67e7" L="12" Y="261" c="4" H="131" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="338" o="0fa5f1" L="36" Y="197" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="337" o="0b56c2" L="28" Y="253" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="338" o="324650" L="10" Y="155" H="22" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="338" o="0b56c2" L="17" Y="150" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="338" o="0e67e7" L="10" Y="128" c="4" H="38" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="721" o="7c99a7" L="111" Y="212" c="4" H="235" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="56" o="480312" L="10" Y="310" c="4" H="36" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="765" o="480312" L="10" Y="292" c="4" H="71" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="592" o="480312" L="10" Y="279" c="4" H="94" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="241" o="480312" L="10" Y="295" c="4" H="62" P="0,0,0.3,0.2,0,0,0,0" T="12"/><S X="753" o="055111" L="26" Y="248" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="755" o="058419" L="10" Y="215" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="730" o="05be22" L="10" Y="256" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="560" o="83ae0b" L="20" Y="236" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="576" o="129226" L="10" Y="195" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="617" o="129226" L="29" Y="219" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="595" o="058419" L="35" Y="232" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="211" o="058419" L="15" Y="253" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="253" o="05be22" L="15" Y="288" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="234" o="058419" L="31" Y="272" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="54" o="05be22" L="20" Y="239" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="56" o="83ae0b" L="26" Y="266" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="79" o="05be22" L="10" Y="279" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="34" o="058419" L="20" Y="264" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/><S X="774" o="058419" L="28" Y="243" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13"/></S><D><DS X="431" Y="309"/></D><O/></Z></C>]])
+tfm.exec.newGame([[<C><P F="0" L="1600" /><Z><S><S X="79" o="aac4d2" L="162" Y="165" c="4" H="334" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="169" o="6d9bb3" L="144" Y="201" c="4" H="285" P="0,0,0.3,0.2,-10,0,0,0" T="12" /><S X="296" o="285b74" L="52" Y="207" c="4" H="240" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="367" o="b5d8ea" L="113" Y="178" c="4" H="300" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="528" o="3d657a" L="61" Y="236" c="4" H="182" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="653" o="a5c5d6" L="197" Y="164" c="4" H="332" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="485" o="dfb218" L="78" Y="293" c="4" H="69" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="435" o="5a4c06" L="75" Y="277" c="4" H="104" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="0e67e7" L="12" Y="261" c="4" H="131" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="0fa5f1" L="36" Y="197" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="337" o="0b56c2" L="28" Y="253" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="324650" L="10" Y="155" H="22" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="0b56c2" L="17" Y="150" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="338" o="0e67e7" L="10" Y="128" c="4" H="38" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="721" o="7c99a7" L="111" Y="212" c="4" H="235" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="56" o="480312" L="10" Y="310" c="4" H="36" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="765" o="480312" L="10" Y="292" c="4" H="71" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="591" o="480312" L="10" Y="282" c="4" H="94" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="241" o="480312" L="10" Y="295" c="4" H="62" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="753" o="055111" L="26" Y="248" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="755" o="058419" L="10" Y="215" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="730" o="05be22" L="10" Y="256" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="560" o="83ae0b" L="20" Y="236" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="576" o="129226" L="10" Y="195" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="1053" Y="178" T="12" L="307" H="306" o="A3B6C0" P="0,0,0.3,0.2,0,0,0,0" c="4" /><S X="1429" o="a5c5d6" L="180" Y="174" c="4" H="332" P="0,0,0.3,0.2,7,0,0,0" T="12" /><S X="799" o="a18600" L="1602" Y="361" H="78" P="0,0,0.3,0.2,0,0,0,0" T="12" /><S X="617" o="129226" L="29" Y="219" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="595" o="058419" L="35" Y="232" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="211" o="058419" L="15" Y="253" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="253" o="05be22" L="15" Y="288" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="234" o="058419" L="31" Y="272" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="54" o="05be22" L="20" Y="239" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="56" o="83ae0b" L="26" Y="266" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="79" o="05be22" L="10" Y="279" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="34" o="058419" L="20" Y="264" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="967" Y="269" T="12" L="280" H="110" o="465962" P="0,0,0.3,0.2,0,0,0,0" c="4" /><S X="773" o="058419" L="28" Y="243" c="4" H="10" P="0,0,0.3,0.2,0,0,0,0" T="13" /><S X="1056" Y="286" T="12" L="10" H="76" o="324650" P="0,0,0.3,0.2,0,0,0,0" c="4" /><S X="1293" Y="286" T="12" L="10" H="76" o="324650" P="0,0,0.3,0.2,0,0,0,0" c="4" /><S X="1167" Y="153" T="12" L="458" H="191" o="67818F" P="0,0,0.3,0.2,0,0,0,0" c="4" /><S X="1508" o="480312" L="10" Y="273" H="94" P="0,0,0.3,0.2,0,0,0,0" T="12" c="4" /><S X="1470" Y="199" T="13" L="31" H="41" o="1F6526" P="0,0,0.3,0.2,0,0,0,0" c="4" /><S X="1495" Y="220" T="13" L="30" H="42" o="26CD52" P="0,0,0.3,0.2,0,0,0,0" c="4" /><S X="1537" Y="226" T="13" L="28" H="27" o="13933F" P="0,0,0.3,0.2,0,0,0,0" c="4" /><S X="1511" Y="168" T="13" L="34" H="41" o="2E8030" P="0,0,0.3,0.2,0,0,0,0" c="4" /></S><D><DS X="431" Y="309" /></D><O /></Z></C>]])
+
+LineChart.init()
 --game variables
 
 tips = {}
@@ -10,9 +18,14 @@ tips = {}
 local CONSTANTS = {
     BAR_WIDTH = 735,
     BAR_X = 60,
-    STAT_BAR_Y = 30,
-
+    STAT_BAR_Y = 30
 }
+
+local year = 3000
+local month = 1
+local day = 1
+
+local months = {"January", "February", "March", "April", "May", "June", "July", "Aughust", "September", "October", "November", "December"}
 
 
 local players = {}
@@ -37,7 +50,30 @@ local gameplay = [[
     <b><u>Shop:</u></b>  Shop is the place you can buy usesful stuff <font size='8'>(that you all know ^_^)</font>. Bought items are stored temporarily in the inventory. You can use them to increase your health when neaded.
     <b><u>Learning:</u></b> Learning is the only way to get qualifications for some jobs. Higher educational qualifications would result in better jobs.
     <b><u>Companies:</u></b>  You can buy a company when you have enough money for it. You can use your company to create jobs and recruit workers. (And that will increase your profit more and more!!).
-  ]]
+    ]]
+
+local chart = LineChart(1, 944, 60, 450, 185)
+local timer = Timer("time-sys", function()
+    day = day + 1
+    if day == 31 then
+        day = 1
+        month = month + 1
+        for comp, data in next, companies do
+            for i=1, 11, 1 do
+                data.capitalHist[i] = data.capitalHist[i+1]
+            end
+            data.capitalHist[12] = data.capital
+            data.chartSeries:setData(range(1, 12, 1), data.capitalHist)
+        end
+        chart:showLabels()
+        chart:show()
+        if month == 13 then
+            month = 1
+            year = year + 1
+        end
+    end
+    ui.updateTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>")
+end, 1000, true)
 --creating the class Player
 
 local Player = {}
@@ -67,7 +103,6 @@ function Player.new(name)
     self.degrees = {}
     self.job = "Cheese collector"
     self.ownedCompanies = {}
-    self.boss = "shaman"
     self.company = "Atelier801"
     self.inventory = {}
     ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
@@ -87,7 +122,6 @@ function Player:getEducationLevel() return self.eduLvl end
 function Player:getEducationStream() return self.eduStream end
 function Player:getDegrees() return self.degrees end
 function Player:getOwnedCompanies() return self.ownedCompanies end
-function Player:getBoss() return self.boss end
 function Player:getInventory() return self.inventory end
 function Player:getJob() return self.job end
 
@@ -97,7 +131,10 @@ function Player:work()
         self.setHealth(self, -job.energy, true)
         self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
-        players[job.owner]:setMoney(job.salary * 0.2, true)
+        for name, shares in next, find(self.company, companies):getShareHolders() do
+            print(name .. ' ' .. shares.shares)
+            players[name]:setMoney(shares.shares * job.salary * 0.1, true)
+        end
         self:levelUp()
     end
 end
@@ -109,7 +146,7 @@ function Player:setHealth(val, add)
         self.health = val
     end
     self.health = self.health > 1  and 1 or self.health < 0 and 0 or self.health
-    ui.addTextArea(1000, "", self.name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH * self.health, 20, 0xff0000, 0xee0000, 1, false)
+    ui.addTextArea(1000, "", self.name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH * self.health, 20, 0xff0000, 0xee0000, 1, true)
     ui.updateTextArea(2, "<p align='center'>" .. math.ceil(self.health * 100) .. "%</p>", self.name)
 end
 
@@ -129,7 +166,7 @@ function Player:setXP(val, add)
     else
         self.xp = val
     end
-    ui.addTextArea(2000, "", self.name, CONSTANTS.BAR_X, 370, ((self.xp - calculateXP(self.level)) / (calculateXP(self.level + 1) - calculateXP(self.level)))  * CONSTANTS.BAR_WIDTH, 17, 0x00ff00, 0x00ee00, 1, false)
+    ui.addTextArea(2000, "", self.name, CONSTANTS.BAR_X, 370, ((self.xp - calculateXP(self.level)) / (calculateXP(self.level + 1) - calculateXP(self.level)))  * CONSTANTS.BAR_WIDTH, 17, 0x00ff00, 0x00ee00, 1, true)
     ui.updateTextArea(3, "<p align='center'>Level " .. self.level .. " - " ..self.xp .. "/" .. calculateXP(self.level + 1) .. "XP", self.name)
 end
 
@@ -138,18 +175,15 @@ function Player:setCourse(course)
   self.learnProgress = 0
   self.eduLvl = course.level
   self.eduStream = course.stream
-  ui.addTextArea(3000, "Lessons left:\n0/" .. find(self.learning, courses).lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, false)
+  ui.addTextArea(3000, "Lessons left:\n0/" .. find(self.learning, courses).lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, true)
 end
 
 function Player:setJob(job)
   local jobRef = find(job, jobs)
 
-
-
   if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or table.indexOf(self.degrees, jobRef.qualifications) ~= nil) then
     find(self.company, companies):removeMember(self.name)
     self.job = job
-    self.boss = jobRef.owner
     self.company = jobRef.company
     find(self.company, companies):addMember(self.name)
   else
@@ -158,15 +192,23 @@ function Player:setJob(job)
 end
 
 function Player:addOwnedCompanies(comName)
-  table.insert(self.ownedCompanies, comName)
+    local have = false
+    for k, comp in next, self.ownedCompanies do
+        print(comp)
+        if comp == comName then
+            have = true
+        end
+    end
+    if not have then table.insert(self.ownedCompanies, comName) end
 end
 
 function Player:investTo(comName, amount)
     if self.money < amount then
         tfm.exec.chatMessage('Not Enough money!')
     else
-        find(comName, companies):addCapital(amount)
+        find(comName, companies):addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
+        self:addOwnedCompanies(comName)
     end
 end
 
@@ -252,19 +294,27 @@ function Company.new(name, owner)
     local self = setmetatable({}, Company)
     self.name = name
     self.owner = owner
+    self.shareholders = {[owner]={capital=5000, shares=1.0}}
     self.capital = 5000
     self.members = {}
     self.jobs = {}
+    self.capitalHist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5000}
+    --self.capitalHist[13 - month] = 5000
+    self.chartSeries = Series(range(1, 12, 1), self.capitalHist, name)
+    chart:addSeries(self.chartSeries)
     self.uid = "com:" .. name
     return self
 end
 
 function Company:getName() return self.name end
 function Company:getOwner() return self.owner end
+function Company:getShareHolders() return self.shareholders end
 function Company:getMembers() return self.members end
 function Company:getJobs() return self.jobs end
 function Company:getUID() return self.uid end
 function Company:getCapital() return self.capital end
+function Company:getCapitalHistory() return self.capitalHist end
+function Company:getChartSeries() return self.chartSeries end
 
 function Company:addMember(name)
   local hasThisMember = false
@@ -284,8 +334,18 @@ function Company:removeMember(name)
   end
 end
 
+function Company:addShareHolder(name, inCapital)
+    self.capital = self.capital + inCapital
+    local newCap = self.shareholders[name] == nil and inCapital or self.shareholders[name].capital + inCapital
+    self.shareholders[name] = {capital=newCap, shares=newCap/self.capital}
+    for n, d in next, self.shareholders do
+        self.shareholders[n] = {capital=d.capital, shares=d.capital/self.capital}
+    end
+end
+
 function Company:addCapital(amount)
     self.capital = self.capital + amount
+    self.capitalHist[month] = self.capital
 end
 
 --class creation(Company) ends
@@ -338,12 +398,14 @@ function displayCompanyDialog(target)
       companyTxt = companyTxt .. "<b><a href='event:" .. company:getUID() .. "'>" .. company:getName() .. "</a></b><br>Members: " .. (#company:getMembers() == 0 and "-" or string.sub(table.tostring(company:getMembers()), 2, -3))
     end
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(401, "<a href='event:createCompany'>New Company</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
   end
 end
 
 function displayCompany(name, target)
   if find(name, companies) ~= nil then
     local com = find(name, companies)
+    local isOwner = false
     tempData[target].jobCompany = name
 
     local companyTxt = ""
@@ -352,11 +414,14 @@ function displayCompany(name, target)
       members = members .. v .. "<br>"
     end
     ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
-    if com:getOwner() == target then 
-      ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
-      --TODO: Make this button visible to all and give them dividends according to their investments
-      ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
+    for n, _ in next, com:getShareHolders() do
+        if n == target then isOwner = true end
     end
+
+    if isOwner then
+      ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
+    end
+    ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
   else
     ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
   end
@@ -366,7 +431,7 @@ function displayJobWizard(target)
   ui.addTextArea(500, closeButton .. [[<p align='center'><font size='20'><b><J>Job Wizard</J></b></font></p><br><br>
     <b>Job Name: </b><a href='event:selectJobName'>]] ..  (tempData[target].jobName == nil and "Select" or tempData[target].jobName) .. [[</a>
     <b>Salary: </b><a href='event:selectJobSalary'> ]] .. (tempData[target].jobSalary == nil and "Select" or tempData[target].jobSalary) .. [[</a>
-    <b>Enery: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy) .. [[</a>
+    <b>Enery: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy .. "%") .. [[</a>
     <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == nil and "Select" or tempData[target].minLvl) .. [[</a>
     <b>Qualifcations: </b><a href='event:chooseJobDegree'>]] .. (tempData[target].qualification == nil and "Select" or tempData[target].qualification) .. [[</a><br>
   ]], target, 200, 90, 400, 200, nil, nil, 1, true)
@@ -396,8 +461,8 @@ function displayTips(target)
 end
 
 function displayProfile(name, target)
-  name = upper(name)
-  local p = players[name] or players[name .. "#0000"]
+  local up = upper(name)
+  local p = players[name] or players[up] or players[up .. "#0000"]
   if p then
     ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
   end
@@ -576,7 +641,7 @@ function setUI(name)
     ui.addTextArea(11, " Level: 1", name, 480, 25, 120, 20, nil, nil, 1, true)
     ui.addTextArea(1, "<br><p align='center'><b>" .. name .. "</b></p>", name, 325, 20, 150, 30, nil, nil, 1, true )
     --health bar area
-    ui.addTextArea(2, "<p align='center'>100%</p>", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, false)
+    ui.addTextArea(2, "<p align='center'>100%</p>", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
     --xp bar area
     ui.addTextArea(3, "<p align='center'>Level 1  -  0/" .. calculateXP(2) .. "XP</p>", name, CONSTANTS.BAR_X, 370, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
     --shop button
@@ -591,6 +656,11 @@ function setUI(name)
     ui.addTextArea(8, "<a href='event:tips'>Tips</a>", name, 740, 180, 36, 20, nil, nil, 1, true)
     --Inventory button
     ui.addTextArea(9, "<a href='event:inv'>Inventory</a>", name, 740, 150, 36, 20, nil, nil, 1, true)
+    --Clock interface
+    ui.addTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>", name, 288, 180, 100, 100, nil, nil, 0, false)
+    --Stockmarket dashboard
+    --chart:showLabels()
+    --chart:show()
 end
 
 --event handling
@@ -644,7 +714,7 @@ function eventTextAreaCallback(id, name, evt)
       displayInventory(name)
     elseif evt == "close" then
         ui.removeTextArea(id, name)
-        if id == 400 then 
+        if id == 400 then
           ui.removeTextArea(401, name)
           ui.removeTextArea(402, name)
         elseif id == 800 then
@@ -666,15 +736,16 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "company" then
         displayCompanyDialog(name)
     elseif evt == "createJob" then
-        if tempData[name].jobName == nil and tempData[name].jobSalary == nil and tempData[name].jobEnergy == nil and tempData[name].minLvl == nil then
+        if tempData[name].jobName == nil or tempData[name].jobSalary == nil or tempData[name].jobEnergy == nil or tempData[name].minLvl == nil then
           displayJobWizard(name)
         else
-
           local tempCompany = tempData[name].jobCompany
           table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany))
           tempData[name] = {jobCompany = tempCompany}
           ui.removeTextArea(500, name)
         end
+    elseif evt == "createCompany" then
+        ui.addPopup(400, 1, "<p align='center'>Do you want to own a new company</p>", name, 300, 90, 200, true)
     elseif evt == "selectJobName" then
         ui.addPopup(601, 2, "<p align='center'>Please choose a name", name, 300, 90, 200, true)
     elseif evt == "selectJobSalary" then
@@ -703,6 +774,8 @@ function eventTextAreaCallback(id, name, evt)
           displayCompany(val, name)
         elseif type == "degree" then
           tempData[name].qualification = val
+          local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - find(val, courses).level * 2
+          tempData[name].jobEnergy = e < 0 and 1 or e
           ui.removeTextArea(id, name)
           displayJobWizard(name)
         elseif type == "use" then
@@ -712,14 +785,11 @@ function eventTextAreaCallback(id, name, evt)
         elseif type == "invest" then
             ui.addPopup(700, 2, "Please enter the amount to invest. (Should be a valid number)", name, 300, 90, 200, true)
             tempData[name].investing = val
-            print(tempData[name].investing)
         end
     end
 end
 
 function eventPopupAnswer(id, name, answer)
-
-
   if id == 400 and answer == 'yes' then --for the popup creating a compnay
     if players[name]:getMoney() < 5000 then
       ui.addPopup(450, 0, "<p align='center'><b><font color='#CB546B'>Not enough money!", name, 300, 90, 200, true)
@@ -727,6 +797,10 @@ function eventPopupAnswer(id, name, answer)
       ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price: $5000<br>Click submit to buy!</p>", name, 300, 90, 200, true)
     end
   elseif id == 450 and answer ~= '' then --for the popup to submit a name for the company
+    if find(answer, companies) then
+        tfm.exec.chatMessage('Company already exists!')
+        return
+    end
     table.insert(companies, Company(answer, name))
     players[name]:setMoney(-5000, true)
     players[name]:addOwnedCompanies(answer)
@@ -736,15 +810,18 @@ function eventPopupAnswer(id, name, answer)
     displayJobWizard(name)
   elseif id == 602 and tonumber(answer) and tonumber(answer) < getMaxSalary(tempData[name].jobCompany) then --for the popup to choose the salary for a new job
     tempData[name].jobSalary = tonumber(answer)
+    tempData[name].jobEnergy = math.ceil(tempData[name].jobSalary / getMaxSalary(tempData[name].jobCompany) * 100)
     displayJobWizard(name)
   elseif id == 603 and tonumber(answer) and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
     tempData[name].jobEnergy = tonumber(answer)
+    tempData[name].jobSalary = tempData[name].jobEnergy * getMaxSalary(tempData[name].jobCompany) / 100
     displayJobWizard(name)
   elseif id == 604 and tonumber(answer) then --for the popup to choose the minimum level for the job
     tempData[name].minLvl = tonumber(answer)
+    local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - tempData[name].minLvl
+    tempData[name].jobEnergy = e < 0 and 1 or e
     displayJobWizard(name)
   elseif id == 700 and tonumber(answer) then --for the investment popups
-    print(tempData[name].investing)
     players[name]:investTo(tempData[name].investing, tonumber(answer))
   end
 
@@ -763,6 +840,7 @@ function eventChatCommand(name, msg)
 end
 
 function eventLoop(t,r)
+    Timer.run(t)
     for name, player in pairs(players) do
         player:setHealth(player:getHealthRate(), true)
     end
@@ -771,6 +849,13 @@ end
 --event handling ends
 
 --game logic
+
+players["shaman"] = Player("shaman")
+table.insert(companies, Company("Atelier801", "shaman"))
+
+chart:showLabels()
+chart:show()
+
 --creating tips
 createTip("You Need $5000 To Start A New Company!", 1)
 createTip("You Gain Money From Your Workers!", 2)
@@ -803,8 +888,6 @@ createTip("The Game is More Fun with More Players", 28)
 createTip("Click Tips When You Need Help", 29)
 createTip("The Health Refreshes Every Moment <3", 30)
 
-players["shaman"] = Player("shaman")
-table.insert(companies, Company("Atelier801", "shaman"))
 
 --creating and storing HealthPack tables
 table.insert(healthPacks, HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself"))
