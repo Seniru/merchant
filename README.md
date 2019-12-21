@@ -2,28 +2,41 @@
 
 <p align='center'><img width=95% src='https://i.ibb.co/G2Jc9dP/Captu1re.png' alt='TFM Clicker'></p>
 
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![GitHub stars](https://img.shields.io/github/stars/seniru/tfm_clicker) ![GitHub forks](https://img.shields.io/github/forks/seniru/tfm_clicker) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/seniru/tfm_clicker?color=green)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![GitHub stars](https://img.shields.io/github/stars/seniru/tfm_clicker)
+![GitHub forks](https://img.shields.io/github/forks/seniru/tfm_clicker)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/seniru/tfm_clicker?color=green)
 
-##  Introduction
+## Introduction
 
-> Disclaimer: This game is still in beta stage! Contribute to make it more awesome
+> Disclaimer: This game is still in beta stage! Contribute to make it more
+> awesome
 
-TFM *(aka Transformice)* Clicker is a clicker game for transformice based on an office or a working environment. Your goal is to earn money, buy companies and recruit other players and be the best businessman in transformice!
+TFM _(aka Transformice)_ Clicker is a clicker game for transformice based on an
+office or a working environment. Your goal is to earn money, buy companies and
+recruit other players and be the best businessman in transformice!
 
 ### How to play?
 
 There are few requirements in order to run a lua script in your tribe house
+
 - Gathered Cheese: 1000
 - Permissions to run /np @code in tribe house
 
-If you already fulfilled these requirements, then run */lua* and enter [this](https://github.com/Seniru/TFM_Clicker/raw/master/game.lua) code in the box and submit it. More information about the game can be found by typing *!help* in the chat.
+If you already fulfilled these requirements, then run _/lua_ and enter
+[this](https://github.com/Seniru/TFM_Clicker/raw/master/game.lua) code in the
+box and submit it. More information about the game can be found by typing
+_!help_ in the chat.
 
-*If  you don't have the above requirements then ask a member in your tribe to run this for you*
+_If you don't have the above requirements then ask a member in your tribe to run
+this for you_
 
 ### Contributing
 
-Ready to contribute this project? Great!!! 
-Here are few ways that you can add contributions
+Ready to contribute this project? Great!!! Here are few ways that you can add
+contributions
+
 - Bug reports and issues
 - PR (with improvements or bug fixes)
 - Code reviews
@@ -31,11 +44,13 @@ Here are few ways that you can add contributions
 - Suggestions
 
 **References for contributors**
- - [Documentation](https://github.com/Seniru/TFM_Clicker/blob/documentation/documentation.md)
+
+- [Documentation](https://github.com/Seniru/TFM_Clicker/blob/documentation/documentation.md)
 
 ## Contributors ✨
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks goes to these wonderful people
+([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -52,6 +67,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the
+[all-contributors](https://github.com/all-contributors/all-contributors)
+specification. Contributions of any kind welcome!
