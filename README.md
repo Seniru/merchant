@@ -2,7 +2,7 @@
 
 <p align='center'><img width=95% src='https://i.ibb.co/G2Jc9dP/Captu1re.png' alt='TFM Clicker'></p>
 
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![GitHub stars](https://img.shields.io/github/stars/seniru/tfm_clicker)
 ![GitHub forks](https://img.shields.io/github/forks/seniru/tfm_clicker)
