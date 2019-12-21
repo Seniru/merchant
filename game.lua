@@ -94,6 +94,8 @@ function Player.new(name)
     local self = setmetatable({}, Player)
     self.name = name
     self.money = name == 'King_seniru#5890' and 100000 or 0
+    self.title = "« Newbie »"
+    self.titles = {[self.title]=true}
     self.health = 1.0
     self.healthRate = 0.002
     self.xp = 0
@@ -126,6 +128,8 @@ function Player:getDegrees() return self.degrees end
 function Player:getOwnedCompanies() return self.ownedCompanies end
 function Player:getInventory() return self.inventory end
 function Player:getJob() return self.job end
+function Player:getTitle() return self.title end
+function Player:getTitles() return self.title end
 
 function Player:work()
     local job = jobs[self.job]
@@ -169,6 +173,17 @@ function Player:setXP(val, add)
     end
     ui.addTextArea(2000, "", self.name, CONSTANTS.BAR_X, 370, ((self.xp - calculateXP(self.level)) / (calculateXP(self.level + 1) - calculateXP(self.level)))  * CONSTANTS.BAR_WIDTH, 17, 0x00ff00, 0x00ee00, 1, true)
     ui.updateTextArea(3, "<p align='center'>Level " .. self.level .. " - " ..self.xp .. "/" .. calculateXP(self.level + 1) .. "XP", self.name)
+end
+
+function Player:setTitle(newTitle)
+    if self.titles[newTitle] then
+        self.title = newTitle
+        self:updateStatsBar()
+    end
+end
+
+function Player:addTitle(newTitle)
+    self.titles[newTitle] = true
 end
 
 function Player:setCourse(course)
@@ -242,7 +257,7 @@ end
 function Player:updateStatsBar()
     ui.updateTextArea(10, "<p align='right'>Money: $" .. formatNumber(self.money) .." </p> ", self.name)
     ui.updateTextArea(11, " Level: " .. self.level, self.name)
-    ui.updateTextArea(1, "<br><p align='center'><b>" .. self.name .. "</b></p>", self.name)
+    ui.updateTextArea(1, "<br><p align='center'><b>" .. self.name .. "</b><br>" .. self.title .. "</p>", self.name)
 end
 
 function Player:grabItem(item)
@@ -439,7 +454,9 @@ function displayProfile(name, target)
     local up = upper(name)
     local p = players[name] or players[up] or players[up .. "#0000"] or players[target]
     if p then
-        ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font></p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() , target, 300, 100, 200, 130, nil, nil, 1, true)
+        ui.addTextArea(900, closeButton .. 
+        "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>" .. p:getTitle() .. "</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob()
+        , target, 300, 100, 200, 130, nil, nil, 1, true)
     end
 end
 
@@ -600,7 +617,7 @@ function setUI(name)
     --ui.addTextArea(1, name .. "<br>Money : $0 | Level 1", name, 6, CONSTANTS.STAT_BAR_Y, 785, 40, 0x324650, 0x000000, 1, true)
     ui.addTextArea(10, "<p align='right'>Money: $0 </p> ", name, 200, 25, 120, 20, nil, nil, 1, true)
     ui.addTextArea(11, " Level: 1", name, 480, 25, 120, 20, nil, nil, 1, true)
-    ui.addTextArea(1, "<br><p align='center'><b>" .. name .. "</b></p>", name, 325, 20, 150, 30, nil, nil, 1, true )
+    ui.addTextArea(1, "<br><p align='center'><b>" .. name .. "</b><br>« Newbie »</p>", name, 325, 20, 150, 45, nil, nil, 1, true )
     --health bar area
     ui.addTextArea(2, "<p align='center'>100%</p>", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
     --xp bar area
