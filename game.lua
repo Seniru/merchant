@@ -186,7 +186,7 @@ end
 function Player:addTitle(newTitle)
     if not self.titles[newTitle] then
         self.titles[newTitle] = "« " .. newTitle .. " »"
-        tfm.exec.chatMessage("Congratulations, " ..  self.name .. " achieved a new title " .. self.titles[newTitle])
+        tfm.exec.chatMessage("Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle])
     end
 end
 
@@ -195,6 +195,7 @@ function Player:setCourse(course)
     self.learnProgress = 0
     self.eduLvl = course.level
     self.eduStream = course.stream
+    self:addTitle("Little Learner")
     ui.addTextArea(3000, "Lessons left:\n0/" .. courses[self.learning].lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, true)
 end
 
@@ -210,6 +211,7 @@ end
 
 function Player:addOwnedCompanies(comName)
     if not self.ownedCompanies[comName] then
+        self:addTitle("Businessman")
         self.ownedCompanies[comName] = companies[comName]
     end
 end
@@ -221,15 +223,16 @@ function Player:investTo(comName, amount)
         companies[comName]:addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
         self:addOwnedCompanies(comName)
+        self:addTitle("Investor")
     end
 end
 
 function Player:addDegree(course)
+    self:addTitle("Degree Holder")
     self.degrees[course] = courses[course]
 end
 
 function Player:learn()
-    print(self.learning)
     if not (self.learning == "") and self.money > courses[self.learning].feePerLesson then
         self.learnProgress = self.learnProgress + 1
         ui.updateTextArea(3000, "Lessons left:\n" .. self.learnProgress .. "/" .. courses[self.learning].lessons, self.name)
@@ -238,6 +241,7 @@ function Player:learn()
             self:addDegree(self.learning)
             self.learning = ""
             self.eduLvl = self.eduLvl + 1
+            self:addTitle("Dedicated Learner")
         end
     end
 end
@@ -248,6 +252,7 @@ function Player:levelUp()
         self:setHealth(1.0, false)
         self:setMoney(5 * self.level, true)
         displayParticles(self.name, tfm.enum.particle.star)
+        self:addTitle("Getting Experience")
     end
 end
 
