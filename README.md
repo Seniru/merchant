@@ -38,16 +38,20 @@ Here are few ways that you can add contributions
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/Seniru"><img src="https://avatars2.githubusercontent.com/u/34127015?v=4" width="100px;" alt="Seniru Pasan Indira"/><br /><sub><b>Seniru Pasan Indira</b></sub></a><br /><a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Code">💻</a> <a href="#design-Seniru" title="Design">🎨</a> <a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/Overjoy06-Creator"><img src="https://avatars3.githubusercontent.com/u/53297297?v=4" width="100px;" alt="Overjoy06"/><br /><sub><b>Overjoy06</b></sub></a><br /><a href="#ideas-Overjoy06-Creator" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/Seniru/TFM_Clicker/commits?author=Overjoy06-Creator" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/kaborja"><img src="https://avatars0.githubusercontent.com/u/36646591?v=4" width="100px;" alt="kaborja"/><br /><sub><b>kaborja</b></sub></a><br /><a href="https://github.com/Seniru/TFM_Clicker/commits?author=kaborja" title="Code">💻</a></td>
-    <td align="center"><a href="https://allcontributors.org"><img src="https://avatars1.githubusercontent.com/u/46410174?v=4" width="100px;" alt="All Contributors"/><br /><sub><b>All Contributors</b></sub></a><br /><a href="#infra-all-contributors" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://github.com/Seniru"><img src="https://avatars2.githubusercontent.com/u/34127015?v=4" width="100px;" alt=""/><br /><sub><b>Seniru Pasan Indira</b></sub></a><br /><a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Code">💻</a> <a href="#design-Seniru" title="Design">🎨</a> <a href="https://github.com/Seniru/TFM_Clicker/commits?author=Seniru" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/Overjoy06-Creator"><img src="https://avatars3.githubusercontent.com/u/53297297?v=4" width="100px;" alt=""/><br /><sub><b>Overjoy06</b></sub></a><br /><a href="#ideas-Overjoy06-Creator" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/Seniru/TFM_Clicker/commits?author=Overjoy06-Creator" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/kaborja"><img src="https://avatars0.githubusercontent.com/u/36646591?v=4" width="100px;" alt=""/><br /><sub><b>kaborja</b></sub></a><br /><a href="https://github.com/Seniru/TFM_Clicker/commits?author=kaborja" title="Code">💻</a></td>
+    <td align="center"><a href="https://allcontributors.org"><img src="https://avatars1.githubusercontent.com/u/46410174?v=4" width="100px;" alt=""/><br /><sub><b>All Contributors</b></sub></a><br /><a href="#infra-all-contributors" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://restyled.io"><img src="https://avatars2.githubusercontent.com/u/31419072?v=4" width="100px;" alt=""/><br /><sub><b>Restyled.io</b></sub></a><br /><a href="#infra-restyled-io" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
   </tr>
 </table>
 
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
