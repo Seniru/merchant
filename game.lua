@@ -94,7 +94,7 @@ function Player.new(name)
     local self = setmetatable({}, Player)
     self.name = name
     self.money = name == 'King_seniru#5890' and 100000 or 0
-    self.title = "« Newbie »"
+    self.title = "Newbie"
     self.titles = {[self.title]=true}
     self.health = 1.0
     self.healthRate = 0.002
@@ -129,7 +129,7 @@ function Player:getOwnedCompanies() return self.ownedCompanies end
 function Player:getInventory() return self.inventory end
 function Player:getJob() return self.job end
 function Player:getTitle() return self.title end
-function Player:getTitles() return self.title end
+function Player:getTitles() return self.titles end
 
 function Player:work()
     local job = jobs[self.job]
@@ -137,6 +137,7 @@ function Player:work()
         self.setHealth(self, -job.energy, true)
         self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
+        self:addTitle("Worker")
         for name, shares in next, companies[self.company]:getShareHolders() do
             players[name]:setMoney(shares.shares * job.salary * 0.1, true)
         end
@@ -183,7 +184,10 @@ function Player:setTitle(newTitle)
 end
 
 function Player:addTitle(newTitle)
-    self.titles[newTitle] = true
+    if not self.titles[newTitle] then
+        self.titles[newTitle] = "« " .. newTitle .. " »"
+        tfm.exec.chatMessage("Congratulations, " ..  self.name .. " achieved a new title " .. self.titles[newTitle])
+    end
 end
 
 function Player:setCourse(course)
@@ -257,7 +261,7 @@ end
 function Player:updateStatsBar()
     ui.updateTextArea(10, "<p align='right'>Money: $" .. formatNumber(self.money) .." </p> ", self.name)
     ui.updateTextArea(11, " Level: " .. self.level, self.name)
-    ui.updateTextArea(1, "<br><p align='center'><b>" .. self.name .. "</b><br>" .. self.title .. "</p>", self.name)
+    ui.updateTextArea(1, "<br><p align='center'><b>" .. self.name .. "</b><br>« " .. self.title .. "»</p>", self.name)
 end
 
 function Player:grabItem(item)
@@ -455,7 +459,7 @@ function displayProfile(name, target)
     local p = players[name] or players[up] or players[up .. "#0000"] or players[target]
     if p then
         ui.addTextArea(900, closeButton .. 
-        "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>" .. p:getTitle() .. "</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob()
+        "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>« " .. p:getTitle() .. " »</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob()
         , target, 300, 100, 200, 130, nil, nil, 1, true)
     end
 end
@@ -464,6 +468,14 @@ function displayHelp(target, mode)
     ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 130, 75, 20, 0x324650, 0x000000, 1, true)
     ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 95, 75, 20, 0x324650, 0x000000, 1, true)
     ui.addTextArea(952, closeButton .. (mode == "game" and gameplay or cmds), target, 100, 90, 600, 230, 0x324650, 0x000000, 1, true)
+end
+
+function displayTitleList(target)
+    local titles = "Listing owned titles. Use !title NEW_TITLE to set a new title."
+    for title, _ in next, players[target]:getTitles() do
+        titles = titles .. "\n« " .. title .. " »"
+    end
+    tfm.exec.chatMessage(titles, target)
 end
 
 function calculateXP(lvl)
@@ -797,6 +809,12 @@ function eventChatCommand(name, msg)
         displayProfile(string.sub(msg, 3), name)
     elseif msg == "help" then
         displayHelp(name, "game")
+    elseif string.sub(msg, 1, 5) == "title" then
+        if string.sub(msg, 7) == "" then
+            displayTitleList(name)
+        else
+            players[name]:setTitle(string.sub(msg, 7))    
+        end
     end
 end
 
@@ -891,6 +909,6 @@ for name, player in next, tfm.get.room.playerList do
     tempData[name] = {}
 end
 
-for id, cmd in next, {"company", "p", "profile", "help"} do
+for id, cmd in next, {"company", "p", "profile", "help", "title"} do
     system.disableChatCommandDisplay(cmd, true)
 end
