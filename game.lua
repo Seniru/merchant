@@ -128,13 +128,12 @@ function Player:getInventory() return self.inventory end
 function Player:getJob() return self.job end
 
 function Player:work()
-    if self.health - find(self.job, jobs).energy > 0 then
-        local job = find(self.job, jobs)
+    local job = jobs[self.job]
+    if self.health - job.energy > 0 then
         self.setHealth(self, -job.energy, true)
         self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
-        for name, shares in next, find(self.company, companies):getShareHolders() do
-            print(name .. ' ' .. shares.shares)
+        for name, shares in next, companies[self.company]:getShareHolders() do
             players[name]:setMoney(shares.shares * job.salary * 0.1, true)
         end
         self:levelUp()
@@ -177,51 +176,46 @@ function Player:setCourse(course)
     self.learnProgress = 0
     self.eduLvl = course.level
     self.eduStream = course.stream
-    ui.addTextArea(3000, "Lessons left:\n0/" .. find(self.learning, courses).lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, true)
+    ui.addTextArea(3000, "Lessons left:\n0/" .. courses[self.learning].lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, true)
 end
 
 function Player:setJob(job)
-    local jobRef = find(job, jobs)
-
-    if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or table.indexOf(self.degrees, jobRef.qualifications) ~= nil) then
-        find(self.company, companies):removeMember(self.name)
+    local jobRef = jobs[job]
+    if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or self.degrees[jobRef.qualifications] ~= nil) then
+        companies[self.company]:removeMember(self.name)
         self.job = job
         self.company = jobRef.company
-        find(self.company, companies):addMember(self.name)
+        companies[self.company]:addMember(self.name)
     end
 end
 
 function Player:addOwnedCompanies(comName)
-    local have = false
-    for k, comp in next, self.ownedCompanies do
-        print(comp)
-        if comp == comName then
-            have = true
-        end
+    if not self.ownedCompanies[comName] then
+        self.ownedCompanies[comName] = companies[comName]
     end
-    if not have then table.insert(self.ownedCompanies, comName) end
 end
 
 function Player:investTo(comName, amount)
     if self.money < amount then
         tfm.exec.chatMessage('Not Enough money!')
     else
-        find(comName, companies):addShareHolder(self.name, amount)
+        companies[comName]:addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
         self:addOwnedCompanies(comName)
     end
 end
 
 function Player:addDegree(course)
-    table.insert(self.degrees, course)
+    self.degrees[course] = courses[course]
 end
 
 function Player:learn()
-    if not learning == "" and self.money > find(self.learning, courses).feePerLesson then
+    print(self.learning)
+    if not (self.learning == "") and self.money > courses[self.learning].feePerLesson then
         self.learnProgress = self.learnProgress + 1
-        ui.updateTextArea(3000, "Lessons left:\n" .. self.learnProgress .. "/" .. find(self.learning, courses).lessons, self.name)
-        self:setMoney(-find(self.learning, courses).feePerLesson, true)
-        if self.learnProgress >= find(self.learning, courses).lessons then
+        ui.updateTextArea(3000, "Lessons left:\n" .. self.learnProgress .. "/" .. courses[self.learning].lessons, self.name)
+        self:setMoney(-courses[self.learning].feePerLesson, true)
+        if self.learnProgress >= courses[self.learning].lessons then
             self:addDegree(self.learning)
             self.learning = ""
             self.eduLvl = self.eduLvl + 1
@@ -309,21 +303,13 @@ function Company:getCapitalHistory() return self.capitalHist end
 function Company:getChartSeries() return self.chartSeries end
 
 function Company:addMember(name)
-    local hasThisMember = false
-    for k, v in ipairs(self.members) do
-        if v == name then hasThisMember = true end
-    end
-    if not hasThisMember then
-        table.insert(self.members, name)
+    if not self.members[name] then
+        self.members[name] = true
     end
 end
 
 function Company:removeMember(name)
-    for k, v in ipairs(self.members) do
-        if v == name then
-            table.remove(self.members, k)
-        end
-    end
+    self.members[name] = nil
 end
 
 function Company:addShareHolder(name, inCapital)
@@ -358,7 +344,7 @@ end
 function displayCourses(target)
     local courseTxt = ""
     local p = players[target]
-    for id, course in ipairs(courses) do
+    for id, course in next, courses do
         if p:getEducationLevel() == course.level and (p:getEducationStream() == course.stream or p:getEducationStream() == "") and learning ~= "" then
             courseTxt = courseTxt .. "<b><font size='13'>" .. course.name .. "</font></b><VP><a href='event:" .. course.uid .. "'><b> | Enroll |</b></a></VP><br><font size='10'>(Fee: " .. course.fee .. " Lessons: " .. course.lessons .. ")</font><br>"
         end
@@ -380,13 +366,12 @@ function displayJobs(target, page)
 end
 
 function displayCompanyDialog(target)
-    if #players[target]:getOwnedCompanies() == 0 then
+    if not next(players[target]:getOwnedCompanies()) then
         ui.addPopup(400, 1, "<p align='center'>No owned companies<br>Do you want to own one?</p>", target, 300, 90, 200, true)
     else
         local companyTxt = ""
         local p = players[target]
-        for k, v in ipairs(p:getOwnedCompanies()) do
-            local company = find(v, companies)
+        for name, company in next, p:getOwnedCompanies() do
             companyTxt = companyTxt .. "<b><a href='event:" .. company:getUID() .. "'>" .. company:getName() .. "</a></b><br>Members: " .. (#company:getMembers() == 0 and "-" or string.sub(table.tostring(company:getMembers()), 2, -3))
         end
         ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
@@ -395,13 +380,13 @@ function displayCompanyDialog(target)
 end
 
 function displayCompany(name, target)
-    if find(name, companies) ~= nil then
-        local com = find(name, companies)
+    if companies[name] ~= nil then
+        local com = companies[name]
         local isOwner = false
         tempData[target].jobCompany = name
         local companyTxt = ""
         local members = ""
-        for k, v in ipairs(com:getMembers()) do
+        for k, v in next, com:getMembers() do
             members = members .. v .. "<br>"
         end
         ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
@@ -429,7 +414,7 @@ end
 
 function displayAllDegrees(target)
     local degreeTxt = ""
-    for k, v in ipairs(courses) do
+    for k, v in next, courses do
         degreeTxt = degreeTxt .. "<a href='event:degree:" .. v.name .. "'>" .. v.name .. "</a><br>"
     end
     ui.addTextArea(600, closeButton .. "<p align='center'><font size='20'><b><J>Choose a Degree</J></b></font></p>" .. degreeTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
@@ -437,7 +422,7 @@ end
 
 function displayInventory(target)
     local invTxt = ""
-    for k, v in pairs(players[target]:getInventory()) do
+    for k, v in next, players[target]:getInventory() do
         invTxt = invTxt .. "<b><font size='12'>".. k .. "</font><a href='event:use:" .. k .."'><VP> | Use x" .. v .. " |</VP> </a></b> : <font size='10'>(Energy: " .. (find(k, healthPacks).regainVal * 100) .. "%)</font><br>"
     end
     ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p><br>" .. (invTxt == "" and nothing or invTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
@@ -469,7 +454,7 @@ function calculateXP(lvl)
 end
 
 function getMaxSalary(comp)
-    return find(comp, companies):getCapital() * 0.1
+    return companies[comp]:getCapital() * 0.1
 end
 
 function displayParticles(target, particle)
@@ -482,8 +467,8 @@ end
 function getQualifiedJobs(player)
     local p = players[player]
     local qjobs = {}
-    for id, job in ipairs(jobs) do
-        if p:getLevel() >= job.minLvl and (job.qualifications == nil or table.indexOf(p:getDegrees(), job.qualifications) ~= nil) then
+    for id, job in next, jobs do
+        if p:getLevel() >= job.minLvl and (job.qualifications == nil or p:getDegrees()[job.qualifications] ~= nil) then
                 table.insert(qjobs, job)
         end
     end
@@ -503,19 +488,6 @@ function createTip(tip, index)
     tips[index] = closeButton .. "<p align='center'><J><b>Tips!</b></J><br><br>" .. tip
 end
 
---[[copied from the internet. lazy to write it by myself :D
-  Credits: walterlua (https://gist.github.com/walterlua/978150/2742d9479cd5bfb3d08d90cfcb014da94021e271)
-           jakbyte
-]]
-function table.indexOf(t, object)
-    if type(t) ~= "table" then error("table expected, got " .. type(t), 2) end
-    for i, v in pairs(t) do
-        if object == v then
-            return i
-        end
-    end
-end
-
 --[[copied from stackoverflow
   Credits: https://stackoverflow.com/users/1514861/ivo-beckers
   Question: https://stackoverflow.com/questions/1426954/split-string-in-lua
@@ -530,7 +502,7 @@ end
 
 function table.tostring(tbl)
     s = "["
-    for k, v in pairs(tbl) do
+    for k, v in next, tbl do
         s = s .. k .. ":" .. v .. ", "
     end
     return s .. "]"
@@ -647,9 +619,6 @@ function setUI(name)
     ui.addTextArea(9, "<a href='event:inv'>Inventory</a>", name, 740, 150, 36, 20, nil, nil, 1, true)
     --Clock interface
     ui.addTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>", name, 288, 180, 100, 100, nil, nil, 0, false)
-    --Stockmarket dashboard
-    --chart:showLabels()
-    --chart:show()
 end
 
 --event handling
@@ -717,7 +686,7 @@ function eventTextAreaCallback(id, name, evt)
             displayJobWizard(name)
         else
             local tempCompany = tempData[name].jobCompany
-            table.insert(jobs, Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany))
+            jobs[tempData[name].jobName] = Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany)
             tempData[name] = {jobCompany = tempCompany}
             ui.removeTextArea(500, name)
         end
@@ -741,7 +710,7 @@ function eventTextAreaCallback(id, name, evt)
             players[name]:setMoney(-pack.price, true)
             players[name]:grabItem(pack.name)
         elseif type == "course" then
-            players[name]:setCourse(find(val, courses))
+            players[name]:setCourse(courses[val])
             ui.removeTextArea(id, name)
         elseif type == "job" then
             players[name]:setJob(val)
@@ -750,7 +719,7 @@ function eventTextAreaCallback(id, name, evt)
             displayCompany(val, name)
         elseif type == "degree" then
             tempData[name].qualification = val
-            local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - find(val, courses).level * 2
+            local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - courses[val].level * 2
             tempData[name].jobEnergy = e < 0 and 1 or e
             ui.removeTextArea(id, name)
             displayJobWizard(name)
@@ -773,11 +742,11 @@ function eventPopupAnswer(id, name, answer)
         ui.addPopup(450, 2, "<p align='center'>Please choose a name<br>Price: $5000<br>Click submit to buy!</p>", name, 300, 90, 200, true)
     end
     elseif id == 450 and answer ~= '' then --for the popup to submit a name for the company
-        if find(answer, companies) then
+        if companies[answer] then
             tfm.exec.chatMessage('Company already exists!')
             return
         end
-        table.insert(companies, Company(answer, name))
+        companies[answer] = Company(answer, name)
         players[name]:setMoney(-5000, true)
         players[name]:addOwnedCompanies(answer)
         displayCompany(answer, name)
@@ -816,7 +785,7 @@ end
 
 function eventLoop(t,r)
     Timer.run(t)
-    for name, player in pairs(players) do
+    for name, player in next, players do
         player:setHealth(player:getHealthRate(), true)
     end
 end
@@ -826,7 +795,7 @@ end
 --game logic
 
 players["shaman"] = Player("shaman")
-table.insert(companies, Company("Atelier801", "shaman"))
+companies["Atelier801"] = Company("Atelier801", "shaman")
 
 chart:showLabels()
 chart:show()
@@ -879,28 +848,27 @@ table.insert(healthPacks, HealthPack("Vito`s Pizza", 700, 0.6, true, "World's be
 table.insert(healthPacks, HealthPack("Vito`s Lasagne", 750, 0.8, true, "World's best lasagne!"))
 table.insert(healthPacks, HealthPack("Ambulance!", 999, 1, false, "Restores your health back! (Powered by Shaman!)"))
 
-
 --creating and storing Course tables
-table.insert(courses, Course("School", 20, 2, 1, ""))
-table.insert(courses, Course("Junior Sports Club", 10, 4, 2, ""))
-table.insert(courses, Course("High School", 500, 20, 3, ""))
-table.insert(courses, Course("Cheese mining", 1000, 30, 4, "admin"))
-table.insert(courses, Course("Cheese trading", 2500, 30, 4, "bs"))
-table.insert(courses, Course("Cheese developing", 2500, 50, 4, "it"))
-table.insert(courses, Course("Law", 35000, 80, 5, "admin"))
-table.insert(courses, Course("Cheese trading-II", 90000, 75, 5, "bs"))
-table.insert(courses, Course("Fullstack cheese developing", 40000, 70, 5, "it"))
+courses["School"] = Course("School", 20, 2, 1, "")
+courses["Junior Sports Club"] = Course("Junior Sports Club", 10, 4, 2, "")
+courses["High School"] = Course("High School", 500, 20, 3, "")
+courses["Cheese mining"] = Course("Cheese mining", 1000, 30, 4, "admin")
+courses["Cheese trading"] = Course("Cheese trading", 2500, 30, 4, "bs")
+courses["Cheese developing"] = Course("Cheese developing", 2500, 50, 4, "it")
+courses["Law"] = Course("Law", 35000, 80, 5, "admin")
+courses["Cheese trading-II"] = Course("Cheese trading-II", 90000, 75, 5, "bs")
+courses["Fullstack cheese developing"] = Course("Fullstack cheese developing", 40000, 70, 5, "it")
 --creating and stofing Job tables
-table.insert(jobs, Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelier801"))
-table.insert(jobs, Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801"))
-table.insert(jobs, Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelier801"))
-table.insert(jobs, Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman", "Atelier801"))
-table.insert(jobs, Job("Cheese trader", 200, 0.2, 12, "Cheese trading", "shaman"))
-table.insert(jobs, Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelier801"))
-table.insert(jobs, Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman", "Atelier801"))
-table.insert(jobs, Job("Fullstack cheeese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801"))
+jobs["Cheese collector"] = Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelier801")
+jobs["Junior miner"] = Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801")
+jobs["Cheese producer"] = Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelier801")
+jobs["Cheese miner"] = Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman", "Atelier801")
+jobs["Cheese trader"] = Job("Cheese trader", 200, 0.2, 12, "Cheese trading", "shaman")
+jobs["Cheeese developer"] = Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelier801")
+jobs["Cheese wholesaler"] = Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman", "Atelier801")
+jobs["Fullstack cheese developer"] = Job("Fullstack cheeese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801")
 
-for name, player in pairs(tfm.get.room.playerList) do
+for name, player in next, tfm.get.room.playerList do
     players[name] = Player(name)
     setUI(name)
     tempData[name] = {}
