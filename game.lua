@@ -234,7 +234,7 @@ function Player:investTo(comName, amount, sharePurchase)
                 return
             end
                 companies[comName]:setShares(-amount / 100, true)
-        end
+            end
         companies[comName]:addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
         self:addOwnedCompanies(comName)
@@ -463,7 +463,7 @@ function displayCompany(name, target)
             --add the relevant event
             ui.addTextArea(403, "<a href='event:issueShares:" .. com:getName() .. "'>Issue Shares</a>", target, 405, 310, 80, 20, nil, nil, 1, true)
         end
-    ui.addTextArea(404, (com:getUnownedShares() == 0 and "<BL>Buy Shares</BL>" or "<a href='event:buyShares:" .. com:getName() .. "'> Buy Shares <font size='10'>(all: " .. com:getUnownedShares() .. ")</font></a>"), target, 315, 310, isOwner and 80 or 170, 20, nil, nil, 1, true)
+        ui.addTextArea(404, (com:getUnownedShares() == 0 and "<BL>Buy Shares</BL>" or "<a href='event:buyShares:" .. com:getName() .. "'> Buy Shares <font size='10'>(all: " .. com:getUnownedShares() .. ")</font></a>"), target, 315, 310, isOwner and 80 or 170, 20, nil, nil, 1, true)
     else
         ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
     end
@@ -555,7 +555,7 @@ end
 function find(name, tbl)
     for k,v in ipairs(tbl) do
         if (v.name == name) then
-        return v
+            return v
         end
     end
     return nil
@@ -712,6 +712,7 @@ function eventPlayerDied(name)
 end
 
 function eventTextAreaCallback(id, name, evt)
+    LineChart.handleClick(id, name, evt)
     if evt == "work" then
         players[name]:work()
     elseif evt == "tips" then
@@ -895,6 +896,7 @@ players["shaman"] = Player("shaman")
 companies["Atelier801"] = Company("Atelier801", "shaman")
 
 chart:showLabels()
+chart:setShowDataPoints(true)
 chart:show()
 
 --creating tips
