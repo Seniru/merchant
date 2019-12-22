@@ -13,6 +13,9 @@ tfm.exec.newGame([[<C><P F="0" L="1600"/><Z><S><S X="79" o="aac4d2" L="162" Y="1
 LineChart.init()
 tfm.exec.addImage("16f2831a4b1.png", "_10", 60, 210) -- Shop image
 tfm.exec.addImage("16f285ae02c.png", "_18", 500, 100) -- School image (icon made by Dinosoft labs in 'flaticons.com')
+tfm.exec.addImage("16f2c24d90e.png", "_50", 1380, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
+tfm.exec.addImage("16f2c24d90e.png", "_50", 1440, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
+tfm.exec.addImage("16f2c24d90e.png", "_50", 1500, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
 
 --game variables
 
