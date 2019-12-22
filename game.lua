@@ -64,12 +64,14 @@ local timer = Timer("time-sys", function()
     if day == 31 then
         day = 1
         month = month + 1
+        companies["Atelier801"]:issueShares(50, "shaman")
         for comp, data in next, companies do
             for i=1, 11, 1 do
-                data.capitalHist[i] = data.capitalHist[i+1]
+                data.shareVal[i] = data.shareVal[i+1]
             end
-            data.capitalHist[12] = data.capital
-            data.chartSeries:setData(range(1, 12, 1), data.capitalHist)
+            data.shareVal[12] = data.incomePerMonth / data.outstandingShares + 100
+            data.chartSeries:setData(range(1, 12, 1), data.shareVal)
+            data.incomePerMonth = 0
         end
         chart:showLabels()
         chart:show()
@@ -143,6 +145,7 @@ function Player:work()
         self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
         self:addTitle("Worker")
+        companies[self.company]:setIncome(job.salary * 0.5, true)
         for name, shares in next, companies[self.company]:getShareHolders() do
             players[name]:setMoney(shares.shares * job.salary * 0.1, true)
         end
@@ -221,14 +224,22 @@ function Player:addOwnedCompanies(comName)
     end
 end
 
-function Player:investTo(comName, amount)
+function Player:investTo(comName, amount, sharePurchase)
     if self.money < amount then
-        tfm.exec.chatMessage('Not Enough money!')
+        tfm.exec.chatMessage('Not Enough money!', self.name)
     else
+        if sharePurchase then
+            if companies[comName]:getUnownedShares() < amount / 100 then
+                tfm.exec.chatMessage("Company doesn't issue shares of the specified amount", self.name)
+                return
+            end
+                companies[comName]:setShares(-amount / 100, true)
+        end
         companies[comName]:addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
         self:addOwnedCompanies(comName)
         self:addTitle("Investor")
+        displayCompany(comName, self.name)
     end
 end
 
@@ -314,8 +325,11 @@ function Company.new(name, owner)
     self.capital = 5000
     self.members = {}
     self.jobs = {}
-    self.capitalHist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5000}
-    self.chartSeries = Series(range(1, 12, 1), self.capitalHist, name)
+    self.unownedShares = 0
+    self.outstandingShares = 50
+    self.incomePerMonth = 0
+    self.shareVal = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100}
+    self.chartSeries = Series(range(1, 12, 1), self.shareVal, name)
     chart:addSeries(self.chartSeries)
     self.uid = "com:" .. name
     return self
@@ -328,8 +342,11 @@ function Company:getMembers() return self.members end
 function Company:getJobs() return self.jobs end
 function Company:getUID() return self.uid end
 function Company:getCapital() return self.capital end
-function Company:getCapitalHistory() return self.capitalHist end
+function Company:getshareValory() return self.shareVal end
 function Company:getChartSeries() return self.chartSeries end
+function Company:getUnownedShares() return self.unownedShares end
+function Company:getOutstandingShares() return self.outstandingShares end
+function Company:getIncomePerMonth() return self.incomePerMonth end
 
 function Company:addMember(name)
     if not self.members[name] then
@@ -352,7 +369,25 @@ end
 
 function Company:addCapital(amount)
     self.capital = self.capital + amount
-    self.capitalHist[month] = self.capital
+    self.shareVal[month] = self.capital
+end
+
+function Company:issueShares(number, auth)
+    if self.shareholders[auth] then
+        self.unownedShares = self.unownedShares + number
+    end
+end
+
+function Company:setShares(amount, add, category)
+    if category == "outstanding" then
+        self.outstandingShares = add and self.outstandingShares + amout or amount
+    else
+        self.unownedShares = add and self.unownedShares + amount or amount
+    end
+end
+
+function Company:setIncome(amount, add)
+    self.incomePerMonth = add and self.incomePerMonth + amount or amount
 end
 
 --class creation(Company) ends
@@ -415,8 +450,8 @@ function displayCompany(name, target)
         tempData[target].jobCompany = name
         local companyTxt = ""
         local members = ""
-        for k, v in next, com:getMembers() do
-            members = members .. v .. "<br>"
+        for name, v in next, com:getMembers() do
+            members = members .. name .. "<br>"
         end
         ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
         for n, _ in next, com:getShareHolders() do
@@ -424,8 +459,11 @@ function displayCompany(name, target)
         end
         if isOwner then
             ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
+            ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
+            --add the relevant event
+            ui.addTextArea(403, "<a href='event:issueShares:" .. com:getName() .. "'>Issue Shares</a>", target, 405, 310, 80, 20, nil, nil, 1, true)
         end
-        ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
+    ui.addTextArea(404, (com:getUnownedShares() == 0 and "<BL>Buy Shares</BL>" or "<a href='event:buyShares:" .. com:getName() .. "'> Buy Shares <font size='10'>(all: " .. com:getUnownedShares() .. ")</font></a>"), target, 315, 310, isOwner and 80 or 170, 20, nil, nil, 1, true)
     else
         ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
     end
@@ -702,6 +740,8 @@ function eventTextAreaCallback(id, name, evt)
         if id == 400 then
             ui.removeTextArea(401, name)
             ui.removeTextArea(402, name)
+            ui.removeTextArea(403, name)
+            ui.removeTextArea(404, name)
         elseif id == 800 then
             ui.removeTextArea(801, name)
             ui.removeTextArea(802, name)
@@ -769,6 +809,13 @@ function eventTextAreaCallback(id, name, evt)
         elseif type == "invest" then
             ui.addPopup(700, 2, "Please enter the amount to invest. (Should be a valid number)", name, 300, 90, 200, true)
             tempData[name].investing = val
+        elseif type == "buyShares" then
+            local comp = companies[val]
+            ui.addPopup(800, 2, "This company issues " .. comp:getUnownedShares() .. " shares.<br>Enter the amount you want to purchase (1 share = $100)", name, 300, 90, 200, true)
+            tempData[name].investing = val
+        elseif type == "issueShares" then
+            ui.addPopup(900, 2, "Please specify the number of shares you want to issue (Should be a valid number)", name, 300, 90, 200, true)
+            tempData[name].issuesSharesIn = val
         end
     end
 end
@@ -807,6 +854,11 @@ function eventPopupAnswer(id, name, answer)
         displayJobWizard(name)
     elseif id == 700 and tonumber(answer) then --for the investment popups
         players[name]:investTo(tempData[name].investing, tonumber(answer))
+    elseif id == 800 and tonumber(answer) then
+        players[name]:investTo(tempData[name].investing, tonumber(answer) * 100, true)
+    elseif id == 900 and tonumber(answer) then
+        companies[tempData[name].issuesSharesIn]:issueShares(tonumber(answer), name)
+        displayCompany(tempData[name].issuesSharesIn, name)
     end
 end
 
