@@ -13,9 +13,7 @@ tfm.exec.newGame([[<C><P F="0" L="1600"/><Z><S><S X="79" o="aac4d2" L="162" Y="1
 LineChart.init()
 tfm.exec.addImage("16f2831a4b1.png", "_10", 60, 210) -- Shop image
 tfm.exec.addImage("16f285ae02c.png", "_18", 500, 100) -- School image (icon made by Dinosoft labs in 'flaticons.com')
-tfm.exec.addImage("16f2c24d90e.png", "_50", 1380, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
-tfm.exec.addImage("16f2c24d90e.png", "_50", 1440, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
-tfm.exec.addImage("16f2c24d90e.png", "_50", 1500, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
+tfm.exec.addImage("16f3176f389.png", "_50", 1450, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
 
 --game variables
 
@@ -58,6 +56,11 @@ local gameplay = [[
     <b><u>Companies:</u></b>  You can buy a company when you have enough money for it. You can use your company to create jobs and recruit workers. (And that will increase your profit more and more!!).
     ]]
 
+local ab = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
+local latestLotto = {}
+local lottoWins = {}
+local lottoBuyers = {}
+
 local chart = LineChart(1, 944, 60, 450, 185)
 local timer = Timer("time-sys", function()
     day = day + 1
@@ -65,6 +68,7 @@ local timer = Timer("time-sys", function()
         day = 1
         month = month + 1
         companies["Atelier801"]:issueShares(50, "shaman")
+        --updating the stock market dashboard
         for comp, data in next, companies do
             for i=1, 11, 1 do
                 data.shareVal[i] = data.shareVal[i+1]
@@ -75,6 +79,13 @@ local timer = Timer("time-sys", function()
         end
         chart:showLabels()
         chart:show()
+        --checking lottery winners
+        latestLotto = {math.random(1, 100), math.random(1, 100), math.random(1, 100), ab[math.random(1, 26)]}
+        checkLottoWinners()
+        for name, wins in next, lottoWins do
+            players[name]:setMoney(wins, true)
+        end
+        lottoBuyers = {}
         if month == 13 then
             month = 1
             year = year + 1
@@ -204,7 +215,8 @@ function Player:setCourse(course)
     self.eduLvl = course.level
     self.eduStream = course.stream
     self:addTitle("Little Learner")
-    ui.addTextArea(3000, "Lessons left:\n0/" .. courses[self.learning].lessons, self.name, 5, 100, 50, 50, nil, nil, 0.8, true)
+    ui.updateTextArea(5, "<a href='event:courses'><font size='15'><b>Learn</b></font></a>", self.name)
+    ui.addTextArea(3000, "<p align='center'><b>Lessons left: 0 / " .. courses[self.learning].lessons .. "</b></p>", self.name, 480, 180, 300, 20, nil, nil, 0, false)
 end
 
 function Player:setJob(job)
@@ -251,7 +263,7 @@ end
 function Player:learn()
     if not (self.learning == "") and self.money > courses[self.learning].feePerLesson then
         self.learnProgress = self.learnProgress + 1
-        ui.updateTextArea(3000, "Lessons left:\n" .. self.learnProgress .. "/" .. courses[self.learning].lessons, self.name)
+        ui.updateTextArea(3000, "<b><p align='center'>Lessons left: " .. self.learnProgress .. " / " .. courses[self.learning].lessons .. "</b></p>", self.name)
         self:setMoney(-courses[self.learning].feePerLesson, true)
         if self.learnProgress >= courses[self.learning].lessons then
             self:addDegree(self.learning)
@@ -300,6 +312,30 @@ function Player:useItem(item)
         self.inventory[item] = nil
     end
   end
+end
+
+function Player:buyLottery(choices)
+    local invalid = not choices:find("%s*%d+%s+%d+%s+%d+%s+[a-zA-Z]%s*")
+    if invalid then
+        return tfm.exec.chatMessage('Invalid input!', self.name)
+    end
+    choices = map(split(choices:gsub("%s+", " "), " "), function(x)
+        if x:find("%d+") then
+            local n = tonumber(x)
+            if n < 0 or n > 100 then invalid = true end
+            return n
+        end
+        if x:find("[a-zA-Z]") then return x:upper() end
+        invalid = true
+    end)
+    if invalid then
+        tfm.exec.chatMessage("Invalid input!")
+    else
+        self:setMoney(-20, true)
+        if not lottoBuyers[self.name] then lottoBuyers[self.name] = {} end
+        table.insert(lottoBuyers[self.name], choices)
+        tfm.exec.chatMessage("Bought a lottery!", self.name)
+    end
 end
 
 --class creation(Player) ends
@@ -526,6 +562,12 @@ function displayTitleList(target)
     tfm.exec.chatMessage(titles, target)
 end
 
+function displayLotto(target)
+    local txt = "<p align='center'><font size='20'><b><J>Lotto Info</J></b></font><br><br><b>This month's winning lotto: </b>" .. ((#latestLotto == 0) and 'No drawings yet!' or latestLotto[1] .. ", " .. latestLotto[2] ..  ", " .. latestLotto[3] .. ", " .. latestLotto[4]) .. "<br><br>"
+    txt = txt .. ((lottoWins[target] == nil or lottoWins[target] == 0) and "You have no wins in the past month!" or "You have won $" .. lottoWins[target] .. " in the past month") .. "</p>"
+    ui.addTextArea(4000, closeButton .. txt, target, 200, 90, 400, 200, nil, nil, 1, true)
+end
+
 function calculateXP(lvl)
     return 2.5 * (lvl + 2) * (lvl - 1)
 end
@@ -563,6 +605,32 @@ end
 
 function createTip(tip, index)
     tips[index] = closeButton .. "<p align='center'><J><b>Tips!</b></J><br><br>" .. tip
+end
+
+function checkLottoWinners(p)
+    if p then
+        return lottoWins[p]
+    end
+    lottoWins = {}
+    for name, lottos in next, lottoBuyers do
+        local wins = 0
+        for _, lotto in next, lottos do
+            wins = wins + getWinPrice(lotto)
+        end
+        lottoWins[name] = wins
+    end
+end
+
+function getWinPrice(lotto)
+    local wins = 0
+    if latestLotto[1] == lotto[1] and latestLotto[2] == lotto[2] and latestLotto[3] == lotto[3] and latestLotto[4] == lotto[4] then
+        return 100000
+    elseif (latestLotto[1] == lotto[1] and latestLotto[2] == lotto[2]) or (latestLotto[2] == lotto[2] and latestLotto[3] == lotto[3]) or (latestLotto[1] == lotto[1] and latestLotto[3] == lotto[3]) then
+        wins = 5000
+    elseif (latestLotto[4] == lotto[4]) then
+        return wins + 1000
+    end
+    return wins
 end
 
 --[[copied from stackoverflow
@@ -683,9 +751,9 @@ function setUI(name)
     --xp bar area
     ui.addTextArea(3, "<p align='center'>Level 1  -  0/" .. calculateXP(2) .. "XP</p>", name, CONSTANTS.BAR_X, 370, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
     --shop button
-    ui.addTextArea(4, "<a href='event:shop'>Shop</a>", name, 740, 300, 36, 20, nil, nil, 1, true)
+    ui.addTextArea(4, "<a href='event:shop'><b><font color='#000000' size='15'>Shop</font></b></a>", name, 100, 230, 50, 40, nil, nil, 0, false)
     --school button
-    ui.addTextArea(5, "<a href='event:courses'>Learn</a>", name, 740, 270, 36, 20, nil, nil, 1, true)
+    ui.addTextArea(5, "<a href='event:courses'><font size='15'><b>Enter</b></font></a>", name, 600, 270, 60, 20, nil, nil, 0, false)
     --jobs button
     ui.addTextArea(6, "<a href='event:jobs'>Jobs</a>", name, 740, 240, 36, 20, nil, nil, 1, true)
     --Company button
@@ -696,6 +764,8 @@ function setUI(name)
     ui.addTextArea(9, "<a href='event:inv'>Inventory</a>", name, 740, 150, 36, 20, nil, nil, 1, true)
     --Clock interface
     ui.addTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>", name, 288, 180, 100, 100, nil, nil, 0, false)
+    --Lottery board
+    ui.addTextArea(13, "<p align='center'><a href='event:getLottery'>Buy Lottery!</a><br><br><a href='event:checkLotto'>Check</a></p>", name, 1530, 250, 50, 65, nil, nil, 1, false)
 end
 
 --event handling
@@ -782,6 +852,10 @@ function eventTextAreaCallback(id, name, evt)
         ui.addPopup(604, 2, "<p align='center'>Please select the minimum level (<i>Should be a number</i>", name, 300, 90, 200, true)
     elseif evt == "chooseJobDegree" then
         displayAllDegrees(name)
+    elseif evt == "getLottery" then
+        ui.addPopup(1000, 2, "<p align='center'>Please enter your choices (3 numbers between 0 and 100 and a letter) separated by spaces. <br><i>eg:15 20 30 B</i></p>", name, 300, 90, 200, true)
+    elseif evt == "checkLotto" then
+        displayLotto(name)
     elseif evt:gmatch("%s+:%s+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
@@ -860,6 +934,8 @@ function eventPopupAnswer(id, name, answer)
     elseif id == 900 and tonumber(answer) then
         companies[tempData[name].issuesSharesIn]:issueShares(tonumber(answer), name)
         displayCompany(tempData[name].issuesSharesIn, name)
+    elseif id == 1000 then
+        players[name]:buyLottery(answer)
     end
 end
 
