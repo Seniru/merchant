@@ -761,13 +761,14 @@ function setUI(name)
     ui.addTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>", name, 288, 180, 100, 100, nil, nil, 0, false)
     --Lottery board
     ui.addTextArea(13, "<p align='center'><a href='event:getLottery'>Buy Lottery!</a><br><br><a href='event:checkLotto'>Check</a></p>", name, 1530, 250, 50, 65, nil, nil, 1, false)
-    LineChart.init()
     tfm.exec.addImage("16f2831a4b1.png", "_10", 60, 210) -- Shop image
     tfm.exec.addImage("16f285ae02c.png", "_18", 500, 100) -- School image (icon made by Dinosoft labs in 'flaticons.com')
     tfm.exec.addImage("16f3176f389.png", "_50", 1450, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
+    LineChart.init()
     chart:showLabels()
     chart:setShowDataPoints(true)
     chart:show()
+    tfm.exec.chatMessage("<BV><b>Welcome to the Clicker!</b></BV><br><N>For more information type <J><b>!help</b></J><br>The game is under development. Please report any bug to <b><V>King_seniru#5890</V></b>", name)
 end
 
 --event handling
