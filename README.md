@@ -7,7 +7,7 @@
 ![GitHub stars](https://img.shields.io/github/stars/seniru/tfm_clicker)
 ![GitHub forks](https://img.shields.io/github/forks/seniru/tfm_clicker)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/seniru/tfm_clicker?color=green)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/Seniru/TFM_Clicker) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/Seniru/TFM_Clicker)
 
 ## Introduction
 
