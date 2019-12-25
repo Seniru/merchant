@@ -527,10 +527,10 @@ function displayInventory(target)
 end
 
 function displayTips(target)
-    ui.addTextArea(800, tips[1], target, 6, 150, 120, 150, 0x324650, 0x000000, 1, true)
-    ui.addTextArea(801, "«", target, 10, 315, 10, 15, nil, nil, 1, true)
-    ui.addTextArea(802, "Page 1", target, 35, 315, 50, 15, nil, nil, 1, true)
-    ui.addTextArea(803, "<p align='center'><a href='event:page:tip:2'>»</a></p>", target, 100, 315, 15, 15, nil, nil, 1, true)
+    ui.addTextArea(800, tips[1], target, 6, 120, 120, 150, 0x324650, 0x000000, 1, true)
+    ui.addTextArea(801, "«", target, 10, 285, 10, 15, nil, nil, 1, true)
+    ui.addTextArea(802, "Page 1", target, 35, 285, 50, 15, nil, nil, 1, true)
+    ui.addTextArea(803, "<p align='center'><a href='event:page:tip:2'>»</a></p>", target, 100, 285, 15, 15, nil, nil, 1, true)
 end
 
 function displayProfile(name, target)
