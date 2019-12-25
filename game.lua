@@ -51,7 +51,58 @@ local cmds = [[
     <b><u>Companies:</u></b>  You can buy a company when you have enough money for it. You can use your company to create jobs and recruit workers. (And that will increase your profit more and more!!).
     ]]
 -- todo: add the help    
-local gameplay = {"<p align='center'><font size='20'><b><J>Game Play</J></b></font></p>GAMEPLAY HELP TODO"}
+local gameplay = {[[
+    <p align='center'><font size='20'><b><J>Gameplay Overview</J></b></font></p>
+    <font size='12'>This is a <b>Clicker</b> which is largely based on businesses we see everywhere. You start as a little mouse with a basic job, but with a great story to write! Your goal is to earn money, buy companis, hire workers and be the best businessman in transformice!
+    Click each title to know more about each thing in depth:
+    <b><BV>
+            <a href='event:page:help:2'>• Working</a>                       <a href='event:page:help:6'>• Shop</a>
+            <a href='event:page:help:3'>• Learning</a>                      <a href='event:page:help:7'>• Jobs</a>
+            <a href='event:page:help:4'>• Companies</a>
+            <a href='event:page:help:5'>• Investing and Shares</a>
+    </BV></b></font>
+    ]],
+    [[
+    <p align='center'><font size='20'><b><J>Working</J></b></font></p>
+    <font size='12'>This is the starting point for many players in this game. Working gives you money, and also it increases our XP level. To work, simply click the button in the bottom-right corner saying <b>Work!</b>
+    As you work, your energy reduces. The amount of energy depends on the job you are doing currently. There are lots of jobs available (and you can create as well) and all of them have varying salaries and energy levels.
+    If you do a good job, then surely you will get lot of money with minimum effort. Please read the page at <a href='event:page:help:7'><b><BV>jobs</BV></b></a> to know more about them.
+    </font>
+    ]],
+    [[
+    <p align='center'><font size='20'><b><J>Learning</J></b></font></p>
+    <font size='12'>Learning makes a person better, so do here.
+    <b><u>Why learning?</u></b>
+    When you learn, you'd get qualifications to do many jobs with many benefits. Also according to the level of your education, the amount of energy you spend on jobs decreases. So why not learning?
+    <b><u>How?</u></b>
+    You can learn by entering the school. Then enroll a course of your choice and start learning. Your learning progress is displayed on top of the school, so you can plan things accordingly
+    </font>
+    ]],
+    [[
+    <p align='center'><font size='20'><b><J>Companies</J></b></font></p>
+    <font size='12'>Companies are the most important things in this game; and it's the fastest way to become rich! You can view information about a company using the <i><font color='#6A7495'>!company COMPANY_NAME</font></i> command.
+    There are 2 ways to own a company: By buying shares of an existing company or buying a new company for money.
+    To buy a company you need to spend $5000 in your hand. Click 'Company' button and follow the instructions. If you already own companies, click the 'Create a new company' button in companies menu. To buy shares of a company of a company, simply view the desired company and do 'Buy shares' if the company has issued shares). After that you'd get the ownership of that company and you can do anything.         <i><font color='#6A7495'>(to be  continued...)</font></i>
+    </font>
+    ]],
+    [[
+    <p align='center'><font size='20'><b><J>Companies - Investing, Issuing and buying shares</J></b></font></p>
+    <font size='12'>Share is based on the ownership for a ceratain company. Sometimes you may need more money to grow your business. In such cases issuing shares is a good idea. Buy doing so you'll improve the capital and also share the ownership of your company. Click the 'Issue Shares' button in the company's menu and follow the instructions. 1 share worths $100 in this game.
+    When a certain company issue shares in the above manner, the public will be able to buy some shares to get more profit. You can buy shares buy following the instructions mentioned in the previous section.
+    You can also increase the capital without issuing any sharing. That's by investing into your own company. Click the invest button and follow the instructions to invest!
+    </font>
+    ]],
+    [[
+    <p align='center'><font size='20'><b><J>Shop</J></b></font></p>
+    <font size='12'>
+    Shop includes healthpacks which can be used to increase your health. After buying things in shop, they will get stored in your inventory temporarily. So check your inventory and use the things you bought according to your choice!
+    </font>
+    ]],
+    [[
+    <p align='center'><font size='20'><b><J>Jobs</J></b></font></p>
+    THE JOB HELP MENU IS STILL UNDER CONSTRUCTION! HOPE IT'D BE AVAILABLE SOON
+    ]]
+}
 
 local ab = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 local latestLotto = {}
