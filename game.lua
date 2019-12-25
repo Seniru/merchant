@@ -42,14 +42,16 @@ local cmds = [[
   <b>!company <i>[company name]:</i></b> Displays the specified compnay
   <b>!p <i>[player name]</i> or !profile <i>[player name]</i></b> Displays information about the specified player
 ]]
-local gameplay = [[
-    <p align='center'><font size='20'><b><J>Game Play</J></b></font></p>
+--local gameplay = --[[[[
+   --[[ <p align='center'><font size='20'><b><J>Game Play</J></b></font></p>
     TFM Clicker is a game <b>clicker</b> which is based on an office/working environment. Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
     <b><u>Working:</u></b> You have to work to earn money. You just need to click the 'Work' button in the corner! When you work, it will result in reduction of your health. And also increase in your money. Different jobs have different salaries and energy costs!
     <b><u>Shop:</u></b>  Shop is the place you can buy usesful stuff <font size='8'>(that you all know ^_^)</font>. Bought items are stored temporarily in the inventory. You can use them to increase your health when neaded.
     <b><u>Learning:</u></b> Learning is the only way to get qualifications for some jobs. Higher educational qualifications would result in better jobs.
     <b><u>Companies:</u></b>  You can buy a company when you have enough money for it. You can use your company to create jobs and recruit workers. (And that will increase your profit more and more!!).
     ]]
+-- todo: add the help    
+local gameplay = {"<p align='center'><font size='20'><b><J>Game Play</J></b></font></p>GAMEPLAY HELP TODO"}
 
 local ab = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 local latestLotto = {}
@@ -543,10 +545,15 @@ function displayProfile(name, target)
     end
 end
 
-function displayHelp(target, mode)
-    ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 130, 75, 20, 0x324650, 0x000000, 1, true)
-    ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 95, 75, 20, 0x324650, 0x000000, 1, true)
-    ui.addTextArea(952, closeButton .. (mode == "game" and gameplay or cmds), target, 100, 90, 600, 230, 0x324650, 0x000000, 1, true)
+function displayHelp(target, mode, page)
+    ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 120, 75, 20, 0x324650, 0x000000, 1, true)
+    ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 85, 75, 20, 0x324650, 0x000000, 1, true)
+    ui.addTextArea(952, closeButton .. (mode == "game" and gameplay[page or 1] or cmds), target, 110, 80, 600, 200, 0x324650, 0x000000, 1, true)
+    if mode == "game" then
+        ui.addTextArea(953, "«",  target, 600, 300, 15, 15, nil, nil, 1, true)
+        ui.addTextArea(954, "Page 1", target, 630, 300, 50, 15, nil, nil, 1, true)
+        ui.addTextArea(955, "<a href='event:page:help:2'>»</a></p>", target, 695, 300, 15, 15, nil, nil, 1, true)
+    end
 end
 
 function displayTitleList(target)
@@ -677,6 +684,8 @@ function getTotalPages(type, target)
         return #healthPacks / 2 + (#healthPacks % 2)
     elseif type == 'jobs' then
         return #getQualifiedJobs(target) / 2 + (#getQualifiedJobs(target) % 2)
+    elseif type == 'help' then
+        return #gameplay
     end
     return 0
 end
@@ -688,6 +697,11 @@ function updatePages(name, type, page)
             ui.updateTextArea(801, "<a href='event:page:tip:" .. (page - 1) .. "'>«</a>", name)
             ui.updateTextArea(802, "<p align='center'>Page " .. page .. "</p>", name)
             ui.updateTextArea(803, "<a href='event:page:tip:" .. (page + 1) .. "'>»</a>", name)
+        elseif type == 'help' then
+            ui.updateTextArea(952, closeButton .. gameplay[page], name)
+            ui.updateTextArea(953, "<a href='event:page:help:" .. (page - 1) .. "'>«</a>",  name)
+            ui.updateTextArea(954, "<p align='center'>Page " .. page .. "</p>", name)
+            ui.updateTextArea(955, "<a href='event:page:help:" .. (page + 1) .. "'>»</a>", name)
         elseif type == 'shop' then
             displayShop(name, page)
         elseif type == 'jobs' then
@@ -829,8 +843,9 @@ function eventTextAreaCallback(id, name, evt)
             ui.removeTextArea(302, name)
             ui.removeTextArea(303, name)
         elseif id == 952 then
-            ui.removeTextArea(950, name)
-            ui.removeTextArea(951, name)
+            for i=950, 956, 1 do
+                ui.removeTextArea(i, name)
+            end
         end
     elseif evt == "company" then
         displayCompanyDialog(name)
