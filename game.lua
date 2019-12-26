@@ -876,6 +876,9 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "tips" then
         displayTips(name)
     elseif evt == "cmds" then
+        ui.removeTextArea(953, name)
+        ui.removeTextArea(954, name)
+        ui.removeTextArea(955, name)
         displayHelp(name, "cmds")
     elseif evt == "game" then
         displayHelp(name, "game")
