@@ -100,7 +100,27 @@ local gameplay = {[[
     ]],
     [[
     <p align='center'><font size='20'><b><J>Jobs</J></b></font></p>
-    THE JOB HELP MENU IS STILL UNDER CONSTRUCTION! HOPE IT'D BE AVAILABLE SOON
+    <font size='12'>You need a job to work. Each job has different salaries and energies. You can apply for a job by visiting the job menu (NOTE: You can only see jobs that you are qualified). To become qualified for a certain job, your level should be higher than the minimum level required for that job. You may also need to complete some degrees by learning, to apply for some jobs. Jobs with higher level and educational level usually have low energy consumption and higher salaries. Also if you have achieved a certain educational level, you will spend less energy when working. So keep in mind that learning is always good!
+    Jobs are offered by company owners, so doing a job means you are working for a particular company. When you work both you, company owners and company get profit... 
+    </font>
+    ]],
+    [[
+    <p align='center'><font size='20'><b><J>Creating Jobs</J></b></font></p>
+    <font size='12'>You need to become an owner to create a job. You can start creating a job by clicking the 'Create job' button in the company. You would see a dialogue asking some information about the job
+        • Job Name (required): The name of the job
+        • Salary (required): The salary. For a company, there's a maximum limit of salary that could be assigned to a job, which depends on the amount of invested capital. It will cost more energy if you created the job with a salary close to the minimum amount, and vice-versa.
+        • Energy (required): The amount of energy spend. Energy depends on the salary, minimum level of the job and the qualifications for it.  <i><font color='#6A7495'>(to be  continued...)</font></i>
+    </font>
+    ]],
+    [[
+    <p align='center'><font size='20'><b><J>Creating Jobs</J></b></font></p>
+    <font size='12'><i><font color='#6A7495'>(from the last page...)</font></i>
+        • Minimum level (required): The minimum level of a player to apply for this job. Increasing the level would decrease the energy
+        • Qualifications (optional): The educational qualifications required for this job. Increasing this would decrease the energy further!
+    Salary and the energy consumed is the factor that many workers are looking for. So be careful when choosing this!
+    
+    <b><J>GOOD LUCK!</J></b>
+    </font>    
     ]]
 }
 
