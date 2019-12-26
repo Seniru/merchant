@@ -493,7 +493,6 @@ function displayCompany(name, target)
         if isOwner then
             ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
             ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
-            --add the relevant event
             ui.addTextArea(403, "<a href='event:issueShares:" .. com:getName() .. "'>Issue Shares</a>", target, 405, 310, 80, 20, nil, nil, 1, true)
         end
         ui.addTextArea(404, (com:getUnownedShares() == 0 and "<BL>Buy Shares</BL>" or "<a href='event:buyShares:" .. com:getName() .. "'> Buy Shares <font size='10'>(all: " .. com:getUnownedShares() .. ")</font></a>"), target, 315, 310, isOwner and 80 or 170, 20, nil, nil, 1, true)
@@ -506,7 +505,7 @@ function displayJobWizard(target)
     ui.addTextArea(500, closeButton .. [[<p align='center'><font size='20'><b><J>Job Wizard</J></b></font></p><br><br>
     <b>Job Name: </b><a href='event:selectJobName'>]] ..  (tempData[target].jobName == nil and "Select" or tempData[target].jobName) .. [[</a>
     <b>Salary: </b><a href='event:selectJobSalary'> ]] .. (tempData[target].jobSalary == nil and "Select" or tempData[target].jobSalary) .. [[</a>
-    <b>Enery: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy .. "%") .. [[</a>
+    <b>Energy: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy .. "%") .. [[</a>
     <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == nil and "Select" or tempData[target].minLvl) .. [[</a>
     <b>Qualifcations: </b><a href='event:chooseJobDegree'>]] .. (tempData[target].qualification == nil and "Select" or tempData[target].qualification) .. [[</a><br>
     ]], target, 200, 90, 400, 200, nil, nil, 1, true)
@@ -826,6 +825,7 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "close" then
         ui.removeTextArea(id, name)
         if id == 400 then
+            print(name)
             ui.removeTextArea(401, name)
             ui.removeTextArea(402, name)
             ui.removeTextArea(403, name)
