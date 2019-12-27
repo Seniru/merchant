@@ -42,18 +42,10 @@ local cmds = [[
   <b>!company <i>[company name]:</i></b> Displays the specified compnay
   <b>!p <i>[player name]</i> or !profile <i>[player name]</i></b> Displays information about the specified player
 ]]
---local gameplay = --[[[[
-   --[[ <p align='center'><font size='20'><b><J>Game Play</J></b></font></p>
-    TFM Clicker is a game <b>clicker</b> which is based on an office/working environment. Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
-    <b><u>Working:</u></b> You have to work to earn money. You just need to click the 'Work' button in the corner! When you work, it will result in reduction of your health. And also increase in your money. Different jobs have different salaries and energy costs!
-    <b><u>Shop:</u></b>  Shop is the place you can buy usesful stuff <font size='8'>(that you all know ^_^)</font>. Bought items are stored temporarily in the inventory. You can use them to increase your health when neaded.
-    <b><u>Learning:</u></b> Learning is the only way to get qualifications for some jobs. Higher educational qualifications would result in better jobs.
-    <b><u>Companies:</u></b>  You can buy a company when you have enough money for it. You can use your company to create jobs and recruit workers. (And that will increase your profit more and more!!).
-    ]]
--- todo: add the help
+
 local gameplay = {[[
     <p align='center'><font size='20'><b><J>Gameplay Overview</J></b></font></p>
-    <font size='12'>This is a <b>Clicker</b> which is largely based on businesses we see everywhere. You start as a little mouse with a basic job, but with a great story to write! Your goal is to earn money, buy companis, hire workers and be the best businessman in transformice!
+    <font size='12'>This is a <b>Clicker</b> which is largely based on businesses we see everywhere. You start as a little mouse with a basic job, but with a great story to write! Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
     Click each title to know more about each thing in depth:
     <b><BV>
             <a href='event:page:help:2'>• Working</a>                       <a href='event:page:help:6'>• Shop</a>
@@ -64,8 +56,8 @@ local gameplay = {[[
     ]],
     [[
     <p align='center'><font size='20'><b><J>Working</J></b></font></p>
-    <font size='12'>This is the starting point for many players in this game. Working gives you money, and also it increases our XP level. To work, simply click the button in the bottom-right corner saying <b>Work!</b>
-    As you work, your energy reduces. The amount of energy depends on the job you are doing currently. There are lots of jobs available (and you can create as well) and all of them have varying salaries and energy levels.
+    <font size='12'>This is the starting point for many players in this game. Working gives you money, and also it increases your XP level. To work, simply click the button in the bottom-left corner saying <b>Work!</b>
+    As you work, your energy reduces. The amount of energy depends on the job you are currently doing. There are lots of jobs available (and you can create as well) and all of them have varying salaries and energy levels.
     If you do a good job, then surely you will get lot of money with minimum effort. Please read the page at <a href='event:page:help:7'><b><BV>jobs</BV></b></a> to know more about them.
     </font>
     ]],
@@ -73,7 +65,7 @@ local gameplay = {[[
     <p align='center'><font size='20'><b><J>Learning</J></b></font></p>
     <font size='12'>Learning makes a person better, so do here.
     <b><u>Why learning?</u></b>
-    When you learn, you'd get qualifications to do many jobs with many benefits. Also according to the level of your education, the amount of energy you spend on jobs decreases. So why not learning?
+    When you learn, you'll get qualifications to do many jobs with many benefits. Also according to the level of your education, the amount of energy you spend on jobs decreases. So why not learning?
     <b><u>How?</u></b>
     You can learn by entering the school. Then enroll a course of your choice and start learning. Your learning progress is displayed on top of the school, so you can plan things accordingly
     </font>
@@ -897,9 +889,7 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "inv" then
         displayInventory(name)
     elseif evt == "close" then
-        ui.removeTextArea(id, name)
         if id == 400 then
-            print(name)
             ui.removeTextArea(401, name)
             ui.removeTextArea(402, name)
             ui.removeTextArea(403, name)
@@ -921,6 +911,7 @@ function eventTextAreaCallback(id, name, evt)
                 ui.removeTextArea(i, name)
             end
         end
+        ui.removeTextArea(id, name)
     elseif evt == "company" then
         displayCompanyDialog(name)
     elseif evt == "createJob" then
