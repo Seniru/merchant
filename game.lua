@@ -122,6 +122,7 @@ local lottoWins = {}
 local lottoBuyers = {}
 
 local chart = LineChart(1, 944, 60, 450, 185)
+local dummySeries = Series({0}, {0}, "dummy") -- *sigh*
 local timer = Timer("time-sys", function()
     day = day + 1
     if day == 31 then
@@ -129,6 +130,7 @@ local timer = Timer("time-sys", function()
         month = month + 1
         companies["Atelier801"]:issueShares(50, "shaman")
         --updating the stock market dashboard
+        chart:addSeries(dummySeries)
         for comp, data in next, companies do
             for i=1, 11, 1 do
                 data.shareVal[i] = data.shareVal[i+1]
@@ -136,7 +138,12 @@ local timer = Timer("time-sys", function()
             data.shareVal[12] = data.incomePerMonth / data.outstandingShares + 100
             data.chartSeries:setData(range(1, 12, 1), data.shareVal)
             data.incomePerMonth = 0
+            chart:removeSeries(comp)
         end
+        for _, comp in next, getTopCompanies(10) do
+            chart:addSeries(companies[comp[1]].chartSeries)
+        end
+        chart:removeSeries("dummy")
         chart:showLabels()
         chart:show()
         --checking lottery winners
@@ -737,6 +744,27 @@ end
 
 function upper(str)
 	return string.upper(string.sub(str,1,1)) .. string.lower(string.sub(str,2))
+end
+
+function getTopCompanies(upto)
+    --data.incomePerMonth / data.outstandingShares + 100
+    local temp = {}
+    for name, data in next, companies do
+        table.insert(temp, {name, data.incomePerMonth / data.outstandingShares + 100})
+    end
+
+    table.sort(temp, function(e1, e2)
+        return e1[2] > e2[2]
+    end)
+
+    if not upto then return temp end   
+    local top = {}
+    for i=1, upto, 1 do
+        if temp[i] then
+            table.insert(top, {temp[i][1], temp[i][2]})
+        end
+    end
+    return top
 end
 
 function getTotalPages(type, target)
