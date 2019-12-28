@@ -535,7 +535,7 @@ function displayCompanyDialog(target)
             companyTxt = companyTxt .. "<b><a href='event:" .. company:getUID() .. "'>" .. company:getName() .. "</a></b><br>Members: " .. (#company:getMembers() == 0 and "-" or string.sub(table.tostring(company:getMembers()), 2, -3))
         end
         ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
-        ui.addTextArea(401, "<a href='event:createCompany'>New Company</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
+        ui.addTextArea(401, "<a href='event:createCompany'>New Company</a>", target, 500, 305, 100, 20, nil, nil, 1, true)
     end
 end
 
@@ -554,11 +554,11 @@ function displayCompany(name, target)
             if n == target then isOwner = true end
         end
         if isOwner then
-            ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 310, 100, 20, nil, nil, 1, true)
-            ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 310, 100, 20, nil, nil, 1, true)
-            ui.addTextArea(403, "<a href='event:issueShares:" .. com:getName() .. "'>Issue Shares</a>", target, 405, 310, 80, 20, nil, nil, 1, true)
+            ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 305, 100, 20, nil, nil, 1, true)
+            ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 305, 100, 20, nil, nil, 1, true)
+            ui.addTextArea(403, "<a href='event:issueShares:" .. com:getName() .. "'>Issue Shares</a>", target, 405, 305, 80, 20, nil, nil, 1, true)
         end
-        ui.addTextArea(404, (com:getUnownedShares() == 0 and "<BL>Buy Shares</BL>" or "<a href='event:buyShares:" .. com:getName() .. "'> Buy Shares <font size='10'>(all: " .. com:getUnownedShares() .. ")</font></a>"), target, 315, 310, isOwner and 80 or 170, 20, nil, nil, 1, true)
+        ui.addTextArea(404, (com:getUnownedShares() == 0 and "<BL>Buy Shares</BL>" or "<a href='event:buyShares:" .. com:getName() .. "'> Buy Shares <font size='10'>(all: " .. com:getUnownedShares() .. ")</font></a>"), target, 315, 305, isOwner and 80 or 170, 20, nil, nil, 1, true)
     else
         ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
     end
