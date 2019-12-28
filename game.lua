@@ -192,6 +192,7 @@ function Player.new(name)
     self.degrees = {}
     self.job = "Cheese collector"
     self.ownedCompanies = {}
+    self.totalCompanies = 0
     self.company = "Atelier801"
     self.inventory = {}
     ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
@@ -300,6 +301,7 @@ function Player:addOwnedCompanies(comName)
     if not self.ownedCompanies[comName] then
         self:addTitle("Businessman")
         self.ownedCompanies[comName] = companies[comName]
+        self.totalCompanies = self.totalCompanies + 1
     end
 end
 
@@ -532,17 +534,28 @@ function displayJobs(target, page)
     ui.addTextArea(303, "<p align='center'><a href='event:page:jobs:" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
 end
 
-function displayCompanyDialog(target)
+function displayCompanyDialog(target, page)
+    page = page or 1
+    eventTextAreaCallback(400, target, "close")
     if not next(players[target]:getOwnedCompanies()) then
         ui.addPopup(400, 1, "<p align='center'>No owned companies<br>Do you want to own one?</p>", target, 300, 90, 200, true)
     else
         local companyTxt = ""
         local p = players[target]
+        local entry = 1
         for name, company in next, p:getOwnedCompanies() do
-            companyTxt = companyTxt .. "<b><a href='event:" .. company:getUID() .. "'>" .. company:getName() .. "</a></b><br>Members: " .. (#company:getMembers() == 0 and "-" or string.sub(table.tostring(company:getMembers()), 2, -3))
+            if (page - 1) * 8 + 1 <= entry and entry <= page * 8 then
+                companyTxt = companyTxt .. "<b><a href='event:" .. company:getUID() .. "'>" .. company:getName() .. "</a></b> <i>(Your Ownership: " .. math.ceil(company:getShareHolders()[target].shares * 100) .. "%)</i><br>"
+            elseif entry > page * 8 then
+                break
+            end
+            entry = entry + 1
         end
         ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
         ui.addTextArea(401, "<a href='event:createCompany'>New Company</a>", target, 500, 305, 100, 20, nil, nil, 1, true)
+        ui.addTextArea(402, "<p align='center'><a href='event:page:comp:" .. (page - 1) .. "'>«</a></p>", target, 200, 305, 10, 20, nil, nil, 1, true)
+        ui.addTextArea(403, "Page " .. page, target, 225, 305, 50, 20, nil, nil, 1, true)
+        ui.addTextArea(404, "<p align='center'><a href='event:page:comp:" .. (page + 1) .. "'>»</a></p>", target, 290, 305, 15, 20, nil, nil, 1, true)
     end
 end
 
@@ -776,6 +789,8 @@ function getTotalPages(type, target)
         return #getQualifiedJobs(target) / 2 + (#getQualifiedJobs(target) % 2)
     elseif type == 'help' then
         return #gameplay
+    elseif type == 'comp' then
+        return math.ceil(players[target].totalCompanies / 8)
     end
     return 0
 end
@@ -796,6 +811,8 @@ function updatePages(name, type, page)
             displayShop(name, page)
         elseif type == 'jobs' then
             displayJobs(name, page)
+        elseif type == 'comp' then
+            displayCompanyDialog(name, page)
         end
     end
 end
