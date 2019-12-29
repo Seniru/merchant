@@ -79,7 +79,7 @@ local gameplay = {[[
     ]],
     [[
     <p align='center'><font size='20'><b><J>Companies - Investing, Issuing and buying shares</J></b></font></p>
-    <font size='12'>Share is based on the ownership for a ceratain company. Sometimes you may need more money to grow your business. In such cases issuing shares is a good idea. Buy doing so you'll improve the capital and also share the ownership of your company. Click the 'Issue Shares' button in the company's menu and follow the instructions. 1 share worths $100 in this game.
+    <font size='12'>Share is based on the ownership for a ceratain company. Sometimes you may need more money to grow your business. In such cases issuing shares is a good idea. By doing so you'll improve the capital and also share the ownership of your company. Click the 'Issue Shares' button in the company's menu and follow the instructions. 1 share worths $100 in this game.
     When a certain company issue shares in the above manner, the public will be able to buy some shares to get more profit. You can buy shares buy following the instructions mentioned in the previous section.
     You can also increase the capital without issuing any sharing. That's by investing into your own company. Click the invest button and follow the instructions to invest!
     </font>
@@ -427,8 +427,9 @@ function Company.new(name, owner)
     self.name = name
     self.owner = owner
     self.shareholders = {[owner]={capital=5000, shares=1.0}}
+    self.totalHolders = 1
     self.capital = 5000
-    self.members = {}
+    self.members = {_total = 0}
     self.jobs = {}
     self.unownedShares = 0
     self.outstandingShares = 50
@@ -447,7 +448,6 @@ function Company:getMembers() return self.members end
 function Company:getJobs() return self.jobs end
 function Company:getUID() return self.uid end
 function Company:getCapital() return self.capital end
-function Company:getshareValory() return self.shareVal end
 function Company:getChartSeries() return self.chartSeries end
 function Company:getUnownedShares() return self.unownedShares end
 function Company:getOutstandingShares() return self.outstandingShares end
@@ -456,17 +456,20 @@ function Company:getIncomePerMonth() return self.incomePerMonth end
 function Company:addMember(name)
     if not self.members[name] then
         self.members[name] = true
+        self.members._total = self.members._total + 1
     end
 end
 
 function Company:removeMember(name)
     self.members[name] = nil
+    self.members._total = self.members._total + 1
 end
 
 function Company:addShareHolder(name, inCapital)
     self.capital = self.capital + inCapital
     local newCap = self.shareholders[name] == nil and inCapital or self.shareholders[name].capital + inCapital
     self.shareholders[name] = {capital=newCap, shares=newCap/self.capital}
+    if not self.shareholders[name] then self.totalHolders = self.totalHolders + 1 end
     for n, d in next, self.shareholders do
         self.shareholders[n] = {capital=d.capital, shares=d.capital/self.capital}
     end
@@ -566,10 +569,10 @@ function displayCompany(name, target)
         tempData[target].jobCompany = name
         local companyTxt = ""
         local members = ""
-        for name, v in next, com:getMembers() do
+        --[[for name, v in next, com:getMembers() do
             members = members .. name .. "<br>"
-        end
-        ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Owner</b>: " ..  com:getOwner() .. "<br><b>Members</b>: <br>" .. members, target, 200, 90, 400, 200, nil, nil, 1, true)
+        end]]
+        ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Founder</b>: " ..  com:getOwner() .. "<br><br><b>Total Owners / Shareholders:  </b>\t" .. com.totalHolders .. "<i>\t<a href='event:page:owners" .. com:getName() .. ":1'>(See all)</a></i><br><b>Total Workers</b>:\t\t\t\t" .. com:getMembers()._total .. "\t<i>(See all)</i>", target, 200, 90, 400, 200, nil, nil, 1, true)
         for n, _ in next, com:getShareHolders() do
             if n == target then isOwner = true end
         end
@@ -582,6 +585,23 @@ function displayCompany(name, target)
     else
         ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
     end
+end
+
+function displayCompanyOwners(name, target, page)
+    local entry = 1
+    local res = ""
+    for name, data in next, companies[name]:getShareHolders() do
+        if (page - 1) * 6 + 1 <= entry and entry <= page * 6 then
+            res = res .. "<b><a href='event:profile:" .. name .. "'>" .. name .. "</a></b> <i>(Owns " .. math.ceil(data.shares * 100) .. "%)</i><br>"
+        elseif entry > page * 6 then
+            break
+        end
+        entry = entry + 1
+    end
+    ui.addTextArea(450, closeButton .. "<p align='center'><font size='20'><b><J>Shareholders of " .. name .. "</J></b></font></p><br><br><b>Total: </b>" .. companies[name].totalHolders .. "<br><br>" .. res, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(451, "<p align='center'><a href='event:page:owners" .. name .. ":" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
+    ui.addTextArea(452, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
+    ui.addTextArea(453, "<p align='center'><a href='event:page:owners" .. name .. ":" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
 end
 
 function displayJobWizard(target)
@@ -791,6 +811,8 @@ function getTotalPages(type, target)
         return #gameplay
     elseif type == 'comp' then
         return math.ceil(players[target].totalCompanies / 8)
+    elseif type:find("^owners") then
+        return 1
     end
     return 0
 end
@@ -813,6 +835,8 @@ function updatePages(name, type, page)
             displayJobs(name, page)
         elseif type == 'comp' then
             displayCompanyDialog(name, page)
+        elseif type:find("owners.+") then
+            displayCompanyOwners(type:sub(7), name, page)
         end
     end
 end
@@ -940,6 +964,10 @@ function eventTextAreaCallback(id, name, evt)
             ui.removeTextArea(402, name)
             ui.removeTextArea(403, name)
             ui.removeTextArea(404, name)
+        elseif id == 450 then
+            ui.removeTextArea(451, name)
+            ui.removeTextArea(452, name)
+            ui.removeTextArea(453, name)
         elseif id == 800 then
             ui.removeTextArea(801, name)
             ui.removeTextArea(802, name)
@@ -983,8 +1011,8 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "getLottery" then
         ui.addPopup(1000, 2, "<p align='center'>Please enter your choices (3 numbers between 0 and 100 and a letter) separated by spaces. <br><i>eg:15 20 30 B</i></p>", name, 300, 90, 200, true)
     elseif evt == "checkLotto" then
-        displayLotto(name)
-    elseif evt:gmatch("%s+:%s+") then
+        displayLotto(name)        
+    elseif evt:gmatch("%w+:%w+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
         if type == "buy" and players[name]:getMoney() - find(split(evt, ":")[3], healthPacks).price >= 0 then
@@ -1019,6 +1047,8 @@ function eventTextAreaCallback(id, name, evt)
         elseif type == "issueShares" then
             ui.addPopup(900, 2, "Please specify the number of shares you want to issue (Should be a valid number)", name, 300, 90, 200, true)
             tempData[name].issuesSharesIn = val
+        elseif type == "profile" then
+            displayProfile(val, name)
         end
     end
 end
