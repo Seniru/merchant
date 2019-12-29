@@ -190,7 +190,7 @@ function Player.new(name)
     self.eduLvl = 1
     self.eduStream = ""
     self.degrees = {}
-    self.job = "Cheese collector"
+    self.job = ""
     self.ownedCompanies = {}
     self.totalCompanies = 0
     self.company = "Atelier801"
@@ -289,9 +289,11 @@ end
 
 function Player:setJob(job)
     local jobRef = jobs[job]
-    if jobRef.minLvl <= self.level and (jobRef.qualifications == nil or self.degrees[jobRef.qualifications] ~= nil) then
-        companies[self.company]:removeMember(self.name)
+    if jobRef and jobRef.minLvl <= self.level and (jobRef.qualifications == nil or self.degrees[jobRef.qualifications] ~= nil) then
         self.job = job
+        if self.company ~= jobRef.company then
+            companies[self.company]:removeMember(self.name)
+        end
         self.company = jobRef.company
         companies[self.company]:addMember(self.name)
     end
@@ -429,7 +431,8 @@ function Company.new(name, owner)
     self.shareholders = {[owner]={capital=5000, shares=1.0}}
     self.totalHolders = 1
     self.capital = 5000
-    self.members = {_total = 0}
+    self.members = {}
+    self.totalWorkers = 0
     self.jobs = {}
     self.unownedShares = 0
     self.outstandingShares = 50
@@ -456,20 +459,20 @@ function Company:getIncomePerMonth() return self.incomePerMonth end
 function Company:addMember(name)
     if not self.members[name] then
         self.members[name] = true
-        self.members._total = self.members._total + 1
+        self.totalWorkers = self.totalWorkers + 1
     end
 end
 
 function Company:removeMember(name)
     self.members[name] = nil
-    self.members._total = self.members._total + 1
+    self.totalWorkers = self.totalWorkers - 1
 end
 
 function Company:addShareHolder(name, inCapital)
     self.capital = self.capital + inCapital
     local newCap = self.shareholders[name] == nil and inCapital or self.shareholders[name].capital + inCapital
-    self.shareholders[name] = {capital=newCap, shares=newCap/self.capital}
     if not self.shareholders[name] then self.totalHolders = self.totalHolders + 1 end
+    self.shareholders[name] = {capital=newCap, shares=newCap/self.capital}
     for n, d in next, self.shareholders do
         self.shareholders[n] = {capital=d.capital, shares=d.capital/self.capital}
     end
@@ -569,10 +572,7 @@ function displayCompany(name, target)
         tempData[target].jobCompany = name
         local companyTxt = ""
         local members = ""
-        --[[for name, v in next, com:getMembers() do
-            members = members .. name .. "<br>"
-        end]]
-        ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Founder</b>: " ..  com:getOwner() .. "<br><br><b>Total Owners / Shareholders:  </b>\t" .. com.totalHolders .. "<i>\t<a href='event:page:owners" .. com:getName() .. ":1'>(See all)</a></i><br><b>Total Workers</b>:\t\t\t\t" .. com:getMembers()._total .. "\t<i>(See all)</i>", target, 200, 90, 400, 200, nil, nil, 1, true)
+        ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Founder</b>: " ..  com:getOwner() .. "<br><br><b>Total Owners / Shareholders:  </b>\t" .. com.totalHolders .. "<i>\t<a href='event:page:owners" .. com:getName() .. ":1'>(See all)</a></i><br><b>Total Workers</b>:\t\t\t\t" .. com.totalWorkers .. "\t<i>(See all)</i>", target, 200, 90, 400, 200, nil, nil, 1, true)
         for n, _ in next, com:getShareHolders() do
             if n == target then isOwner = true end
         end
@@ -923,6 +923,7 @@ function eventNewPlayer(name)
     tempData[name] = {}
     setUI(name)
     tfm.exec.respawnPlayer(name)
+    players[name]:setJob("Cheese collector")
 end
 
 function eventPlayerDied(name)
@@ -1199,7 +1200,7 @@ jobs["Fullstack cheese developer"] = Job("Fullstack cheeese developer", 9000, 0.
 
 for name, player in next, tfm.get.room.playerList do
     players[name] = Player(name)
-    setUI(name)
+    eventNewPlayer(name)
     tempData[name] = {}
 end
 
