@@ -138,7 +138,7 @@ local timer = Timer("time-sys", function()
             data.shareVal[12] = data.incomePerMonth / data.outstandingShares + 100
             data.chartSeries:setData(range(1, 12, 1), data.shareVal)
             data.incomePerMonth = 0
-            chart:removeSeries(comp)
+            chart:removeSeries("<a href='event:com:" .. comp .. "'>" .. comp .. "</a>")
         end
         for _, comp in next, getTopCompanies(10) do
             chart:addSeries(companies[comp[1]].chartSeries)
@@ -434,7 +434,7 @@ function Company.new(name, owner)
     self.outstandingShares = 50
     self.incomePerMonth = 0
     self.shareVal = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100}
-    self.chartSeries = Series(range(1, 12, 1), self.shareVal, name)
+    self.chartSeries = Series(range(1, 12, 1), self.shareVal, "<a href='event:com:" .. name .. "'>" .. name .. "</a>")
     chart:addSeries(self.chartSeries)
     self.uid = "com:" .. name
     return self
