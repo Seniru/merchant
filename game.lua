@@ -572,7 +572,10 @@ function displayCompany(name, target)
         tempData[target].jobCompany = name
         local companyTxt = ""
         local members = ""
-        ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>" .. name .. "</J></b></font></p><br><br><b>Founder</b>: " ..  com:getOwner() .. "<br><br><b>Total Owners / Shareholders:  </b>\t" .. com.totalHolders .. "<i>\t<a href='event:page:owners" .. com:getName() .. ":1'>(See all)</a></i><br><b>Total Workers</b>:\t\t\t\t" .. com.totalWorkers .. "\t<i>(See all)</i>", target, 200, 90, 400, 200, nil, nil, 1, true)
+        ui.addTextArea(400, closeButton .. [[<p align='center'><font size='20'><b><J>]] .. name .. [[</J></b></font></p><br>
+        <b>Founder</b>: ]] ..  com:getOwner() .. [[<br>
+        <b>Total Owners / Shareholders:  </b>]] .. com.totalHolders .. [[<i>  <a href='event:page:owners]] .. com:getName() .. [[:1'>(See all)</a></i>
+        <b>Total Workers:</b>                ]] .. com.totalWorkers .. [[<i>  <a href='event:page:workers]] .. com:getName() .. [[:1'>(See all)</a></i>]], target, 200, 90, 400, 200, nil, nil, 1, true)
         for n, _ in next, com:getShareHolders() do
             if n == target then isOwner = true end
         end
@@ -587,10 +590,10 @@ function displayCompany(name, target)
     end
 end
 
-function displayCompanyOwners(name, target, page)
+function displayCompanyOwners(comp, target, page)
     local entry = 1
     local res = ""
-    for name, data in next, companies[name]:getShareHolders() do
+    for name, data in next, companies[comp]:getShareHolders() do
         if (page - 1) * 6 + 1 <= entry and entry <= page * 6 then
             res = res .. "<b><a href='event:profile:" .. name .. "'>" .. name .. "</a></b> <i>(Owns " .. math.ceil(data.shares * 100) .. "%)</i><br>"
         elseif entry > page * 6 then
@@ -598,10 +601,29 @@ function displayCompanyOwners(name, target, page)
         end
         entry = entry + 1
     end
-    ui.addTextArea(450, closeButton .. "<p align='center'><font size='20'><b><J>Shareholders of " .. name .. "</J></b></font></p><br><br><b>Total: </b>" .. companies[name].totalHolders .. "<br><br>" .. res, target, 200, 90, 400, 200, nil, nil, 1, true)
-    ui.addTextArea(451, "<p align='center'><a href='event:page:owners" .. name .. ":" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
+    ui.addTextArea(450, closeButton .. "<p align='center'><font size='20'><b><J>Shareholders of " .. comp .. "</J></b></font></p><br><br><b>Total: </b>" .. companies[comp].totalHolders .. "<br><br>" .. res, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(451, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
     ui.addTextArea(452, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
-    ui.addTextArea(453, "<p align='center'><a href='event:page:owners" .. name .. ":" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
+    ui.addTextArea(453, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
+end
+
+function displayCompanyMembers(comp, target, page)
+    local entry = 1
+    local res = ""
+    for name, data in next, companies[comp]:getMembers() do
+        if (page - 1) * 6 + 1 <= entry and entry <= page * 6 then
+            res = res .. "<b><a href='event:profile:" .. name .. "'>" .. name .. "</a></b>   <i>(" .. players[name]:getJob() .. ")</i><br>"
+            print(entry)
+            print(res)
+        elseif entry > page * 6 then
+            break
+        end
+    end
+    entry = entry + 1
+    ui.addTextArea(460, closeButton .. "<p align='center'><font size='20'><b><J>Workers of " .. comp .. "</J></b></font></p><br><br><b>Total: </b>" .. companies[comp].totalWorkers .. "<br><br>" .. res, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(461, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
+    ui.addTextArea(462, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
+    ui.addTextArea(463, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
 end
 
 function displayJobWizard(target)
@@ -812,7 +834,9 @@ function getTotalPages(type, target)
     elseif type == 'comp' then
         return math.ceil(players[target].totalCompanies / 8)
     elseif type:find("^owners") then
-        return 1
+        return math.ceil(companies[type:sub(7)].totalHolders / 6)
+    elseif type:find("^workers") then
+        return math.ceil(companies[type:sub(8)].totalWorkers / 6)
     end
     return 0
 end
@@ -837,6 +861,8 @@ function updatePages(name, type, page)
             displayCompanyDialog(name, page)
         elseif type:find("owners.+") then
             displayCompanyOwners(type:sub(7), name, page)
+        elseif type:find("workers.+") then
+            displayCompanyMembers(type:sub(8), name, page)
         end
     end
 end
@@ -969,6 +995,10 @@ function eventTextAreaCallback(id, name, evt)
             ui.removeTextArea(451, name)
             ui.removeTextArea(452, name)
             ui.removeTextArea(453, name)
+        elseif id == 460 then
+            ui.removeTextArea(461, name)
+            ui.removeTextArea(462, name)
+            ui.removeTextArea(463, name)
         elseif id == 800 then
             ui.removeTextArea(801, name)
             ui.removeTextArea(802, name)
