@@ -183,7 +183,7 @@ function Player.new(name)
     self.titles = {[self.title]=true}
     self.health = 1.0
     self.healthRate = 0.002
-    self.xp = 0
+    self.xp = 1
     self.level = 1
     self.learning = ""
     self.learnProgress = 0
@@ -196,7 +196,7 @@ function Player.new(name)
     self.company = "Atelier801"
     self.inventory = {}
     ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
-    ui.addTextArea(2000, "", name, CONSTANTS.BAR_X, 370, 1, 17, 0x00ff00, 0x00ee00, 1, true)
+    ui.addTextArea(2000, "", name, CONSTANTS.BAR_X, 370, CONSTANTS.BAR_WIDTH, 17, 0x00ff00, 0x00ee00, 1, true)
     return self
 end
 
@@ -613,8 +613,6 @@ function displayCompanyMembers(comp, target, page)
     for name, data in next, companies[comp]:getMembers() do
         if (page - 1) * 6 + 1 <= entry and entry <= page * 6 then
             res = res .. "<b><a href='event:profile:" .. name .. "'>" .. name .. "</a></b>   <i>(" .. players[name]:getJob() .. ")</i><br>"
-            print(entry)
-            print(res)
         elseif entry > page * 6 then
             break
         end
@@ -904,18 +902,19 @@ function Job(_name, _salary, _energy, _minLvl, _qualifications, _owner, _company
 end
 
 function setUI(name)
+    local p = players[name]
     --textAreas
     --work
     ui.addTextArea(0, "<a href='event:work'><br><p align='center'><b>Work!</b></p>", name, 5, 340, 45, 50, 0x324650, 0x000000, 1, true)
     --stats
     --ui.addTextArea(1, name .. "<br>Money : $0 | Level 1", name, 6, CONSTANTS.STAT_BAR_Y, 785, 40, 0x324650, 0x000000, 1, true)
-    ui.addTextArea(10, "<p align='right'>Money: $0 </p> ", name, 200, 25, 120, 20, nil, nil, 1, true)
-    ui.addTextArea(11, " Level: 1", name, 480, 25, 120, 20, nil, nil, 1, true)
-    ui.addTextArea(1, "<br><p align='center'><b>" .. name .. "</b><br>« Newbie »</p>", name, 325, 20, 150, 45, nil, nil, 1, true )
+    ui.addTextArea(10, "<p align='right'>Money: " .. formatNumber(p:getMoney()) .. " </p> ", name, 200, 25, 120, 20, nil, nil, 1, true)
+    ui.addTextArea(11, " Level: " .. p:getLevel(), name, 480, 25, 120, 20, nil, nil, 1, true)
+    ui.addTextArea(1, "<br><p align='center'><b>" .. name .. "</b><br>« " .. p:getTitle() .. " »</p>", name, 325, 20, 150, 45, nil, nil, 1, true )
     --health bar area
     ui.addTextArea(2, "<p align='center'>100%</p>", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
     --xp bar area
-    ui.addTextArea(3, "<p align='center'>Level 1  -  0/" .. calculateXP(2) .. "XP</p>", name, CONSTANTS.BAR_X, 370, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
+    ui.addTextArea(3, "<p align='center'>Level " .. p:getLevel() .. "  -  " .. p:getXP() .. "/" .. calculateXP(p:getLevel() + 1) .. "XP</p>", name, CONSTANTS.BAR_X, 370, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
     --shop button
     ui.addTextArea(4, "<a href='event:shop'><b><font color='#000000' size='15'>Shop</font></b></a>", name, 100, 230, 50, 40, nil, nil, 0, false)
     --school button
@@ -932,6 +931,7 @@ function setUI(name)
     ui.addTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>", name, 288, 180, 100, 100, nil, nil, 0, false)
     --Lottery board
     ui.addTextArea(13, "<p align='center'><a href='event:getLottery'>Buy Lottery!</a><br><br><a href='event:checkLotto'>Check</a></p>", name, 1530, 250, 50, 65, nil, nil, 1, false)
+    p:setXP(0, true)
     tfm.exec.addImage("16f2831a4b1.png", "_10", 60, 210) -- Shop image
     tfm.exec.addImage("16f285ae02c.png", "_18", 500, 100) -- School image (icon made by Dinosoft labs in 'flaticons.com')
     tfm.exec.addImage("16f3176f389.png", "_50", 1450, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
@@ -945,7 +945,7 @@ end
 --event handling
 
 function eventNewPlayer(name)
-    players[name] = Player(name)
+    players[name] = players[name] or Player(name)
     tempData[name] = {}
     setUI(name)
     tfm.exec.respawnPlayer(name)
@@ -1229,9 +1229,7 @@ jobs["Cheese wholesaler"] = Job("Cheese wholesaler", 700, 0.2, 15, "Cheese tradi
 jobs["Fullstack cheese developer"] = Job("Fullstack cheeese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801")
 
 for name, player in next, tfm.get.room.playerList do
-    players[name] = Player(name)
     eventNewPlayer(name)
-    tempData[name] = {}
 end
 
 for id, cmd in next, {"company", "p", "profile", "help", "title"} do
