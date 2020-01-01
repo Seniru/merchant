@@ -133,7 +133,8 @@ local dHandler = DataHandler.new("clicker", {
     eduLvl = {index = 7, type = "number", default = 1},
     eduStream = {index =  8, type = "string", default = ""},
     degrees = {index = 9, type = "table", default = {}},
-    inventory = {index = 10, type = "table", default = {}}
+    inventory = {index = 10, type = "table", default = {}},
+    titles = {index = 11, type = "table", default = {}}
 })
 
 local chart = LineChart(1, 944, 60, 450, 185)
@@ -241,6 +242,7 @@ function Player:getTitle() return self.title end
 function Player:getTitles() return self.titles end
 
 function Player:work()
+    print(dHandler:dumpPlayer(self.name))
     local job = jobs[self.job]
     if self.health - job.energy > 0 then
         self.setHealth(self, -job.energy, true)
@@ -285,6 +287,7 @@ function Player:setXP(val, add)
     else
         self.xp = val
     end
+    dHandler:set(self.name, "xp", self.xp)
     ui.addTextArea(2000, "", self.name, CONSTANTS.BAR_X, 370, ((self.xp - calculateXP(self.level)) / (calculateXP(self.level + 1) - calculateXP(self.level)))  * CONSTANTS.BAR_WIDTH, 17, 0x00ff00, 0x00ee00, 1, true)
     ui.updateTextArea(3, "<p align='center'>Level " .. self.level .. " - " ..self.xp .. "/" .. calculateXP(self.level + 1) .. "XP", self.name)
 end
@@ -293,12 +296,20 @@ function Player:setTitle(newTitle)
     if self.titles[newTitle] then
         self.title = newTitle
         self:updateStatsBar()
+        dHandler:set(self.name, "title", self.title)
     end
 end
 
 function Player:addTitle(newTitle)
     if not self.titles[newTitle] then
         self.titles[newTitle] = "« " .. newTitle .. " »"
+        local titles = {}
+        for title, _ in next, self.titles do
+            table.insert(titles, title)
+        end
+        --dHandler:set(self.name, "titles", titles)
+        print(dHandler:dumpPlayer(self.name))
+        titles = nil
         tfm.exec.chatMessage("Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle])
     end
 end
@@ -308,6 +319,10 @@ function Player:setCourse(course)
     self.learnProgress = 0
     self.eduLvl = course.level
     self.eduStream = course.stream
+    dHandler:set(self.name, "learning", self.learning)
+    dHandler:set(self.name, "learnProgress", self.learnProgress)
+    dHandler:set(self.name, "eduLvl", self.eduLvl)
+    dHandler:set(self.name, "eduStream", self.eduStream)
     self:addTitle("Little Learner")
     ui.updateTextArea(5, "<a href='event:courses'><font size='15'><b>Learn</b></font></a>", self.name)
     ui.addTextArea(3000, "<p align='center'><b>Lessons left: 0 / " .. courses[self.learning].lessons .. "</b></p>", self.name, 480, 180, 300, 20, nil, nil, 0, false)
@@ -354,6 +369,7 @@ end
 
 function Player:addDegree(course)
     self:addTitle("Degree Holder")
+    print(type(self.degrees))
     self.degrees[course] = courses[course]
 end
 
@@ -368,6 +384,11 @@ function Player:learn()
             self.eduLvl = self.eduLvl + 1
             self:addTitle("Dedicated Learner")
         end
+        dHandler:set(self.name, "learning", self.learning)
+        dHandler:set(self.name, "learnProgress", self.learnProgress)
+        dHandler:set(self.name, "eduLvl", self.eduLvl)
+        dHandler:set(self.name, "eduStream", self.eduStream)
+        print(dHandler:dumpPlayer(self.name))
     end
 end
 
@@ -376,6 +397,7 @@ function Player:levelUp()
         self.level = self.level + 1
         self:setHealth(1.0, false)
         self:setMoney(5 * self.level, true)
+        dHandler:set(self.name, "level", self.level)
         displayParticles(self.name, tfm.enum.particle.star)
         self:addTitle("Getting Experience")
     end
@@ -981,19 +1003,27 @@ function eventNewPlayer(name)
 end
 
 function eventPlayerDataLoaded(name, data)
+    print(data)
     dHandler:newPlayer(name, data)
+    local titles = {}
+    for _, title in next, dHandler:get(name, "titles") do
+        title = title:sub(2, #title - 1)
+        print(title)
+        titles[title] = "« " .. title .. " »"
+    end
+    
     players[name] = Player(name, {
         money = dHandler:get(name, "money"),
         title = dHandler:get(name, "title"),
-        titles = dHandler:get(name, "titles"),
+        --titles = titles,
         xp = dHandler:get(name, "xp"),
         level = dHandler:get(name, "level"),
         learning = dHandler:get(name, "learning"),
         learnProgress = dHandler:get(name, "learnProgress"),
         eduLvl = dHandler:get(name, "eduLvl"),
         eduStream = dHandler:get(name, "eduStream"),
-        degrees = dHandler:get(name, "eduStream"),
-        inventory = dHandler:get(name, "inventory")
+        --degrees = dHandler:get(name, "degrees"),
+        --inventory = dHandler:get(name, "inventory")
     })
     tempData[name] = {}
     setUI(name)
