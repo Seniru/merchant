@@ -182,9 +182,7 @@ local saveDataTimer = Timer("dataTimer", function()
         system.savePlayerData(name, dHandler:dumpPlayer(name))
         print('Player Data Saved!')
     end
-end, 1000 * 30, true)
---fixme: to 1000* 60
-
+end, 1000 * 60 * 2, true)
 
 --creating the class Player
 local Player = {}
@@ -423,6 +421,7 @@ function Player:grabItem(item)
     else
         self.inventory[item] = self.inventory[item] + 1
     end
+    self:storeInventory(item)
 end
 
 function Player:useItem(item)
@@ -432,6 +431,15 @@ function Player:useItem(item)
         self.inventory[item] = nil
     end
   end
+    self:storeInventory(item)
+end
+
+function Player:storeInventory(item, amount)
+    local inv = {}
+    for name, count in next, self.inventory do
+        table.insert(inv, {name, count})
+    end
+    dHandler:set(self.name, "inventory", inv)
 end
 
 function Player:buyLottery(choices)
@@ -1017,6 +1025,12 @@ function eventPlayerDataLoaded(name, data)
         degree = degree:sub(2, #degree - 1)
         degrees[degree] = courses[degree]
     end
+
+    local inv = {}
+    for _, data in next, dHandler:get(name, "inventory") do
+        local n = data[1]:sub(2, #data[1] - 1)
+        inv[n] = data[2]
+    end
     
     players[name] = Player(name, {
         money = dHandler:get(name, "money"),
@@ -1029,10 +1043,11 @@ function eventPlayerDataLoaded(name, data)
         eduLvl = dHandler:get(name, "eduLvl"),
         eduStream = dHandler:get(name, "eduStream"),
         degrees = degrees,
-        --inventory = dHandler:get(name, "inventory")
+        inventory = inv
     })
     dHandler:set(name, "titles", map(dHandler:get(name, "titles"), function(t) return t:sub(2, #t - 1)end))
     dHandler:set(name, "degrees", map(dHandler:get(name, "degrees"), function(d) return d:sub(2, #d - 1) end))
+    players[name]:storeInventory()
     tempData[name] = {}
     setUI(name)
     players[name]:setJob("Cheese collector")
@@ -1309,10 +1324,10 @@ jobs["Cheese collector"] = Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "
 jobs["Junior miner"] = Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801")
 jobs["Cheese producer"] = Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelier801")
 jobs["Cheese miner"] = Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman", "Atelier801")
-jobs["Cheese trader"] = Job("Cheese trader", 200, 0.2, 12, "Cheese trading", "shaman")
-jobs["Cheeese developer"] = Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelier801")
+jobs["Cheese trader"] = Job("Cheese trader", 200, 0.2, 12, "Cheese trading", "shaman", "Atelier801")
+jobs["Cheese developer"] = Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelier801")
 jobs["Cheese wholesaler"] = Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman", "Atelier801")
-jobs["Fullstack cheese developer"] = Job("Fullstack cheeese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801")
+jobs["Fullstack cheese developer"] = Job("Fullstack cheese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801")
 
 for name, player in next, tfm.get.room.playerList do
     eventNewPlayer(name)
