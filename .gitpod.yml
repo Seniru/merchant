@@ -1,1 +1,5 @@
-{}
+vscode:
+  extensions:
+    - akamud.vscode-theme-onedark
+    - pkief.material-icon-theme
+    - wakatime.vscode-wakatime
