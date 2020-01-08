@@ -45,6 +45,18 @@ local cmds = [[
   <b>!p <i>[player name]</i> or !profile <i>[player name]</i></b> Displays information about the specified player
 ]]
 
+local credits = [[
+    <p align='center'><font size='20'><b><J>Credits</J></b></font>
+    <b>All the credits go to these people for helping me with different things</b></p>
+    <b><u>Coders</u></b>
+            • Overforyou#9290                                               • Cyanny#0000
+    <b><u>Icons and Images</u></b>
+            • Dinosoft labs (flaticons.com) for the school image            • Nikita Golubev (flaticons.com) for lotto stall image
+    <b><u>Editing</u></b>
+            • Haxor_333#0000                                                • Rail#9727
+    And special thanks for <b>Haxor_333#0000</b>, <b>Dorjanoruci#0000</b> and <b>We talk a lot</b> tribe members for encouring me to do this <3
+]]
+
 local gameplay = {[[
     <p align='center'><font size='20'><b><J>Gameplay Overview</J></b></font></p>
     <font size='12'>This is a <b>Clicker</b> which is largely based on businesses we see everywhere. You start as a little mouse with a basic job, but with a great story to write! Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
@@ -725,9 +737,10 @@ function displayProfile(name, target)
 end
 
 function displayHelp(target, mode, page)
-    ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 120, 75, 20, 0x324650, 0x000000, 1, true)
-    ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 85, 75, 20, 0x324650, 0x000000, 1, true)
-    ui.addTextArea(952, closeButton .. (mode == "game" and gameplay[page or 1] or cmds), target, 110, 80, 600, 200, 0x324650, 0x000000, 1, true)
+    ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 120, 75, 20, nil, nil, 1, true)
+    ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 85, 75, 20, nil, nil, 1, true)
+    ui.addTextArea(956, "<B><J><a href='event:credits'>Credits</a>", target, 30, 155, 75, 20, nil, nil, 1, true)
+    ui.addTextArea(952, closeButton .. (mode == "game" and gameplay[page or 1] or (mode == "credits" and credits or cmds)), target, 110, 80, 600, 200, 0x324650, 0x000000, 1, true)
     if mode == "game" then
         ui.addTextArea(953, "«",  target, 600, 300, 15, 15, nil, nil, 1, true)
         ui.addTextArea(954, "Page 1", target, 630, 300, 50, 15, nil, nil, 1, true)
@@ -1070,6 +1083,8 @@ function eventTextAreaCallback(id, name, evt)
         displayHelp(name, "cmds")
     elseif evt == "game" then
         displayHelp(name, "game")
+    elseif evt == "credits" then
+        displayHelp(name, "credits")
     elseif string.sub(evt, 1, 4) == "page" then
         local args = split(evt, ":")
         updatePages(name, args[2], tonumber(args[3]))
@@ -1194,7 +1209,10 @@ function eventPopupAnswer(id, name, answer)
     end
     elseif id == 450 and answer ~= '' then --for the popup to submit a name for the company
         if companies[answer] then
-            tfm.exec.chatMessage('Company already exists!')
+            tfm.exec.chatMessage('Company already exists!', name)
+            return
+        elseif answer:len() > 15 or answer:find("[^%w%s]") then
+            tfm.exec.chatMessage('Name should contain only letters, numbers and spaces, which is lesser than 15 characters', name)
             return
         end
         companies[answer] = Company(answer, name)
@@ -1202,8 +1220,12 @@ function eventPopupAnswer(id, name, answer)
         players[name]:addOwnedCompanies(answer)
         displayCompany(answer, name)
     elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
-        tempData[name].jobName = answer
-        displayJobWizard(name)
+        if answer:len() > 15 or answer:find("[^%w%s]") then
+            tfm.exec.chatMessage('Name should contain only letters, numbers and spaces, which is lesser than 15 characters', name)
+        else
+            tempData[name].jobName = answer
+            displayJobWizard(name)
+        end
     elseif id == 602 and tonumber(answer) and tonumber(answer) < getMaxSalary(tempData[name].jobCompany) then --for the popup to choose the salary for a new job
         tempData[name].jobSalary = tonumber(answer)
         tempData[name].jobEnergy = math.ceil(tempData[name].jobSalary / getMaxSalary(tempData[name].jobCompany) * 100)
@@ -1211,11 +1233,12 @@ function eventPopupAnswer(id, name, answer)
     elseif id == 603 and tonumber(answer) and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
         tempData[name].jobEnergy = tonumber(answer)
         tempData[name].jobSalary = tempData[name].jobEnergy * getMaxSalary(tempData[name].jobCompany) / 100
+        tempData[name].minLvl = 1
         displayJobWizard(name)
     elseif id == 604 and tonumber(answer) then --for the popup to choose the minimum level for the job
         tempData[name].minLvl = tonumber(answer)
         local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - tempData[name].minLvl
-        tempData[name].jobEnergy = e < 0 and 1 or e
+        tempData[name].jobEnergy = e <= 0 and 1 or e
         displayJobWizard(name)
     elseif id == 700 and tonumber(answer) then --for the investment popups
         players[name]:investTo(tempData[name].investing, tonumber(answer))
@@ -1269,18 +1292,18 @@ createTip("The Better The Job The Better The Income!", 4)
 createTip("Buy Items From The Shop To Gain Health!", 5)
 createTip("Some Jobs Needs A Specific Degree", 6)
 createTip("To Level Up You Need To Work!", 7)
-createTip("The Higher The Level The Higher The Health", 8)
+createTip("You Will Spend Less Energy When Working if You have Educational Qualifications", 8)
 createTip("The Stats Of A Company Can Be Seen By Anyone", 9)
 createTip("While Working Your Health Bar Goes Down", 10)
 createTip("Patience is The Key To This Game.", 11)
-createTip("Your Stats Can Be Seen At The Top Of The Map!", 12)
+createTip("The Stock Market Dashboard Displays how Companies Perform in Each Month", 12)
 createTip("You Can Buy Multiple Companies!", 13)
-createTip("Once You Have A Job You Can't Quit!", 14)
+createTip("You Can Have Only one Job at a Time", 14)
 createTip("Your Health will be Refreshed when You Level Up", 15)
 createTip("Recruit More Players to Have More Salary!", 16)
 createTip("Try your Best to Own a Company", 17)
 createTip("Make Sure You Consider About Energy and Salary When Choosing a Job", 18)
-createTip("The Red Bar Displays Your Health, While the Green Bar Displays your XP Percentage", 19)
+createTip("The Red Bar Displays Your Health or Energy, While the Green Bar Displays your XP Percentage", 19)
 createTip("Chat With Your Friends When You Are Out of Health", 20)
 createTip("Use Your Brain and Take Correct Decisions!", 21)
 createTip("If Your Job Seems to Take More Energy, Try to Choose Another!", 22)
@@ -1292,7 +1315,8 @@ createTip("Report Bugs To Developers", 27)
 createTip("The Game is More Fun with More Players", 28)
 createTip("Click Tips When You Need Help", 29)
 createTip("The Health Refreshes Every Moment <3", 30)
-
+createTip("There is a Chance for Luck Too! Buy a Lotto and Check Your Luck!", 31)
+createTip("Invest Other Companies to Have an Ownership Share", 32)
 
 --creating and storing HealthPack tables
 table.insert(healthPacks, HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself"))
