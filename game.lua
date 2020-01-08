@@ -46,12 +46,14 @@ local cmds = [[
 ]]
 
 local credits = [[
-    <p align='center'><font size='20'><b><J>Credits</J></b></font>
-    <b>All the credits go to these people for helping me with different things</b></p>
+    <p align='center'><font size='20'><b><J>Credits</J></b></font></p>
+    <b>All the credits go to these people for helping me with different things</b>
+    
     <b><u>Coders</u></b>
             • Overforyou#9290                                               • Cyanny#0000
     <b><u>Icons and Images</u></b>
-            • Dinosoft labs (flaticons.com) for the school image            • Nikita Golubev (flaticons.com) for lotto stall image
+            • Dinosoft labs (flaticons.com) for the school image
+            • Nikita Golubev (flaticons.com) for lotto stall image
     <b><u>Editing</u></b>
             • Haxor_333#0000                                                • Rail#9727
     And special thanks for <b>Haxor_333#0000</b>, <b>Dorjanoruci#0000</b> and <b>We talk a lot</b> tribe members for encouring me to do this <3
@@ -872,7 +874,6 @@ function upper(str)
 end
 
 function getTopCompanies(upto)
-    --data.incomePerMonth / data.outstandingShares + 100
     local temp = {}
     for name, data in next, companies do
         table.insert(temp, {name, data.incomePerMonth / data.outstandingShares + 100})
@@ -1086,6 +1087,9 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "game" then
         displayHelp(name, "game")
     elseif evt == "credits" then
+        ui.removeTextArea(953, name)
+        ui.removeTextArea(954, name)
+        ui.removeTextArea(955, name)
         displayHelp(name, "credits")
     elseif string.sub(evt, 1, 4) == "page" then
         local args = split(evt, ":")
