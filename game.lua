@@ -853,16 +853,18 @@ function float(n, digits)
 end
 
 function formatNumber(n)
-    if n >= 1000000000000 then
-        return float(math.floor(n / 100000000000),1) .. "T"
-    elseif n >= 1000000000 then
-        return float(math.floor(n / 100000000),1) .. "B"
-    elseif n >= 1000000 then
-        return float(math.floor(n / 100000),1) .. "M"
-    elseif n >= 10000 then
-        return float(math.floor(n / 1000),1) .. "K"
+    if n >= 10e14 then
+        return float(math.floor(n / 10e14),1) .. "P"
+    elseif n >= 10e11 then
+        return float(math.floor(n / 10e11),1) .. "T"
+    elseif n >= 10e8 then
+        return float(math.floor(n / 10e8),1) .. "B"
+    elseif n >= 10e5 then
+        return float(math.floor(n / 10e5),1) .. "M"
+    elseif n >= 10e3 then
+        return float(math.floor(n / 10e2),1) .. "K"
     end
-    return float(n,1)
+    return float(n, 1)
 end
 
 function upper(str)
