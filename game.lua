@@ -48,7 +48,7 @@ local cmds = [[
 local credits = [[
     <p align='center'><font size='20'><b><J>Credits</J></b></font></p>
     <b>All the credits go to these people for helping me with different things</b>
-    
+
     <b><u>Coders</u></b>
             • Overforyou#9290                                               • Cyanny#0000
     <b><u>Icons and Images</u></b>
@@ -109,7 +109,7 @@ local gameplay = {[[
     [[
     <p align='center'><font size='20'><b><J>Jobs</J></b></font></p>
     <font size='12'>You need a job to work. Each job has different salaries and energies. You can apply for a job by visiting the job menu (NOTE: You can only see jobs that you are qualified). To become qualified for a certain job, your level should be higher than the minimum level required for that job. You may also need to complete some degrees by learning, to apply for some jobs. Jobs with higher level and educational level usually have low energy consumption and higher salaries. Also if you have achieved a certain educational level, you will spend less energy when working. So keep in mind that learning is always good!
-    Jobs are offered by company owners, so doing a job means you are working for a particular company. When you work both you, company owners and company get profit...
+    Jobs are offered by company owners, so doing a job means you are working for a particular company. When you work you, company owners and company get profit...
     </font>
     ]],
     [[
@@ -1008,6 +1008,7 @@ function setUI(name)
     tfm.exec.addImage("16f2831a4b1.png", "_10", 60, 210) -- Shop image
     tfm.exec.addImage("16f285ae02c.png", "_18", 500, 100) -- School image (icon made by Dinosoft labs in 'flaticons.com')
     tfm.exec.addImage("16f3176f389.png", "_50", 1450, 260)-- Slot machine image (Icons made byNikita Golubev in flaticons.com)
+    tfm.exec.addImage("16f83fc33be.png", "_10", 20, 20)
     LineChart.init()
     chart:showLabels()
     chart:setShowDataPoints(true)
