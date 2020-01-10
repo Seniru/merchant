@@ -1030,7 +1030,7 @@ function setUI(name)
     chart:showLabels()
     chart:setShowDataPoints(true)
     chart:show()
-    tfm.exec.chatMessage("<BV><b>Welcome to the Clicker!</b></BV><br><N>For more information type <J><b>!help</b></J><br>The game is under development. Please report any bug to <b><V>King_seniru#5890</V></b>", name)
+    tfm.exec.chatMessage("<BV><b>Welcome to the Clicker!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J><br>The game is under development. Please report any bug to <b><V>King_seniru#5890</V></b>", name)
 end
 
 --event handling
@@ -1043,6 +1043,7 @@ function eventNewPlayer(name)
         setUI(name)
         players[name]:setJob("Cheese collector")
     end
+    system.bindKeyboard(name, 72, true, true)
 end
 
 function eventPlayerDataLoaded(name, data)
@@ -1293,6 +1294,12 @@ function eventChatCommand(name, msg)
         else
             players[name]:setTitle(string.sub(msg, 7))
         end
+    end
+end
+
+function eventKeyboard(name, key, down, x, y)
+    if key == 72 then
+        displayHelp(name, "game", 1)
     end
 end
 
