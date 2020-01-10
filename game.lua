@@ -1007,7 +1007,9 @@ function setUI(name)
     ui.addTextArea(4, "<a href='event:shop'><b><font color='#000000' size='15'>Shop</font></b></a>", name, 100, 230, 50, 40, nil, nil, 0, false)
     --school button
     ui.addTextArea(5, "<a href='event:courses'><font size='15'><b>Enter</b></font></a>", name, 600, 270, 60, 20, nil, nil, 0, false)
-    ui.addTextArea(3000, "<p align='center'><b>Lessons left: " .. p:getLearningProgress() .." / " .. courses[p.learning].lessons .. "</b></p>", name, 480, 180, 300, 20, nil, nil, 0, false)
+    if not p.learning == "" then
+        ui.addTextArea(3000, "<p align='center'><b>Lessons left: " .. p:getLearningProgress() .." / " .. courses[p.learning].lessons .. "</b></p>", name, 480, 180, 300, 20, nil, nil, 0, false)
+    end
     --jobs button
     tfm.exec.addImage("16f88c66ed1.png", ":10", 610, 25) -- Job search image by Freepik in 'Flaticon.com'
     ui.addTextArea(6, "<a href='event:jobs'>\t\n\t\n\t\n</a>", name, 610, 25, 30, 30, nil, nil, 0, true)
