@@ -26,7 +26,7 @@ local year = 3000
 local month = 1
 local day = 1
 
-local months = {"January", "February", "March", "April", "May", "June", "July", "Aughust", "September", "October", "November", "December"}
+local months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 
 
 local players = {}
@@ -273,7 +273,6 @@ function Player:work()
         self.setHealth(self, -job.energy, true)
         self:setMoney(job.salary + job.salary * self.eduLvl * 0.1, true)
         self:setXP(1, true)
-        self:addTitle("Worker")
         companies[self.company]:setIncome(job.salary * 0.5, true)
         for name, shares in next, companies[self.company]:getShareHolders() do
             players[name]:setMoney(shares.shares * job.salary * 0.1, true)
@@ -347,7 +346,6 @@ function Player:setCourse(course)
     dHandler:set(self.name, "learnProgress", self.learnProgress)
     dHandler:set(self.name, "eduLvl", self.eduLvl)
     dHandler:set(self.name, "eduStream", self.eduStream)
-    self:addTitle("Little Learner")
     ui.updateTextArea(5, "<a href='event:courses'><font size='15'><b>Learn</b></font></a>", self.name)
     ui.addTextArea(3000, "<p align='center'><b>Lessons left: 0 / " .. courses[self.learning].lessons .. "</b></p>", self.name, 480, 180, 300, 20, nil, nil, 0, false)
 end
@@ -403,6 +401,7 @@ end
 
 function Player:learn()
     if not (self.learning == "") and self.money > courses[self.learning].feePerLesson then
+        self:addTitle("Little Learner")
         self.learnProgress = self.learnProgress + 1
         ui.updateTextArea(3000, "<b><p align='center'>Lessons left: " .. self.learnProgress .. " / " .. courses[self.learning].lessons .. "</b></p>", self.name)
         self:setMoney(-courses[self.learning].feePerLesson, true)
@@ -410,7 +409,9 @@ function Player:learn()
             self:addDegree(self.learning)
             self.learning = ""
             self.eduLvl = self.eduLvl + 1
-            self:addTitle("Dedicated Learner")
+            if self.eduLvl == 3 then
+                self:addTitle("Dedicated Learner")
+            end
         end
         dHandler:set(self.name, "learning", self.learning)
         dHandler:set(self.name, "learnProgress", self.learnProgress)
@@ -426,7 +427,10 @@ function Player:levelUp()
         self:setMoney(5 * self.level, true)
         dHandler:set(self.name, "level", self.level)
         displayParticles(self.name, tfm.enum.particle.star)
-        self:addTitle("Getting Experience")
+        self:addTitle("Worker")
+        if self.level == 3 then
+            self:addTitle("Getting Experience")
+        end
     end
 end
 
