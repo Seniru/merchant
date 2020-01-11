@@ -206,10 +206,12 @@ local timer = Timer("time-sys", function()
 end, 1000, true)
 
 local saveDataTimer = Timer("dataTimer", function()
-    for name, _ in next, tfm.get.room.playerList do
-        system.savePlayerData(name, dHandler:dumpPlayer(name))
+    if #tfm.get.room.playerList >= 5 then
+        for name, _ in next, tfm.get.room.playerList do
+            system.savePlayerData(name, dHandler:dumpPlayer(name))
+        end
+        print('Player Data Saved!')
     end
-    print('Player Data Saved!')
 end, 1000 * 60 * 2, true)
 
 --creating the class Player
@@ -1052,6 +1054,14 @@ function eventNewPlayer(name)
         players[name]:setJob("Cheese collector")
     end
     system.bindKeyboard(name, 72, true, true)
+end
+
+function eventPlayerLeft(name)
+    if #tfm.get.room.playerList < 5 then
+        tfm.exec.chatMessage("You need atleast 5 players to save stats")
+    else
+        system.savePlayerData(name, dHandler:dumpPlayer(name))
+    end
 end
 
 function eventPlayerDataLoaded(name, data)
