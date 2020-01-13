@@ -30,6 +30,7 @@ local months = {"January", "February", "March", "April", "May", "June", "July", 
 
 
 local players = {}
+local pCount = 0
 local healthPacks = {}
 local courses = {}
 local jobs = {}
@@ -206,13 +207,13 @@ local timer = Timer("time-sys", function()
 end, 1000, true)
 
 local saveDataTimer = Timer("dataTimer", function()
-    if #tfm.get.room.playerList >= 5 then
+    if pCount >= 5 then
         for name, _ in next, tfm.get.room.playerList do
             system.savePlayerData(name, dHandler:dumpPlayer(name))
         end
         print('Player Data Saved!')
     end
-end, 1000 * 60 * 2, true)
+end, 1000 * 60 * 1, true)
 
 --creating the class Player
 local Player = {}
@@ -1054,14 +1055,16 @@ function eventNewPlayer(name)
         players[name]:setJob("Cheese collector")
     end
     system.bindKeyboard(name, 72, true, true)
+    pCount = pCount + 1
 end
 
 function eventPlayerLeft(name)
-    if #tfm.get.room.playerList < 5 then
+    if pCount < 5 then
         tfm.exec.chatMessage("You need atleast 5 players to save stats")
     else
         system.savePlayerData(name, dHandler:dumpPlayer(name))
     end
+    pCount = pCount - 1
 end
 
 function eventPlayerDataLoaded(name, data)
