@@ -213,7 +213,7 @@ local saveDataTimer = Timer("dataTimer", function()
         end
         print('Player Data Saved!')
     end
-end, 1000 * 60 * 1, true)
+end, 1000 * 60 * 5, true)
 
 --creating the class Player
 local Player = {}
