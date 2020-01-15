@@ -2,7 +2,7 @@
 
 <p align='center'><img width=95% src='https://i.ibb.co/phCCD7Z/Capture.png' alt='merchant'></p>
 
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![GitHub stars](https://img.shields.io/github/stars/seniru/merchant)
 ![GitHub forks](https://img.shields.io/github/forks/seniru/merchant)
