@@ -1,52 +1,26 @@
-# TFM Clicker
 
-<p align='center'><img width=95% src='https://i.ibb.co/G2Jc9dP/Captu1re.png' alt='TFM Clicker'></p>
+# #merchant
+
+<p align='center'><img width=95% src='https://i.ibb.co/phCCD7Z/Capture.png' alt='merchant'></p>
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-![GitHub stars](https://img.shields.io/github/stars/seniru/tfm_clicker)
-![GitHub forks](https://img.shields.io/github/forks/seniru/tfm_clicker)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/seniru/tfm_clicker?color=green)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/Seniru/TFM_Clicker) 
+![GitHub stars](https://img.shields.io/github/stars/seniru/merchant)
+![GitHub forks](https://img.shields.io/github/forks/seniru/merchant)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/seniru/merchant?color=green)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/Seniru/merchant) 
 
 ## Introduction
 
-> Disclaimer: This game is still in beta stage! Contribute to make it more
-> awesome
+**#Merchant** is a transformice module which is largely based on businesses we see everywhere. You start as a little mouse with a basic job, but with a great story to write! Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
 
-TFM _(aka Transformice)_ Clicker is a clicker game for transformice based on an
-office or a working environment. Your goal is to earn money, buy companies and
-recruit other players and be the best businessman in transformice!
+## How to Play?
 
-### How to play?
+You can run this game in #merchant rooms *(`/room #merchant`)*
 
-There are few requirements in order to run a lua script in your tribe house
+***DISCLAIMER: The game wont run in merchant room as usual modules since this is not officialy approved. But you can play this game with the help of me or another module team member***
 
-- Gathered Cheese: 1000
-- Permissions to run /np @code in tribe house
-
-If you already fulfilled these requirements, then run _/lua_ and enter
-[this](https://github.com/Seniru/TFM_Clicker/raw/master/game.lua) code in the
-box and submit it. More information about the game can be found by typing
-_!help_ in the chat.
-
-_If you don't have the above requirements then ask a member in your tribe to run
-this for you_
-
-### Contributing
-
-Ready to contribute this project? Great!!! Here are few ways that you can add
-contributions
-
-- Bug reports and issues
-- PR (with improvements or bug fixes)
-- Code reviews
-- Improving the documentation
-- Suggestions
-
-**References for contributors**
-
-- [Documentation](https://github.com/Seniru/TFM_Clicker/blob/documentation/documentation.md)
+Type `!help` in game to know more about gameplay and commands.
 
 ## Contributors ✨
 
