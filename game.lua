@@ -76,7 +76,7 @@ local iconProviders = closeButton .. [[
 
 local gameplay = {[[
     <p align='center'><font size='20'><b><J>Gameplay Overview</J></b></font></p>
-    <font size='12'>This is a <b>Clicker</b> which is largely based on businesses we see everywhere. You start as a little mouse with a basic job, but with a great story to write! Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
+    <font size='12'>This is a game which is largely based on businesses we see everywhere. You start as a little mouse with a basic job, but with a great story to write! Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
     Click each title to know more about each thing in depth:
     <b><BV>
             <a href='event:page:help:2'>• Working</a>                       <a href='event:page:help:6'>• Shop</a>
@@ -1041,7 +1041,7 @@ function setUI(name)
     chart:showLabels()
     chart:setShowDataPoints(true)
     chart:show()
-    tfm.exec.chatMessage("<BV><b>Welcome to the Clicker!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J><br>The game is under development. Please report any bug to <b><V>King_seniru#5890</V></b>", name)
+    tfm.exec.chatMessage("<BV><b>Welcome to #merchant!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J><br>The game is under development. Please report any bug to <b><V>King_seniru#5890</V></b>", name)
 end
 
 --event handling
