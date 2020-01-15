@@ -1,4 +1,3 @@
-
 # #merchant
 
 <p align='center'><img width=95% src='https://i.ibb.co/phCCD7Z/Capture.png' alt='merchant'></p>
@@ -8,17 +7,22 @@
 ![GitHub stars](https://img.shields.io/github/stars/seniru/merchant)
 ![GitHub forks](https://img.shields.io/github/forks/seniru/merchant)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/seniru/merchant?color=green)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/Seniru/merchant) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/Seniru/merchant)
 
 ## Introduction
 
-**#Merchant** is a transformice module which is largely based on businesses we see everywhere. You start as a little mouse with a basic job, but with a great story to write! Your goal is to earn money, buy companies, hire workers and be the best businessman in transformice!
+**#Merchant** is a transformice module which is largely based on businesses we
+see everywhere. You start as a little mouse with a basic job, but with a great
+story to write! Your goal is to earn money, buy companies, hire workers and be
+the best businessman in transformice!
 
 ## How to Play?
 
-You can run this game in #merchant rooms *(`/room #merchant`)*
+You can run this game in #merchant rooms _(`/room #merchant`)_
 
-***DISCLAIMER: The game wont run in merchant room as usual modules since this is not officialy approved. But you can play this game with the help of me or another module team member***
+**_DISCLAIMER: The game wont run in merchant room as usual modules since this is
+not officialy approved. But you can play this game with the help of me or
+another module team member_**
 
 Type `!help` in game to know more about gameplay and commands.
 
@@ -43,6 +47,7 @@ Thanks goes to these wonderful people
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the
