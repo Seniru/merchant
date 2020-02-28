@@ -336,7 +336,7 @@ function Player:addTitle(newTitle)
         end
         dHandler:set(self.name, "titles", titles)
         titles = nil
-        tfm.exec.chatMessage("Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle])
+        tfm.exec.chatMessage("<FC><b>Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle] .. "</b></FC>")
     end
 end
 
@@ -375,15 +375,16 @@ end
 
 function Player:investTo(comName, amount, sharePurchase)
     if self.money < amount then
-        tfm.exec.chatMessage('Not Enough money!', self.name)
+        tfm.exec.chatMessage('<R>[Error] Not Enough money!</R>', self.name)
     else
         if sharePurchase then
             if companies[comName]:getUnownedShares() < amount / 100 then
-                tfm.exec.chatMessage("Company doesn't issue shares of the specified amount", self.name)
+                tfm.exec.chatMessage("<R>[Error]Company doesn't issue shares of the specified amount</R>", self.name)
                 return
             end
                 companies[comName]:setShares(-amount / 100, true)
-            end
+            tfm.exec.chatMessage("<J>Bought shares from '" .. comName .. "'</J>", self.name)                
+        end
         companies[comName]:addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
         self:addOwnedCompanies(comName)
@@ -480,7 +481,7 @@ end
 function Player:buyLottery(choices)
     local invalid = not choices:find("%s*%d+%s+%d+%s+%d+%s+[a-zA-Z]%s*")
     if invalid then
-        return tfm.exec.chatMessage('Invalid input!', self.name)
+        return tfm.exec.chatMessage('<R>[Error] Invalid input!</R>', self.name)
     end
     choices = map(split(choices:gsub("%s+", " "), " "), function(x)
         if x:find("%d+") then
@@ -492,12 +493,12 @@ function Player:buyLottery(choices)
         invalid = true
     end)
     if invalid then
-        tfm.exec.chatMessage("Invalid input!")
+        tfm.exec.chatMessage("<R>[Error] Invalid input!</R>", self.name)
     else
         self:setMoney(-20, true)
         if not lottoBuyers[self.name] then lottoBuyers[self.name] = {} end
         table.insert(lottoBuyers[self.name], choices)
-        tfm.exec.chatMessage("Bought a lottery!", self.name)
+        tfm.exec.chatMessage("<J>Bought a lottery!</J>", self.name)
     end
 end
 
@@ -1188,6 +1189,7 @@ function eventTextAreaCallback(id, name, evt)
         else
             local tempCompany = tempData[name].jobCompany
             jobs[tempData[name].jobName] = Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany)
+            tfm.exec.chatMessage("<J>Successfully created the job '" .. tempData[name].jobName .. "'</J>", name)
             tempData[name] = {jobCompany = tempCompany}
             ui.removeTextArea(500, name)
         end
@@ -1257,19 +1259,20 @@ function eventPopupAnswer(id, name, answer)
     end
     elseif id == 450 and answer ~= '' then --for the popup to submit a name for the company
         if companies[answer] then
-            tfm.exec.chatMessage('Company already exists!', name)
+            tfm.exec.chatMessage('<R>[Error] Company already exists!</R>', name)
             return
         elseif answer:len() > 15 or answer:find("[^%w%s]") then
-            tfm.exec.chatMessage('Name should contain only letters, numbers and spaces, which is lesser than 15 characters', name)
+            tfm.exec.chatMessage('<R>[Error] Name should contain only letters, numbers and spaces, which is lesser than 15 characters</R>', name)
             return
         end
         companies[answer] = Company(answer, name)
         players[name]:setMoney(-5000, true)
         players[name]:addOwnedCompanies(answer)
         displayCompany(answer, name)
+        tfm.exec.chatMessage("<J>Succesfully created the new company '" .. answer .. "'</J>", name)
     elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
         if answer:len() > 15 or answer:find("[^%w%s]") then
-            tfm.exec.chatMessage('Name should contain only letters, numbers and spaces, which is lesser than 15 characters', name)
+            tfm.exec.chatMessage('<R>[Error] Name should contain only letters, numbers and spaces, which is lesser than 15 characters</R>', name)
         else
             tempData[name].jobName = answer
             displayJobWizard(name)
