@@ -1206,7 +1206,7 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "chooseJobDegree" then
         displayAllDegrees(name)
     elseif evt == "getLottery" then
-        ui.addPopup(1000, 2, "<p align='center'>Please enter your choices (3 numbers between 0 and 100 and a letter) separated by spaces. <br><i>eg:15 20 30 B</i></p>", name, 300, 90, 200, true)
+        ui.addPopup(1000, 2, "<p align='center'>Please enter your choices (3 numbers between 0 and 100 and a letter) separated by spaces. <br><i>eg:15 20 30 B</i><br><br><b><i>Price: $20</i></b></p>", name, 300, 90, 200, true)
     elseif evt == "checkLotto" then
         displayLotto(name)        
     elseif evt:gmatch("%w+:%w+") then
