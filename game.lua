@@ -999,6 +999,7 @@ end
 
 function setUI(name)
     local p = players[name]
+    ui.setMapName("Merchant")
     --textAreas and images
     --work
     tfm.exec.addImage("16f88de3629.png", ":10", 2, 333)
@@ -1019,17 +1020,17 @@ function setUI(name)
         ui.addTextArea(3000, "<p align='center'><b>Lessons left: " .. p:getLearningProgress() .." / " .. courses[p.learning].lessons .. "</b></p>", name, 480, 180, 300, 20, nil, nil, 0, false)
     end
     --jobs button
-    tfm.exec.addImage("16f88c66ed1.png", ":10", 610, 25) -- Job search image by Freepik in 'Flaticon.com'
-    ui.addTextArea(6, "<a href='event:jobs'>\t\n\t\n\t\n</a>", name, 610, 25, 30, 30, nil, nil, 0, true)
+    tfm.exec.addImage("16f88c66ed1.png", ":10", 620, 30) -- Job search image by Freepik in 'Flaticon.com'
+    ui.addTextArea(6, "<a href='event:jobs'>\t\n\t\n\t\n</a>", name, 620, 30, 30, 30, nil, nil, 0, true)
     --Company button
-    tfm.exec.addImage("16f88b93d41.png", ":10", 650, 25) -- Company buildings images by Freepik in 'Flaticon.com'
-    ui.addTextArea(7, "<a href='event:company'>\t\n\t\n\t\n</a>", name, 650, 25, 30, 30, nil, nil, 0, true)
+    tfm.exec.addImage("16f88b93d41.png", ":10", 660, 30) -- Company buildings images by Freepik in 'Flaticon.com'
+    ui.addTextArea(7, "<a href='event:company'>\t\n\t\n\t\n</a>", name, 660, 30, 30, 30, nil, nil, 0, true)
     --Tips buton
-    tfm.exec.addImage("16f88aaf19f.png", ":10", 120, 20) --Idea bulb image by Vectors Market in 'flaticon.com'
-    ui.addTextArea(8, "<a href='event:tips'>\t\n\t\n\t\n</a>", name, 120, 20, 30, 30, nil, nil, 0, true)
+    tfm.exec.addImage("16f88aaf19f.png", ":10", 110, 25) --Idea bulb image by Vectors Market in 'flaticon.com'
+    ui.addTextArea(8, "<a href='event:tips'>\t\n\t\n\t\n</a>", name, 110, 25, 30, 30, nil, nil, 0, true)
     --Inventory button
-    tfm.exec.addImage("16f83fc33be.png", ":10", 160, 20) -- Bag image (icon made by Payungkead in 'flaticon.com')
-    ui.addTextArea(9, "<a href='event:inv'>\t\n\t\n\t\n", name, 160, 20, 30, 30, nil, nil, 0, true)
+    tfm.exec.addImage("16f83fc33be.png", ":10", 150, 25) -- Bag image (icon made by Payungkead in 'flaticon.com')
+    ui.addTextArea(9, "<a href='event:inv'>\t\n\t\n\t\n", name, 150, 25, 30, 30, nil, nil, 0, true)
     --Clock interface
     ui.addTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>", name, 288, 180, 100, 100, nil, nil, 0, false)
     --Lottery board
