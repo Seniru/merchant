@@ -336,7 +336,7 @@ function Player:addTitle(newTitle)
         end
         dHandler:set(self.name, "titles", titles)
         titles = nil
-        tfm.exec.chatMessage("<FC><b>Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle] .. "</b></FC>")
+        tfm.exec.chatMessage("<D><b>Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle] .. "</b></D>")
     end
 end
 
