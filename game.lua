@@ -792,7 +792,8 @@ function calculateXP(lvl)
 end
 
 function getMaxSalary(comp)
-    return companies[comp]:getCapital() * 0.1
+    local max = companies[comp]:getCapital() * 0.04
+    return max > 10000000 and 10000000 or max
 end
 
 function displayParticles(target, particle)
@@ -1381,35 +1382,35 @@ table.insert(healthPacks, HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! t
 table.insert(healthPacks, HealthPack("Candy", 10, 0.02, true, "Halloween Treat!"))
 table.insert(healthPacks, HealthPack("Apple", 15, 0.025, true, "A nutritious diet from shaman"))
 table.insert(healthPacks, HealthPack("Pastry", 30, 0.06, true, "King's favourite food"))
-table.insert(healthPacks, HealthPack("Lasagne", 100, 0.1, true, "Shh!!! Beware of Garfield :D"))
-table.insert(healthPacks, HealthPack("Cheese Pizza", 130, 0.15, true, "Treat from Italy - with lots of cheeese inside !!!"))
-table.insert(healthPacks, HealthPack("Magician`s Portion", 250, 0.25, true, "Restores 1/4 th of your health."))
-table.insert(healthPacks, HealthPack("Rotten Cheese", 300, 0.35, true, "Gives you the power of vampire <font size='5'>(disclaimer)This won't make you a vampire</font>"))
-table.insert(healthPacks, HealthPack("Cheef`s food", 500, 0.5, true, "Restores half of your health (Powered by Shaman)"))
-table.insert(healthPacks, HealthPack("Cheese Pizza - Large", 550, 0.55, true, "More Pizza Power!"))
-table.insert(healthPacks, HealthPack("Vito`s Pizza", 700, 0.6, true, "World's best pizza!"))
-table.insert(healthPacks, HealthPack("Vito`s Lasagne", 750, 0.8, true, "World's best lasagne!"))
-table.insert(healthPacks, HealthPack("Ambulance!", 999, 1, false, "Restores your health back! (Powered by Shaman!)"))
+table.insert(healthPacks, HealthPack("Lasagne", 200, 0.1, true, "Shh!!! Beware of Garfield :D"))
+table.insert(healthPacks, HealthPack("Cheese Pizza", 300, 0.15, true, "Treat from Italy - with lots of cheeese inside !!!"))
+table.insert(healthPacks, HealthPack("Magician`s Portion", 500, 0.25, true, "Restores 1/4 th of your health."))
+table.insert(healthPacks, HealthPack("Rotten Cheese", 700, 0.35, true, "Gives you the power of vampire <font size='5'>(disclaimer)This won't make you a vampire</font>"))
+table.insert(healthPacks, HealthPack("Cheef`s food", 1000, 0.5, true, "Restores half of your health (Powered by Shaman)"))
+table.insert(healthPacks, HealthPack("Cheese Pizza - Large", 1200, 0.55, true, "More Pizza Power!"))
+table.insert(healthPacks, HealthPack("Vito`s Pizza", 1500, 0.6, true, "World's best pizza!"))
+table.insert(healthPacks, HealthPack("Vito`s Lasagne", 2000, 0.8, true, "World's best lasagne!"))
+table.insert(healthPacks, HealthPack("Ambulance!", 2500, 1, false, "Restores your health back! (Powered by Shaman!)"))
 
 --creating and storing Course tables
 courses["School"] = Course("School", 20, 2, 1, "")
 courses["Junior Sports Club"] = Course("Junior Sports Club", 10, 4, 2, "")
-courses["High School"] = Course("High School", 500, 20, 3, "")
-courses["Cheese mining"] = Course("Cheese mining", 1000, 30, 4, "admin")
-courses["Cheese trading"] = Course("Cheese trading", 2500, 30, 4, "bs")
-courses["Cheese developing"] = Course("Cheese developing", 2500, 50, 4, "it")
-courses["Law"] = Course("Law", 35000, 80, 5, "admin")
-courses["Cheese trading-II"] = Course("Cheese trading-II", 90000, 75, 5, "bs")
-courses["Fullstack cheese developing"] = Course("Fullstack cheese developing", 40000, 70, 5, "it")
+courses["High School"] = Course("High School", 1000, 20, 3, "")
+courses["Cheese mining"] = Course("Cheese mining", 3000, 30, 4, "admin")
+courses["Cheese trading"] = Course("Cheese trading", 5000, 30, 4, "bs")
+courses["Cheese developing"] = Course("Cheese developing", 5500, 50, 4, "it")
+courses["Law"] = Course("Law", 100000, 80, 5, "admin")
+courses["Cheese trading-II"] = Course("Cheese trading-II", 200000, 75, 5, "bs")
+courses["Fullstack cheese developing"] = Course("Fullstack cheese developing", 150000, 70, 5, "it")
 --creating and stofing Job tables
 jobs["Cheese collector"] = Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelier801")
 jobs["Junior miner"] = Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801")
 jobs["Cheese producer"] = Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelier801")
-jobs["Cheese miner"] = Job("Cheese miner", 250, 0.2, 10, "Cheese mining", "shaman", "Atelier801")
-jobs["Cheese trader"] = Job("Cheese trader", 200, 0.2, 12, "Cheese trading", "shaman", "Atelier801")
-jobs["Cheese developer"] = Job("Cheese developer", 300, 0.3, 12, "Cheese developing", "shaman", "Atelier801")
-jobs["Cheese wholesaler"] = Job("Cheese wholesaler", 700, 0.2, 15, "Cheese trading-II", "shaman", "Atelier801")
-jobs["Fullstack cheese developer"] = Job("Fullstack cheese developer", 9000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801")
+jobs["Cheese miner"] = Job("Cheese miner", 350, 0.2, 10, "Cheese mining", "shaman", "Atelier801")
+jobs["Cheese trader"] = Job("Cheese trader", 400, 0.2, 12, "Cheese trading", "shaman", "Atelier801")
+jobs["Cheese developer"] = Job("Cheese developer", 500, 0.3, 12, "Cheese developing", "shaman", "Atelier801")
+jobs["Cheese wholesaler"] = Job("Cheese wholesaler", 800, 0.2, 15, "Cheese trading-II", "shaman", "Atelier801")
+jobs["Fullstack cheese developer"] = Job("Fullstack cheese developer", 10000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801")
 
 for name, player in next, tfm.get.room.playerList do
     eventNewPlayer(name)
