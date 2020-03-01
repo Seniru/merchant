@@ -1063,7 +1063,7 @@ function setUI(name)
     chart:showLabels()
     chart:setShowDataPoints(true)
     chart:show()
-    tfm.exec.chatMessage("<BV><b>Welcome to #merchant!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J></V><br><br><CE>Warning! The game is under development. Your data might get deleted! Please report any bug to <b><V>King_seniru#5890</V></b>", name)
+    tfm.exec.chatMessage("<BV><b>Welcome to #merchant!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J></V><br><br><CE>Warning! The game is under development. Your data might get deleted! Please report any bug to <b><V>King_seniru#5890</V></b><br><br><PT><b><u><i>https://atelier801.com/topic?f=6&t=886315</i></u></b></PT>", name)
 end
 
 --event handling
