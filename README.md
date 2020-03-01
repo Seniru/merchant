@@ -4,6 +4,7 @@
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3748/badge)](https://bestpractices.coreinfrastructure.org/projects/3748)
 ![GitHub stars](https://img.shields.io/github/stars/seniru/merchant)
 ![GitHub forks](https://img.shields.io/github/forks/seniru/merchant)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/seniru/merchant?color=green)
