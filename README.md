@@ -20,10 +20,6 @@ the best businessman in transformice!
 
 You can run this game in #merchant rooms _(`/room #merchant`)_
 
-**_DISCLAIMER: The game wont run in merchant room as usual modules since this is
-not officialy approved. But you can play this game with the help of me or
-another module team member_**
-
 Type `!help` in game to know more about gameplay and commands.
 
 ## Contributors ✨
