@@ -49,7 +49,6 @@ local cmds = [[
 local credits = [[
     <p align='center'><font size='20'><b><J>Credits</J></b></font></p>
     <b>All the credits go to these people for helping me with different things</b>
-
     <b><u>Coders</u>
             <BV>• Overforyou#9290                                               • Cyanny#0000</BV>
     <u>Icons and Images</u>
@@ -141,7 +140,6 @@ local gameplay = {[[
         • Minimum level (required): The minimum level of a player to apply for this job. Increasing the level would decrease the energy
         • Qualifications (optional): The educational qualifications required for this job. Increasing this would decrease the energy further!
     Salary and the energy consumed is the factor that many workers are looking for. So be careful when choosing this!
-
     <b><J>GOOD LUCK!</J></b>
     </font>
     ]]
@@ -336,7 +334,7 @@ function Player:addTitle(newTitle)
         end
         dHandler:set(self.name, "titles", titles)
         titles = nil
-        tfm.exec.chatMessage("<D><b>Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle] .. "</b></D>")
+        tfm.exec.chatMessage("<D>Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle] .. "</D>")
     end
 end
 
@@ -793,7 +791,7 @@ end
 
 function getMaxSalary(comp)
     local max = companies[comp]:getCapital() * 0.04
-    return max > 10000000 and 10000000 or max
+    return (max > 10000000 or max < 0 --[[probably integer overloads]]) and 10000000 or max
 end
 
 function displayParticles(target, particle)
@@ -852,6 +850,27 @@ function getWinPrice(lotto)
     end
     return wins
 end
+
+function getBestParamsJobs(type, val--[[salary, energy, minLvl, eduLvl]], tempData)
+    --[[TODO: Refactor this function]]
+	if type == "salary" then
+		local salary = val
+		local minLvl = tempData.minLvl or 1
+		local eduLvl = tempData.eduLvl or 0
+		local energy = math.ceil(val / getMaxSalary(tempData.jobCompany) * 100)
+        energy =  energy - minLvl - eduLvl * 2
+		energy = energy < 5 and 5 or energy
+		return salary, energy, minLvl, eduLvl
+	elseif type == "energy" then
+		local energy = val or 5
+		local minLvl = 1
+		local eduLvl = 0
+		local e = energy - minLvl - eduLvl * 2
+		local salary = e * getMaxSalary(tempData.jobCompany) / 100
+		return salary, energy, minLvl, eduLvl
+	end
+end
+
 
 --[[copied from stackoverflow
   Credits: https://stackoverflow.com/users/1514861/ivo-beckers
@@ -1044,7 +1063,7 @@ function setUI(name)
     chart:showLabels()
     chart:setShowDataPoints(true)
     chart:show()
-    tfm.exec.chatMessage("<BV><b>Welcome to #merchant!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J><br>The game is under development. Please report any bug to <b><V>King_seniru#5890</V></b>", name)
+    tfm.exec.chatMessage("<BV><b>Welcome to #merchant!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J></V><br><br><CE>Warning! The game is under development. Your data might get deleted! Please report any bug to <b><V>King_seniru#5890</V></b>", name)
 end
 
 --event handling
@@ -1227,9 +1246,11 @@ function eventTextAreaCallback(id, name, evt)
         elseif type == "com" then
             displayCompany(val, name)
         elseif type == "degree" then
-            tempData[name].qualification = val
-            local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - courses[val].level * 2
-            tempData[name].jobEnergy = e < 0 and 1 or e
+			tempData[name].qualification = val
+			tempData[name].eduLvl = courses[val].level
+			salary, energy = getBestParamsJobs("salary", tempData[name].jobSalary or 1, tempData[name])
+            tempData[name].jobEnergy = energy
+			tempData[name].jobSalary = salary
             ui.removeTextArea(id, name)
             displayJobWizard(name)
         elseif type == "use" then
@@ -1280,18 +1301,23 @@ function eventPopupAnswer(id, name, answer)
             displayJobWizard(name)
         end
     elseif id == 602 and tonumber(answer) and tonumber(answer) < getMaxSalary(tempData[name].jobCompany) then --for the popup to choose the salary for a new job
-        tempData[name].jobSalary = tonumber(answer)
-        tempData[name].jobEnergy = math.ceil(tempData[name].jobSalary / getMaxSalary(tempData[name].jobCompany) * 100)
+		tempData[name].jobSalary = tonumber(answer)
+		_, energy = getBestParamsJobs("salary", tempData[name].jobSalary, tempData[name])
+		tempData[name].jobEnergy = energy
         displayJobWizard(name)
     elseif id == 603 and tonumber(answer) and tonumber(answer) > 0 and tonumber(answer) <= 100 then --for the popup to choose the energy for the job
         tempData[name].jobEnergy = tonumber(answer)
-        tempData[name].jobSalary = tempData[name].jobEnergy * getMaxSalary(tempData[name].jobCompany) / 100
+		salary, energy = getBestParamsJobs("energy", tempData[name].jobEnergy, tempData[name])
+        tempData[name].jobSalary = salary
         tempData[name].minLvl = 1
+        tempData[name].eduLvl = 0
+        tempData[name].qualification = nil
         displayJobWizard(name)
     elseif id == 604 and tonumber(answer) then --for the popup to choose the minimum level for the job
-        tempData[name].minLvl = tonumber(answer)
-        local e = math.ceil((tempData[name].jobSalary or 1)/ getMaxSalary(tempData[name].jobCompany) * 100) - tempData[name].minLvl
-        tempData[name].jobEnergy = e <= 0 and 1 or e
+		tempData[name].minLvl = tonumber(answer)
+        salary, energy, minLvl = getBestParamsJobs("salary", tempData[name].jobSalary or 5, tempData[name])
+		tempData[name].jobEnergy = energy
+		tempData[name].jobSalary = tempData[name].jobSalary or 1
         displayJobWizard(name)
     elseif id == 700 and tonumber(answer) then --for the investment popups
         players[name]:investTo(tempData[name].investing, tonumber(answer))
