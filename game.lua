@@ -1167,34 +1167,12 @@ end
 function eventPlayerDataLoaded(name, data)
     print("Loaded player data (" .. name .. ")") --.. data)
     dHandler:newPlayer(name, data)
-    --[[local titles = {}
-    for _, title in next, dHandler:get(name, "titles") do
-        title = title:sub(2, #title - 1)
-        titles[title] = "« " .. title .. " »"
-    end]]
 
-    --[[local title = dHandler:get(name, "title")
-    for _, id in next, titles do
-        if id == title then title = titles[id] break end 
-    end]]
-
-    --[[local degrees = {}
-    for _, degree in next, dHandler:get(name, "degrees") do
-        degree = degree:sub(2, #degree - 1)
-        degrees[degree] = courses[degree]
-    end]]
-
-    --[[local inv = {}
-    for _, data in next, dHandler:get(name, "inventory") do
-        local n = data[1]:sub(2, #data[1] - 1)
-        inv[n] = data[2]
-    end]]
     local inv = {}
     for _, data in next, dHandler:get(name, "inventory") do
         inv[items[data[1]]] = data[2]
     end
-
-    
+  
     players[name] = Player(name, {
         money = dHandler:get(name, "money"),
         title = titles[dHandler:get(name, "title")],
@@ -1208,9 +1186,6 @@ function eventPlayerDataLoaded(name, data)
         degrees = dHandler:get(name, "degrees"),
         inventory = inv
     })
-    --dHandler:set(name, "titles", map(dHandler:get(name, "titles"), function(t) return t:sub(2, #t - 1)end))
-    --dHandler:set(name, "degrees", map(dHandler:get(name, "degrees"), function(d) return d:sub(2, #d - 1) end))
-    --players[name]:storeInventory()
     tempData[name] = {}
     setUI(name)
     players[name]:setJob("Cheese collector")
