@@ -145,6 +145,18 @@ local gameplay = {[[
     ]]
 }
 
+local titles = {
+    [1] = "Newbie",
+    [2] = "Worker",
+    [3] = "Getting Experience",
+    [4] = "Little Learner",
+    [5] = "Dedicated Learner",
+    [6] = "Degree Holder",
+    [7] = "Investor",
+    [8] = "Businessman"
+}
+
+
 local ab = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 local latestLotto = {}
 local lottoWins = {}
@@ -152,7 +164,7 @@ local lottoBuyers = {}
 
 local dHandler = DataHandler.new("clicker", {
     money = {index = 1, type = "number", default = 100},
-    title = {index = 2, type = "string", default = "Newbie"},
+    title = {index = 2, type = "number", default = 1},
     xp =    {index = 3, type = "number", default = 1},
     level = {index = 4, type = "number", default = 1},
     learning = {index = 5, type = "string", default = ""},
@@ -318,15 +330,29 @@ function Player:setXP(val, add)
 end
 
 function Player:setTitle(newTitle)
-    if self.titles[newTitle] then
-        self.title = newTitle
-        self:updateStatsBar()
-        dHandler:set(self.name, "title", self.title)
+    for id, title in next, titles do
+        if title == newTitle and self.titles[id] then
+            self.title = newTitle
+            self:updateStatsBar()
+            dHandler:set(self.name, "title", id)
+            break
+        end
     end
 end
 
 function Player:addTitle(newTitle)
-    if not self.titles[newTitle] then
+    --getting the title id
+    local tid = nil
+    for id, title in next, titles do
+        if title == newTitle then tid = id end
+    end
+
+    if not self.titles[tid] then
+        self.titles[tid] = tid
+        dHandler:set(self.name, "titles", self.titles)
+        tfm.exec.chatMessage("<D>Congratulations, " ..  self.name .. " achieved a new title\n« " .. titles[tid] .. " »</D>")
+    end
+    --[[if not self.titles[newTitle] then
         self.titles[newTitle] = "« " .. newTitle .. " »"
         local titles = {}
         for title, _ in next, self.titles do
@@ -335,7 +361,7 @@ function Player:addTitle(newTitle)
         dHandler:set(self.name, "titles", titles)
         titles = nil
         tfm.exec.chatMessage("<D>Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle] .. "</D>")
-    end
+    end]]
 end
 
 function Player:setCourse(course)
@@ -772,11 +798,11 @@ function displayHelp(target, mode, page)
 end
 
 function displayTitleList(target)
-    local titles = "Listing owned titles. Use !title NEW_TITLE to set a new title."
-    for title, _ in next, players[target]:getTitles() do
-        titles = titles .. "\n« " .. title .. " »"
+    local titleTxt = "Listing owned titles. Use !title NEW_TITLE to set a new title."
+    for id, title in next, players[target]:getTitles() do
+        titleTxt = titleTxt .. "\n« " .. titles[title] .. " »"
     end
-    tfm.exec.chatMessage(titles, target)
+    tfm.exec.chatMessage(titleTxt, target)
 end
 
 function displayLotto(target)
@@ -1092,11 +1118,16 @@ end
 function eventPlayerDataLoaded(name, data)
     print("Loaded player data (" .. name .. ")") --.. data)
     dHandler:newPlayer(name, data)
-    local titles = {}
+    --[[local titles = {}
     for _, title in next, dHandler:get(name, "titles") do
         title = title:sub(2, #title - 1)
         titles[title] = "« " .. title .. " »"
-    end
+    end]]
+
+    --[[local title = dHandler:get(name, "title")
+    for _, id in next, titles do
+        if id == title then title = titles[id] break end 
+    end]]
 
     local degrees = {}
     for _, degree in next, dHandler:get(name, "degrees") do
@@ -1112,8 +1143,8 @@ function eventPlayerDataLoaded(name, data)
     
     players[name] = Player(name, {
         money = dHandler:get(name, "money"),
-        title = dHandler:get(name, "title"),
-        titles = titles,
+        title = titles[dHandler:get(name, "title")],
+        titles = dHandler:get(name, "titles"),
         xp = dHandler:get(name, "xp"),
         level = dHandler:get(name, "level"),
         learning = dHandler:get(name, "learning"),
@@ -1123,7 +1154,7 @@ function eventPlayerDataLoaded(name, data)
         degrees = degrees,
         inventory = inv
     })
-    dHandler:set(name, "titles", map(dHandler:get(name, "titles"), function(t) return t:sub(2, #t - 1)end))
+    --dHandler:set(name, "titles", map(dHandler:get(name, "titles"), function(t) return t:sub(2, #t - 1)end))
     dHandler:set(name, "degrees", map(dHandler:get(name, "degrees"), function(d) return d:sub(2, #d - 1) end))
     players[name]:storeInventory()
     tempData[name] = {}
@@ -1332,7 +1363,10 @@ function eventPopupAnswer(id, name, answer)
 end
 
 function eventChatCommand(name, msg)
-    if string.sub(msg, 1, 7) == "company" then
+    if msg == "save" then
+        print(dHandler:dumpPlayer(name))
+        system.savePlayerData(name, dHandler:dumpPlayer(name))
+    elseif string.sub(msg, 1, 7) == "company" then
         displayCompany(string.sub(msg, 9), name)
     elseif string.sub(msg, 1, 7) == "profile" then
         displayProfile(string.sub(msg, 9), name)
