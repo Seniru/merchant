@@ -358,7 +358,9 @@ end
 
 function Player:setTitle(newTitle)
     for id, title in next, titles do
-        if title == newTitle and self.titles[id] then
+        print(self.titles[id])
+        if title == newTitle and find(id, self.titles, true) then
+            print("found")
             self.title = newTitle
             self:updateStatsBar()
             dHandler:set(self.name, "title", id)
