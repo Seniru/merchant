@@ -359,8 +359,8 @@ function Player:addTitle(newTitle)
         if title == newTitle then tid = id end
     end
 
-    if not self.titles[tid] then
-        self.titles[tid] = tid
+    if not find(tid, self.titles, true) then
+        table.insert(self.titles, tid)
         dHandler:set(self.name, "titles", self.titles)
         tfm.exec.chatMessage("<D>Congratulations, " ..  self.name .. " achieved a new title\n« " .. titles[tid] .. " »</D>")
     end
@@ -419,14 +419,12 @@ function Player:investTo(comName, amount, sharePurchase)
     end
 end
 
-function Player:addDegree(course)
+function Player:addDegree(id)
     self:addTitle("Degree Holder")
-    self.degrees[course] = courses[course]
-    local degrees = {}
-        for deg, _ in next, self.degrees do
-            table.insert(degrees, deg)
-        end
-    dHandler:set(self.name, "degrees", degrees)
+    if not find(id, self.degrees, true) then
+        table.insert(self.degrees, id)
+    end
+    dHandler:set(self.name, "degrees", self.degrees)
 end
 
 function Player:learn()
@@ -436,7 +434,7 @@ function Player:learn()
         ui.updateTextArea(3000, "<b><p align='center'>Lessons left: " .. self.learnProgress .. " / " .. courses[self.learning].lessons .. "</b></p>", self.name)
         self:setMoney(-courses[self.learning].feePerLesson, true)
         if self.learnProgress >= courses[self.learning].lessons then
-            self:addDegree(self.learning)
+            self:addDegree(courses[self.learning].id)
             self.learning = ""
             self.eduLvl = self.eduLvl + 1
             if self.eduLvl == 3 then
@@ -833,17 +831,25 @@ function getQualifiedJobs(player)
     local p = players[player]
     local qjobs = {}
     for id, job in next, jobs do
-        if p:getLevel() >= job.minLvl and (job.qualifications == nil or p:getDegrees()[job.qualifications] ~= nil) then
-                table.insert(qjobs, job)
+        if p:getLevel() >= job.minLvl and (job.qualifications == nil or find(courses[job.qualifications].id, p:getDegrees(), true) ~= nil) then
+            table.insert(qjobs, job)
         end
     end
     return qjobs
 end
 
-function find(name, tbl)
-    for k,v in ipairs(tbl) do
-        if (v.name == name) then
-            return v
+function find(name, tbl, normalLists)
+    if not normalLists then
+        for k,v in ipairs(tbl) do
+            if (v.name == name) then
+                return v
+            end
+        end
+    else
+        for k, v in next, tbl do
+            if v == name then
+                return k
+            end
         end
     end
     return nil
@@ -1132,11 +1138,11 @@ function eventPlayerDataLoaded(name, data)
         if id == title then title = titles[id] break end 
     end]]
 
-    local degrees = {}
+    --[[local degrees = {}
     for _, degree in next, dHandler:get(name, "degrees") do
         degree = degree:sub(2, #degree - 1)
         degrees[degree] = courses[degree]
-    end
+    end]]
 
     local inv = {}
     for _, data in next, dHandler:get(name, "inventory") do
@@ -1154,11 +1160,11 @@ function eventPlayerDataLoaded(name, data)
         learnProgress = dHandler:get(name, "learnProgress"),
         eduLvl = dHandler:get(name, "eduLvl"),
         eduStream = dHandler:get(name, "eduStream"),
-        degrees = degrees,
+        degrees = dHandler:get(name, "degrees"),
         inventory = inv
     })
     --dHandler:set(name, "titles", map(dHandler:get(name, "titles"), function(t) return t:sub(2, #t - 1)end))
-    dHandler:set(name, "degrees", map(dHandler:get(name, "degrees"), function(d) return d:sub(2, #d - 1) end))
+    --dHandler:set(name, "degrees", map(dHandler:get(name, "degrees"), function(d) return d:sub(2, #d - 1) end))
     players[name]:storeInventory()
     tempData[name] = {}
     setUI(name)
