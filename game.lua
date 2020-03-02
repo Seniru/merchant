@@ -156,6 +156,18 @@ local titles = {
     [8] = "Businessman"
 }
 
+local coursesHelper = {
+    [1] = "School",
+    [2] = "Junior Sports Club",
+    [3] = "High School",
+    [4] = "Cheese mining",
+    [5] = "Cheese trading",
+    [6] = "Cheese developing",
+    [7] = "Law",
+    [8] = "Cheese trading-II",
+    [9] = "Fullstack cheese developing"
+}
+
 
 local ab = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 local latestLotto = {}
@@ -167,7 +179,7 @@ local dHandler = DataHandler.new("clicker", {
     title = {index = 2, type = "number", default = 1},
     xp =    {index = 3, type = "number", default = 1},
     level = {index = 4, type = "number", default = 1},
-    learning = {index = 5, type = "string", default = ""},
+    learning = {index = 5, type = "number", default = 0},
     learnProgress = {index = 6, type = "number", default = 0},
     eduLvl = {index = 7, type = "number", default = 1},
     eduStream = {index =  8, type = "string", default = ""},
@@ -352,16 +364,6 @@ function Player:addTitle(newTitle)
         dHandler:set(self.name, "titles", self.titles)
         tfm.exec.chatMessage("<D>Congratulations, " ..  self.name .. " achieved a new title\n« " .. titles[tid] .. " »</D>")
     end
-    --[[if not self.titles[newTitle] then
-        self.titles[newTitle] = "« " .. newTitle .. " »"
-        local titles = {}
-        for title, _ in next, self.titles do
-            table.insert(titles, title)
-        end
-        dHandler:set(self.name, "titles", titles)
-        titles = nil
-        tfm.exec.chatMessage("<D>Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle] .. "</D>")
-    end]]
 end
 
 function Player:setCourse(course)
@@ -369,7 +371,7 @@ function Player:setCourse(course)
     self.learnProgress = 0
     self.eduLvl = course.level
     self.eduStream = course.stream
-    dHandler:set(self.name, "learning", self.learning)
+    dHandler:set(self.name, "learning", course.id)
     dHandler:set(self.name, "learnProgress", self.learnProgress)
     dHandler:set(self.name, "eduLvl", self.eduLvl)
     dHandler:set(self.name, "eduStream", self.eduStream)
@@ -441,7 +443,7 @@ function Player:learn()
                 self:addTitle("Dedicated Learner")
             end
         end
-        dHandler:set(self.name, "learning", self.learning)
+        dHandler:set(self.name, "learning", courses[self.learning] and courses[self.learning].id or 0)
         dHandler:set(self.name, "learnProgress", self.learnProgress)
         dHandler:set(self.name, "eduLvl", self.eduLvl)
         dHandler:set(self.name, "eduStream", self.eduStream)
@@ -1018,8 +1020,9 @@ function HealthPack(_name, _price, _regainVal, _adding, _desc)
     }
 end
 
-function Course(_name, _fee, _lessons, _level, _stream)
+function Course(_id, _name, _fee, _lessons, _level, _stream)
     return {
+        id = _id,
         name = _name,
         fee = _fee,
         lessons = _lessons,
@@ -1147,7 +1150,7 @@ function eventPlayerDataLoaded(name, data)
         titles = dHandler:get(name, "titles"),
         xp = dHandler:get(name, "xp"),
         level = dHandler:get(name, "level"),
-        learning = dHandler:get(name, "learning"),
+        learning = coursesHelper[dHandler:get(name, "learning")],
         learnProgress = dHandler:get(name, "learnProgress"),
         eduLvl = dHandler:get(name, "eduLvl"),
         eduStream = dHandler:get(name, "eduStream"),
@@ -1453,15 +1456,15 @@ table.insert(healthPacks, HealthPack("Vito`s Lasagne", 2000, 0.8, true, "World's
 table.insert(healthPacks, HealthPack("Ambulance!", 2500, 1, false, "Restores your health back! (Powered by Shaman!)"))
 
 --creating and storing Course tables
-courses["School"] = Course("School", 20, 2, 1, "")
-courses["Junior Sports Club"] = Course("Junior Sports Club", 10, 4, 2, "")
-courses["High School"] = Course("High School", 1000, 20, 3, "")
-courses["Cheese mining"] = Course("Cheese mining", 3000, 30, 4, "admin")
-courses["Cheese trading"] = Course("Cheese trading", 5000, 30, 4, "bs")
-courses["Cheese developing"] = Course("Cheese developing", 5500, 50, 4, "it")
-courses["Law"] = Course("Law", 100000, 80, 5, "admin")
-courses["Cheese trading-II"] = Course("Cheese trading-II", 200000, 75, 5, "bs")
-courses["Fullstack cheese developing"] = Course("Fullstack cheese developing", 150000, 70, 5, "it")
+courses["School"] = Course(1, "School", 20, 2, 1, "")
+courses["Junior Sports Club"] = Course(2, "Junior Sports Club", 10, 4, 2, "")
+courses["High School"] = Course(3, "High School", 1000, 20, 3, "")
+courses["Cheese mining"] = Course(4, "Cheese mining", 3000, 30, 4, "admin")
+courses["Cheese trading"] = Course(5, "Cheese trading", 5000, 30, 4, "bs")
+courses["Cheese developing"] = Course(6, "Cheese developing", 5500, 50, 4, "it")
+courses["Law"] = Course(7, "Law", 100000, 80, 5, "admin")
+courses["Cheese trading-II"] = Course(8, "Cheese trading-II", 200000, 75, 5, "bs")
+courses["Fullstack cheese developing"] = Course(9, "Fullstack cheese developing", 150000, 70, 5, "it")
 --creating and stofing Job tables
 jobs["Cheese collector"] = Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelier801")
 jobs["Junior miner"] = Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801")
