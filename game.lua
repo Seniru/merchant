@@ -168,13 +168,28 @@ local coursesHelper = {
     [9] = "Fullstack cheese developing"
 }
 
+local items = {
+    [1] = "Cheese",
+    [2] = "Candy",
+    [3] = "Apple",
+    [4] = "Pastry",
+    [5] = "Lasagne",
+    [6] = "Cheese Pizza",
+    [7] = "Magician`s Portion",
+    [8] = "Rotten Cheese",
+    [9] = "Cheef`s food",
+    [10] = "Cheese Pizza - Large",
+    [11] = "Vito`s Pizza",
+    [12] = "Vito`s Lasagne",
+    [13] = "Ambulance!"
+}
 
 local ab = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 local latestLotto = {}
 local lottoWins = {}
 local lottoBuyers = {}
 
-local dHandler = DataHandler.new("clicker", {
+local dHandler = DataHandler.new("merchant", {
     money = {index = 1, type = "number", default = 100},
     title = {index = 2, type = "number", default = 1},
     xp =    {index = 3, type = "number", default = 1},
@@ -481,23 +496,41 @@ function Player:grabItem(item)
     else
         self.inventory[item] = self.inventory[item] + 1
     end
-    self:storeInventory(item)
+    
+    for id, value in next, items do
+        if item == value then
+            self:storeInventory(id, self.inventory[item])
+        end
+    end
+    --dHandler:set(self.name, "inventory", self.inventory)
 end
 
 function Player:useItem(item)
     if self.inventory[item] ~= nil then
         self.inventory[item] = self.inventory[item] - 1
-    if self.inventory[item] < 1 then
-        self.inventory[item] = nil
+        if self.inventory[item] < 1 then
+            self.inventory[item] = nil
+        end
     end
-  end
-    self:storeInventory(item)
+    for id, value in next, items do
+        if item == value then
+            self:storeInventory(id, self.inventory[item])
+        end
+    end
 end
 
 function Player:storeInventory(item, amount)
-    local inv = {}
-    for name, count in next, self.inventory do
-        table.insert(inv, {name, count})
+    local inv = dHandler:get(self.name, "inventory")
+    local found = false
+    for k, data in next, inv do
+        if data[1] == item then
+            found = true
+            inv[k] = {item, amount}
+            break
+        end
+    end
+    if not found then
+        table.insert(inv, {item, amount})
     end
     dHandler:set(self.name, "inventory", inv)
 end
@@ -1144,11 +1177,16 @@ function eventPlayerDataLoaded(name, data)
         degrees[degree] = courses[degree]
     end]]
 
-    local inv = {}
+    --[[local inv = {}
     for _, data in next, dHandler:get(name, "inventory") do
         local n = data[1]:sub(2, #data[1] - 1)
         inv[n] = data[2]
+    end]]
+    local inv = {}
+    for _, data in next, dHandler:get(name, "inventory") do
+        inv[items[data[1]]] = data[2]
     end
+
     
     players[name] = Player(name, {
         money = dHandler:get(name, "money"),
@@ -1165,7 +1203,7 @@ function eventPlayerDataLoaded(name, data)
     })
     --dHandler:set(name, "titles", map(dHandler:get(name, "titles"), function(t) return t:sub(2, #t - 1)end))
     --dHandler:set(name, "degrees", map(dHandler:get(name, "degrees"), function(d) return d:sub(2, #d - 1) end))
-    players[name]:storeInventory()
+    --players[name]:storeInventory()
     tempData[name] = {}
     setUI(name)
     players[name]:setJob("Cheese collector")
@@ -1372,6 +1410,7 @@ function eventPopupAnswer(id, name, answer)
 end
 
 function eventChatCommand(name, msg)
+    --TODO; Remove this conditional
     if msg == "save" then
         print(dHandler:dumpPlayer(name))
         system.savePlayerData(name, dHandler:dumpPlayer(name))
