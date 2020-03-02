@@ -525,7 +525,12 @@ function Player:storeInventory(item, amount)
     for k, data in next, inv do
         if data[1] == item then
             found = true
-            inv[k] = {item, amount}
+            if not amount then
+                table.remove(inv, k)
+            else 
+                inv[k] = {item, amount}
+            end
+
             break
         end
     end
