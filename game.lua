@@ -1392,11 +1392,7 @@ function eventPopupAnswer(id, name, answer)
 end
 
 function eventChatCommand(name, msg)
-    --TODO; Remove this conditional
-    if msg == "save" then
-        print(dHandler:dumpPlayer(name))
-        system.savePlayerData(name, dHandler:dumpPlayer(name))
-    elseif string.sub(msg, 1, 7) == "company" then
+    if string.sub(msg, 1, 7) == "company" then
         displayCompany(string.sub(msg, 9), name)
     elseif string.sub(msg, 1, 7) == "profile" then
         displayProfile(string.sub(msg, 9), name)
