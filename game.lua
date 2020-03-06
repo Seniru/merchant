@@ -145,17 +145,56 @@ local gameplay = {[[
     ]]
 }
 
+local titles = {
+    [1] = "Newbie",
+    [2] = "Worker",
+    [3] = "Getting Experience",
+    [4] = "Little Learner",
+    [5] = "Dedicated Learner",
+    [6] = "Degree Holder",
+    [7] = "Investor",
+    [8] = "Businessman"
+}
+
+local coursesHelper = {
+    [1] = "School",
+    [2] = "Junior Sports Club",
+    [3] = "High School",
+    [4] = "Cheese mining",
+    [5] = "Cheese trading",
+    [6] = "Cheese developing",
+    [7] = "Law",
+    [8] = "Cheese trading-II",
+    [9] = "Fullstack cheese developing"
+}
+
+local items = {
+    [1] = "Cheese",
+    [2] = "Candy",
+    [3] = "Apple",
+    [4] = "Pastry",
+    [5] = "Lasagne",
+    [6] = "Cheese Pizza",
+    [7] = "Magician`s Portion",
+    [8] = "Rotten Cheese",
+    [9] = "Cheef`s food",
+    [10] = "Cheese Pizza - Large",
+    [11] = "Vito`s Pizza",
+    [12] = "Vito`s Lasagne",
+    [13] = "Ambulance!"
+}
+
 local ab = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 local latestLotto = {}
 local lottoWins = {}
 local lottoBuyers = {}
 
-local dHandler = DataHandler.new("clicker", {
+local dHandler = DataHandler.new("merchant", {
     money = {index = 1, type = "number", default = 100},
-    title = {index = 2, type = "string", default = "Newbie"},
+    title = {index = 2, type = "number", default = 1},
     xp =    {index = 3, type = "number", default = 1},
     level = {index = 4, type = "number", default = 1},
-    learning = {index = 5, type = "string", default = ""},
+    learning = {index = 5, type = "number", default = 0},
     learnProgress = {index = 6, type = "number", default = 0},
     eduLvl = {index = 7, type = "number", default = 1},
     eduStream = {index =  8, type = "string", default = ""},
@@ -318,23 +357,29 @@ function Player:setXP(val, add)
 end
 
 function Player:setTitle(newTitle)
-    if self.titles[newTitle] then
-        self.title = newTitle
-        self:updateStatsBar()
-        dHandler:set(self.name, "title", self.title)
+    for id, title in next, titles do
+        print(self.titles[id])
+        if title == newTitle and find(id, self.titles, true) then
+            print("found")
+            self.title = newTitle
+            self:updateStatsBar()
+            dHandler:set(self.name, "title", id)
+            break
+        end
     end
 end
 
 function Player:addTitle(newTitle)
-    if not self.titles[newTitle] then
-        self.titles[newTitle] = "« " .. newTitle .. " »"
-        local titles = {}
-        for title, _ in next, self.titles do
-            table.insert(titles, title)
-        end
-        dHandler:set(self.name, "titles", titles)
-        titles = nil
-        tfm.exec.chatMessage("<D>Congratulations, " ..  self.name .. " achieved a new title\n" .. self.titles[newTitle] .. "</D>")
+    --getting the title id
+    local tid = nil
+    for id, title in next, titles do
+        if title == newTitle then tid = id end
+    end
+
+    if not find(tid, self.titles, true) then
+        table.insert(self.titles, tid)
+        dHandler:set(self.name, "titles", self.titles)
+        tfm.exec.chatMessage("<D>Congratulations, " ..  self.name .. " achieved a new title\n« " .. titles[tid] .. " »</D>")
     end
 end
 
@@ -343,7 +388,7 @@ function Player:setCourse(course)
     self.learnProgress = 0
     self.eduLvl = course.level
     self.eduStream = course.stream
-    dHandler:set(self.name, "learning", self.learning)
+    dHandler:set(self.name, "learning", course.id)
     dHandler:set(self.name, "learnProgress", self.learnProgress)
     dHandler:set(self.name, "eduLvl", self.eduLvl)
     dHandler:set(self.name, "eduStream", self.eduStream)
@@ -381,7 +426,7 @@ function Player:investTo(comName, amount, sharePurchase)
                 return
             end
                 companies[comName]:setShares(-amount / 100, true)
-            tfm.exec.chatMessage("<J>Bought shares from '" .. comName .. "'</J>", self.name)                
+            tfm.exec.chatMessage("<J>Bought shares from '" .. comName .. "'</J>", self.name)
         end
         companies[comName]:addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
@@ -391,14 +436,12 @@ function Player:investTo(comName, amount, sharePurchase)
     end
 end
 
-function Player:addDegree(course)
+function Player:addDegree(id)
     self:addTitle("Degree Holder")
-    self.degrees[course] = courses[course]
-    local degrees = {}
-        for deg, _ in next, self.degrees do
-            table.insert(degrees, deg)
-        end
-    dHandler:set(self.name, "degrees", degrees)
+    if not find(id, self.degrees, true) then
+        table.insert(self.degrees, id)
+    end
+    dHandler:set(self.name, "degrees", self.degrees)
 end
 
 function Player:learn()
@@ -408,14 +451,14 @@ function Player:learn()
         ui.updateTextArea(3000, "<b><p align='center'>Lessons left: " .. self.learnProgress .. " / " .. courses[self.learning].lessons .. "</b></p>", self.name)
         self:setMoney(-courses[self.learning].feePerLesson, true)
         if self.learnProgress >= courses[self.learning].lessons then
-            self:addDegree(self.learning)
+            self:addDegree(courses[self.learning].id)
             self.learning = ""
             self.eduLvl = self.eduLvl + 1
             if self.eduLvl == 3 then
                 self:addTitle("Dedicated Learner")
             end
         end
-        dHandler:set(self.name, "learning", self.learning)
+        dHandler:set(self.name, "learning", courses[self.learning] and courses[self.learning].id or 0)
         dHandler:set(self.name, "learnProgress", self.learnProgress)
         dHandler:set(self.name, "eduLvl", self.eduLvl)
         dHandler:set(self.name, "eduStream", self.eduStream)
@@ -455,23 +498,46 @@ function Player:grabItem(item)
     else
         self.inventory[item] = self.inventory[item] + 1
     end
-    self:storeInventory(item)
+
+    for id, value in next, items do
+        if item == value then
+            self:storeInventory(id, self.inventory[item])
+        end
+    end
+    --dHandler:set(self.name, "inventory", self.inventory)
 end
 
 function Player:useItem(item)
     if self.inventory[item] ~= nil then
         self.inventory[item] = self.inventory[item] - 1
-    if self.inventory[item] < 1 then
-        self.inventory[item] = nil
+        if self.inventory[item] < 1 then
+            self.inventory[item] = nil
+        end
     end
-  end
-    self:storeInventory(item)
+    for id, value in next, items do
+        if item == value then
+            self:storeInventory(id, self.inventory[item])
+        end
+    end
 end
 
 function Player:storeInventory(item, amount)
-    local inv = {}
-    for name, count in next, self.inventory do
-        table.insert(inv, {name, count})
+    local inv = dHandler:get(self.name, "inventory")
+    local found = false
+    for k, data in next, inv do
+        if data[1] == item then
+            found = true
+            if not amount then
+                table.remove(inv, k)
+            else
+                inv[k] = {item, amount}
+            end
+
+            break
+        end
+    end
+    if not found then
+        table.insert(inv, {item, amount})
     end
     dHandler:set(self.name, "inventory", inv)
 end
@@ -753,7 +819,7 @@ function displayProfile(name, target)
     local p = players[name] or players[up] or players[up .. "#0000"] or players[target]
     if p then
         ui.addTextArea(900, closeButton ..
-        "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>« " .. p:getTitle() .. " »</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() .. 
+        "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>« " .. p:getTitle() .. " »</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() ..
         "<br><b>Learning</b>: " .. (p:getLearningCourse() == "" and "NA" or p:getLearningCourse())
         , target, 300, 100, 200, 140, nil, nil, 1, true)
     end
@@ -772,11 +838,11 @@ function displayHelp(target, mode, page)
 end
 
 function displayTitleList(target)
-    local titles = "Listing owned titles. Use !title NEW_TITLE to set a new title."
-    for title, _ in next, players[target]:getTitles() do
-        titles = titles .. "\n« " .. title .. " »"
+    local titleTxt = "Listing owned titles. Use !title NEW_TITLE to set a new title."
+    for id, title in next, players[target]:getTitles() do
+        titleTxt = titleTxt .. "\n« " .. titles[title] .. " »"
     end
-    tfm.exec.chatMessage(titles, target)
+    tfm.exec.chatMessage(titleTxt, target)
 end
 
 function displayLotto(target)
@@ -805,17 +871,25 @@ function getQualifiedJobs(player)
     local p = players[player]
     local qjobs = {}
     for id, job in next, jobs do
-        if p:getLevel() >= job.minLvl and (job.qualifications == nil or p:getDegrees()[job.qualifications] ~= nil) then
-                table.insert(qjobs, job)
+        if p:getLevel() >= job.minLvl and (job.qualifications == nil or find(courses[job.qualifications].id, p:getDegrees(), true) ~= nil) then
+            table.insert(qjobs, job)
         end
     end
     return qjobs
 end
 
-function find(name, tbl)
-    for k,v in ipairs(tbl) do
-        if (v.name == name) then
-            return v
+function find(name, tbl, normalLists)
+    if not normalLists then
+        for k,v in ipairs(tbl) do
+            if (v.name == name) then
+                return v
+            end
+        end
+    else
+        for k, v in next, tbl do
+            if v == name then
+                return k
+            end
         end
     end
     return nil
@@ -926,7 +1000,7 @@ function getTopCompanies(upto)
         return e1[2] > e2[2]
     end)
 
-    if not upto then return temp end   
+    if not upto then return temp end
     local top = {}
     for i=1, upto, 1 do
         if temp[i] then
@@ -992,8 +1066,9 @@ function HealthPack(_name, _price, _regainVal, _adding, _desc)
     }
 end
 
-function Course(_name, _fee, _lessons, _level, _stream)
+function Course(_id, _name, _fee, _lessons, _level, _stream)
     return {
+        id = _id,
         name = _name,
         fee = _fee,
         lessons = _lessons,
@@ -1072,7 +1147,7 @@ function eventNewPlayer(name)
     tfm.exec.respawnPlayer(name)
     if not players[name] then
         system.loadPlayerData(name)
-    else    
+    else
         setUI(name)
         players[name]:setJob("Cheese collector")
     end
@@ -1092,40 +1167,25 @@ end
 function eventPlayerDataLoaded(name, data)
     print("Loaded player data (" .. name .. ")") --.. data)
     dHandler:newPlayer(name, data)
-    local titles = {}
-    for _, title in next, dHandler:get(name, "titles") do
-        title = title:sub(2, #title - 1)
-        titles[title] = "« " .. title .. " »"
-    end
-
-    local degrees = {}
-    for _, degree in next, dHandler:get(name, "degrees") do
-        degree = degree:sub(2, #degree - 1)
-        degrees[degree] = courses[degree]
-    end
 
     local inv = {}
     for _, data in next, dHandler:get(name, "inventory") do
-        local n = data[1]:sub(2, #data[1] - 1)
-        inv[n] = data[2]
+        inv[items[data[1]]] = data[2]
     end
-    
+
     players[name] = Player(name, {
         money = dHandler:get(name, "money"),
-        title = dHandler:get(name, "title"),
-        titles = titles,
+        title = titles[dHandler:get(name, "title")],
+        titles = dHandler:get(name, "titles"),
         xp = dHandler:get(name, "xp"),
         level = dHandler:get(name, "level"),
-        learning = dHandler:get(name, "learning"),
+        learning = coursesHelper[dHandler:get(name, "learning")],
         learnProgress = dHandler:get(name, "learnProgress"),
         eduLvl = dHandler:get(name, "eduLvl"),
         eduStream = dHandler:get(name, "eduStream"),
-        degrees = degrees,
+        degrees = dHandler:get(name, "degrees"),
         inventory = inv
     })
-    dHandler:set(name, "titles", map(dHandler:get(name, "titles"), function(t) return t:sub(2, #t - 1)end))
-    dHandler:set(name, "degrees", map(dHandler:get(name, "degrees"), function(d) return d:sub(2, #d - 1) end))
-    players[name]:storeInventory()
     tempData[name] = {}
     setUI(name)
     players[name]:setJob("Cheese collector")
@@ -1229,7 +1289,7 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "getLottery" then
         ui.addPopup(1000, 2, "<p align='center'>Please enter your choices (3 numbers between 0 and 100 and a letter) separated by spaces. <br><i>eg:15 20 30 B</i><br><br><b><i>Price: $20</i></b></p>", name, 300, 90, 200, true)
     elseif evt == "checkLotto" then
-        displayLotto(name)        
+        displayLotto(name)
     elseif evt:gmatch("%w+:%w+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
@@ -1419,15 +1479,15 @@ table.insert(healthPacks, HealthPack("Vito`s Lasagne", 2000, 0.8, true, "World's
 table.insert(healthPacks, HealthPack("Ambulance!", 2500, 1, false, "Restores your health back! (Powered by Shaman!)"))
 
 --creating and storing Course tables
-courses["School"] = Course("School", 20, 2, 1, "")
-courses["Junior Sports Club"] = Course("Junior Sports Club", 10, 4, 2, "")
-courses["High School"] = Course("High School", 1000, 20, 3, "")
-courses["Cheese mining"] = Course("Cheese mining", 3000, 30, 4, "admin")
-courses["Cheese trading"] = Course("Cheese trading", 5000, 30, 4, "bs")
-courses["Cheese developing"] = Course("Cheese developing", 5500, 50, 4, "it")
-courses["Law"] = Course("Law", 100000, 80, 5, "admin")
-courses["Cheese trading-II"] = Course("Cheese trading-II", 200000, 75, 5, "bs")
-courses["Fullstack cheese developing"] = Course("Fullstack cheese developing", 150000, 70, 5, "it")
+courses["School"] = Course(1, "School", 20, 2, 1, "")
+courses["Junior Sports Club"] = Course(2, "Junior Sports Club", 10, 4, 2, "")
+courses["High School"] = Course(3, "High School", 1000, 20, 3, "")
+courses["Cheese mining"] = Course(4, "Cheese mining", 3000, 30, 4, "admin")
+courses["Cheese trading"] = Course(5, "Cheese trading", 5000, 30, 4, "bs")
+courses["Cheese developing"] = Course(6, "Cheese developing", 5500, 50, 4, "it")
+courses["Law"] = Course(7, "Law", 100000, 80, 5, "admin")
+courses["Cheese trading-II"] = Course(8, "Cheese trading-II", 200000, 75, 5, "bs")
+courses["Fullstack cheese developing"] = Course(9, "Fullstack cheese developing", 150000, 70, 5, "it")
 --creating and stofing Job tables
 jobs["Cheese collector"] = Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelier801")
 jobs["Junior miner"] = Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801")
