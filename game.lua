@@ -246,7 +246,7 @@ end, 1000, true)
 local saveDataTimer = Timer("dataTimer", function()
     if pCount >= 5 then
         for name, _ in next, tfm.get.room.playerList do
-            system.savePlayerData(name, dHandler:dumpPlayer(name))
+            system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))
         end
         print('Player Data Saved!')
     end
@@ -1159,14 +1159,19 @@ function eventPlayerLeft(name)
     if pCount < 5 then
         tfm.exec.chatMessage("You need atleast 5 players to save stats")
     else
-        system.savePlayerData(name, dHandler:dumpPlayer(name))
+        system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))
     end
     pCount = pCount - 1
 end
 
 function eventPlayerDataLoaded(name, data)
-    print("Loaded player data (" .. name .. ")") --.. data)
-    dHandler:newPlayer(name, data)
+    print("Loaded player data (" .. name .. ")")-- .. data)
+    if data:find("^v2") then
+        dHandler:newPlayer(name, data:sub(3))
+    else
+        system.savePlayerData(name, "")
+        dHandler:newPlayer(name, "")
+    end
 
     local inv = {}
     for _, data in next, dHandler:get(name, "inventory") do
@@ -1406,6 +1411,8 @@ function eventChatCommand(name, msg)
         else
             players[name]:setTitle(string.sub(msg, 7))
         end
+    --[[elseif msg == "save" then
+        system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))]]
     end
 end
 
