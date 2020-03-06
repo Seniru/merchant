@@ -426,7 +426,7 @@ function Player:investTo(comName, amount, sharePurchase)
                 return
             end
                 companies[comName]:setShares(-amount / 100, true)
-            tfm.exec.chatMessage("<J>Bought shares from '" .. comName .. "'</J>", self.name)                
+            tfm.exec.chatMessage("<J>Bought shares from '" .. comName .. "'</J>", self.name)
         end
         companies[comName]:addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
@@ -498,7 +498,7 @@ function Player:grabItem(item)
     else
         self.inventory[item] = self.inventory[item] + 1
     end
-    
+
     for id, value in next, items do
         if item == value then
             self:storeInventory(id, self.inventory[item])
@@ -529,7 +529,7 @@ function Player:storeInventory(item, amount)
             found = true
             if not amount then
                 table.remove(inv, k)
-            else 
+            else
                 inv[k] = {item, amount}
             end
 
@@ -819,7 +819,7 @@ function displayProfile(name, target)
     local p = players[name] or players[up] or players[up .. "#0000"] or players[target]
     if p then
         ui.addTextArea(900, closeButton ..
-        "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>« " .. p:getTitle() .. " »</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() .. 
+        "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>« " .. p:getTitle() .. " »</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() ..
         "<br><b>Learning</b>: " .. (p:getLearningCourse() == "" and "NA" or p:getLearningCourse())
         , target, 300, 100, 200, 140, nil, nil, 1, true)
     end
@@ -1000,7 +1000,7 @@ function getTopCompanies(upto)
         return e1[2] > e2[2]
     end)
 
-    if not upto then return temp end   
+    if not upto then return temp end
     local top = {}
     for i=1, upto, 1 do
         if temp[i] then
@@ -1147,7 +1147,7 @@ function eventNewPlayer(name)
     tfm.exec.respawnPlayer(name)
     if not players[name] then
         system.loadPlayerData(name)
-    else    
+    else
         setUI(name)
         players[name]:setJob("Cheese collector")
     end
@@ -1172,7 +1172,7 @@ function eventPlayerDataLoaded(name, data)
     for _, data in next, dHandler:get(name, "inventory") do
         inv[items[data[1]]] = data[2]
     end
-  
+
     players[name] = Player(name, {
         money = dHandler:get(name, "money"),
         title = titles[dHandler:get(name, "title")],
@@ -1289,7 +1289,7 @@ function eventTextAreaCallback(id, name, evt)
     elseif evt == "getLottery" then
         ui.addPopup(1000, 2, "<p align='center'>Please enter your choices (3 numbers between 0 and 100 and a letter) separated by spaces. <br><i>eg:15 20 30 B</i><br><br><b><i>Price: $20</i></b></p>", name, 300, 90, 200, true)
     elseif evt == "checkLotto" then
-        displayLotto(name)        
+        displayLotto(name)
     elseif evt:gmatch("%w+:%w+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
