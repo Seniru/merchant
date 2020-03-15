@@ -427,7 +427,7 @@ function Player:investTo(comName, amount, sharePurchase)
                 return
             end
                 companies[comName]:setShares(-amount / 100, true)
-            tfm.exec.chatMessage("<J>Bought shares from '" .. comName .. "'</J>", self.name)
+            tfm.exec.chatMessage("<J>Bought shares from <b>" .. comName .. "</b></J>", self.name)
         end
         companies[comName]:addShareHolder(self.name, amount)
         self:setMoney(-amount, true)
@@ -1314,7 +1314,7 @@ function eventTextAreaCallback(id, name, evt)
         else
             local tempCompany = tempData[name].jobCompany
             jobs[tempData[name].jobName] = Job(tempData[name].jobName, tempData[name].jobSalary, tempData[name].jobEnergy / 100, tempData[name].minLvl, tempData[name].qualification, name, tempData[name].jobCompany)
-            tfm.exec.chatMessage("<J>Successfully created the job '" .. tempData[name].jobName .. "'</J>", name)
+            tfm.exec.chatMessage("<J>Successfully created the job <b>" .. tempData[name].jobName .. "</b></J>", name)
             tempData[name] = {jobCompany = tempCompany}
             ui.removeTextArea(500, name)
         end
@@ -1398,7 +1398,7 @@ function eventPopupAnswer(id, name, answer)
         players[name]:setMoney(-5000, true)
         players[name]:addOwnedCompanies(answer)
         displayCompany(answer, name)
-        tfm.exec.chatMessage("<J>Succesfully created the new company '" .. answer .. "'</J>", name)
+        tfm.exec.chatMessage("<J>Succesfully created the new company <b>" .. answer .. "</b></J>", name)
     elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
         if answer:len() > 15 or answer:find("[^%w%s]") then
             tfm.exec.chatMessage('<R>[Error] Name should contain only letters, numbers and spaces, which is lesser than 15 characters</R>', name)
