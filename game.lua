@@ -34,6 +34,7 @@ local pCount = 0
 local healthPacks = {}
 local courses = {}
 local jobs = {}
+local totalJobs = 0
 local companies = {}
 local tempData = {} --this table stores temporary data of players when they are creating a new job. Generally contains data in this order: tempPlayer = {jobName = 'MouseClick', jobSalary = 1000, jobEnergy = 0, minLvl = 100, qualification = "a pro"}
 
@@ -685,16 +686,44 @@ function displayCourses(target)
 end
 
 function displayJobs(target, page)
-    local jobTxt = ""
+    local qualifiedJobTxt = ""
+    local disqualifedJobTxt = ""
     local p = players[target]
-    local qJobs = getQualifiedJobs(target)
-    for id, job in next, {qJobs[((page - 1) * 2) + 1], qJobs[page * 2]} do
-        jobTxt = jobTxt .. "<b><font size='13'>" .. job.name .. "</font></b><br><p align='right'><b><VP><a href='event:" .. job.uid .. "'> | Choose | </a></VP></b></p>Salary: " .. job.salary .. " Energy: " .. (job.energy * 100) .. "%<br>Offered by <b>" .. job.owner .. "</b> of <b>" .. job.company .. "</b><br><br>"
+    local entry = 1
+    for key, value in next, getSortedJobList(players[target]) do
+        if (page - 1) * 2 + 1 <= entry and entry <= page * 2 then
+            if value[2] then
+                local job = value[1]
+                qualifiedJobTxt = qualifiedJobTxt .. "<b><font size='13'>" .. job.name .. " <a href='event:jobInfo:" .. job.name .. "'><BV>ⓘ</BV></a></font></b><br><p align='right'><b><VP><a href='event:" .. job.uid .. "'> | Choose | </a></VP></b></p>Salary: " .. job.salary .. " Energy: " .. (job.energy * 100) .. "%<br>Offered by <b>" .. job.owner .. "</b> of <b>" .. job.company .. "</b><br><br>"
+            else
+                local job = value[1]
+                disqualifedJobTxt = disqualifedJobTxt .. "<N><b><font size='13'>" .. job.name .. " <a href='event:jobInfo:" .. job.name .. "'><BV>ⓘ</BV></a></font></b><br><p align='right'><b><N2>| Choose |</N2></b></p>Salary: " .. job.salary .. " Energy: " .. (job.energy * 100) .. "%<br>Offered by <b>" .. job.owner .. "</b> of <b>" .. job.company .. "</b></N><br><br>"
+            end
+        elseif entry > page * 2 then
+            break
+        end
+        entry = entry + 1
     end
+
+    local jobTxt = qualifiedJobTxt .. disqualifedJobTxt
+
     ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font></p><br><br>" .. (jobTxt == "" and nothing or jobTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
     ui.addTextArea(301, "<p align='center'><a href='event:page:jobs:" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
     ui.addTextArea(302, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
     ui.addTextArea(303, "<p align='center'><a href='event:page:jobs:" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
+end
+
+function displayJobInfo(job, target)
+    local job = jobs[job]
+    ui.addTextArea(901, "", target, -10000, -10000, 20000, 20000, 0x333333, nil, 0.8, true)
+    ui.addTextArea(900, closeButton .. "<p align='center'><font size='15'><b><BV>" .. job.name .."</BV></b></font></p><br><br>" ..
+        "<b>Salary</b>: " .. job.salary .. "<br>" ..
+        "<b>Energy</b>: " .. (job.energy * 100) .. "%<br><br>" ..
+        "<b><u>Requirements</u></b><br><br>" ..
+        "<b>Minimum level</b>: " .. job.minLvl .. "<br>" ..
+        "<b>Qualifications</b>: " .. (job.qualifications or "NA") ..
+        "<br><br>Offered by <b>" .. job.owner .. "</b> of <b>" .. job.company .. "</b>",
+    target, 300, 90, 200, 200, nil, nil, 1, true)
 end
 
 function displayCompanyDialog(target, page)
@@ -818,6 +847,7 @@ function displayProfile(name, target)
     local up = upper(name)
     local p = players[name] or players[up] or players[up .. "#0000"] or players[target]
     if p then
+        ui.addTextArea(901, "", target, -10000, -10000, 20000, 20000, 0x333333, nil, 0.8, true)
         ui.addTextArea(900, closeButton ..
         "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>« " .. p:getTitle() .. " »</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() ..
         "<br><b>Learning</b>: " .. (p:getLearningCourse() == "" and "NA" or p:getLearningCourse())
@@ -867,15 +897,20 @@ function displayParticles(target, particle)
     tfm.exec.displayParticle(particle, tfm.get.room.playerList[target].x + math.random(-15, 15) , tfm.get.room.playerList[target].y, 0, -1, 0, 0, nil)
 end
 
-function getQualifiedJobs(player)
-    local p = players[player]
-    local qjobs = {}
+function isQualified(p, job)
+    return p:getLevel() >= job.minLvl and (job.qualifications == nil or find(courses[job.qualifications].id, p:getDegrees(), true) ~= nil)
+end
+
+function getSortedJobList(p)
+    local qJobs = {}
     for id, job in next, jobs do
-        if p:getLevel() >= job.minLvl and (job.qualifications == nil or find(courses[job.qualifications].id, p:getDegrees(), true) ~= nil) then
-            table.insert(qjobs, job)
+        if isQualified(p, job) then
+            table.insert(qJobs, 1, {job, true})
+        else
+            table.insert(qJobs, {job, false})
         end
     end
-    return qjobs
+    return qJobs
 end
 
 function find(name, tbl, normalLists)
@@ -1016,7 +1051,7 @@ function getTotalPages(type, target)
     elseif type == 'shop' then
         return #healthPacks / 2 + (#healthPacks % 2)
     elseif type == 'jobs' then
-        return #getQualifiedJobs(target) / 2 + (#getQualifiedJobs(target) % 2)
+        return totalJobs / 2 + (totalJobs % 2)
     elseif type == 'help' then
         return #gameplay
     elseif type == 'comp' then
@@ -1080,6 +1115,7 @@ function Course(_id, _name, _fee, _lessons, _level, _stream)
 end
 
 function Job(_name, _salary, _energy, _minLvl, _qualifications, _owner, _company)
+    totalJobs = totalJobs + 1
     return {
         name = _name,
         salary = _salary,
@@ -1260,6 +1296,9 @@ function eventTextAreaCallback(id, name, evt)
             ui.removeTextArea(301, name)
             ui.removeTextArea(302, name)
             ui.removeTextArea(303, name)
+        elseif id == 900 then
+            ui.removeTextArea(900, name)
+            ui.removeTextArea(901, name)
         elseif id == 952 then
             for i=950, 956, 1 do
                 ui.removeTextArea(i, name)
@@ -1334,6 +1373,8 @@ function eventTextAreaCallback(id, name, evt)
             tempData[name].issuesSharesIn = val
         elseif type == "profile" then
             displayProfile(val, name)
+        elseif type == "jobInfo" then
+            displayJobInfo(val, name)
         end
     end
 end
@@ -1361,6 +1402,8 @@ function eventPopupAnswer(id, name, answer)
     elseif id == 601 and answer ~= '' then --for the popup to submit the name for a new job
         if answer:len() > 15 or answer:find("[^%w%s]") then
             tfm.exec.chatMessage('<R>[Error] Name should contain only letters, numbers and spaces, which is lesser than 15 characters</R>', name)
+        elseif jobs[answer] then
+            tfm.exec.chatMessage('<R>[Error] Job already exists!</R>', name)
         else
             tempData[name].jobName = answer
             displayJobWizard(name)
