@@ -30,7 +30,6 @@ local months = {"January", "February", "March", "April", "May", "June", "July", 
 
 
 local players = {}
-local pCount = 0
 local healthPacks = {}
 local courses = {}
 local jobs = {}
@@ -245,7 +244,7 @@ local timer = Timer("time-sys", function()
 end, 1000, true)
 
 local saveDataTimer = Timer("dataTimer", function()
-    if pCount >= 5 then
+    if tfm.get.room.uniquePlayers >= 5 then
         for name, _ in next, tfm.get.room.playerList do
             system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))
         end
@@ -1174,7 +1173,7 @@ function setUI(name)
     chart:showLabels()
     chart:setShowDataPoints(true)
     chart:show()
-    tfm.exec.chatMessage("<BV><b>Welcome to #merchant!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J></V><br><br><CE>Warning! The game is under development. Your data might get deleted! Please report any bug to <b><V>King_seniru#5890</V></b><br><br><PT><b><u><i>https://atelier801.com/topic?f=6&t=886315</i></u></b></PT>", name)
+    tfm.exec.chatMessage("<BV><b>Welcome to #merchant!</b></BV><br><N>For more information type <J><b>!help</b></J> or press <J><b>H</b></J></V><br><br><D>Warning! The game is under development. Your data might get deleted! Please report any bug to <b><V>King_seniru#5890</V></b></D><br><br>Check out the official thread at <PT><b><i>https://atelier801.com/topic?f=6&t=886315</i></b></PT>", name)
 end
 
 --event handling
@@ -1188,16 +1187,14 @@ function eventNewPlayer(name)
         players[name]:setJob("Cheese collector")
     end
     system.bindKeyboard(name, 72, true, true)
-    pCount = pCount + 1
 end
 
 function eventPlayerLeft(name)
-    if pCount < 5 then
+    if tfm.get.room.uniquePlayers < 5 then
         tfm.exec.chatMessage("You need atleast 5 players to save stats")
     else
         system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))
     end
-    pCount = pCount - 1
 end
 
 function eventPlayerDataLoaded(name, data)
