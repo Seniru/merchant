@@ -16,6 +16,18 @@ tfm.exec.newGame([[<C><P F="0" L="1600"/><Z><S><S X="79" o="aac4d2" L="162" Y="1
 
 tips = {}
 
+local VERSION = "v1.0.4"
+local VERSION_TEXT = "Improvements"
+local VERSION_DESCRIPTION = [[
+    <b><PT>What's new</PT></b>
+
+    • Added version information
+    • Improved the module a bit
+
+    <b><PT>What's planned on next version</PT></b>
+    • A leaderboard system (since many of you requested)
+]]
+
 local CONSTANTS = {
     BAR_WIDTH = 720,
     BAR_X = 75,
@@ -28,7 +40,6 @@ local day = 1
 
 local months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 
-
 local players = {}
 local healthPacks = {}
 local courses = {}
@@ -36,6 +47,17 @@ local jobs = {}
 local totalJobs = 0
 local companies = {}
 local tempData = {} --this table stores temporary data of players when they are creating a new job. Generally contains data in this order: tempPlayer = {jobName = 'MouseClick', jobSalary = 1000, jobEnergy = 0, minLvl = 100, qualification = "a pro"}
+local closeSequence = {
+    [100] = {101, 102, 103},
+    [300] = {301, 302, 303},
+    [400] = {401, 403, 403, 404},
+    [450] = {451, 452, 453},
+    [460] = {461, 462, 463},
+    [800] = {801, 802, 803},
+    [900] = {901},
+    [952] = {950, 951, 953, 954, 955, 956},
+    [50000] = {50001}
+}
 
 local closeButton = "<p align='right'><font color='#ff0000' size='13'><b><a href='event:close'>X</a></b></font></p>"
 local nothing = "<br><br><br><br><p align='center'><b><R><font size='15'>Nothing to display!"
@@ -866,6 +888,11 @@ function displayHelp(target, mode, page)
     end
 end
 
+function displayVersionDialogue(target)
+    ui.addTextArea(50001, "", target, -10000, -10000, 20000, 20000, 0x333333, nil, 0.8, true)
+    ui.addTextArea(50000, closeButton .. "<p align='center'><font size='18'><b><VP>" .. VERSION .. "</VP> - " .. VERSION_TEXT .. "</b></font></p><br><br><font size='12'>" .. VERSION_DESCRIPTION .. "</font>", target, 50, 50, 700, 250, nil, nil, 1, true)
+end
+
 function displayTitleList(target)
     local titleTxt = "Listing owned titles. Use !title NEW_TITLE to set a new title."
     for id, title in next, players[target]:getTitles() do
@@ -1089,6 +1116,14 @@ function updatePages(name, type, page)
     end
 end
 
+function handleCloseButton(id, name)
+    if closeSequence[id] then
+        for _, subId in next, closeSequence[id] do
+            ui.removeTextArea(subId, name)
+        end
+    end
+end
+
 function HealthPack(_name, _price, _regainVal, _adding, _desc)
     return {
         name = _name,
@@ -1165,6 +1200,8 @@ function setUI(name)
     ui.addTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>", name, 288, 180, 100, 100, nil, nil, 0, false)
     --Lottery board
     ui.addTextArea(13, "<p align='center'><a href='event:getLottery'>Buy Lottery!</a><br><br><a href='event:checkLotto'>Check</a></p>", name, 1530, 250, 50, 65, nil, nil, 1, false)
+    --Version text
+    ui.addTextArea(14, "<font color='#333333'><b><a href='event:version'>" .. VERSION .."</a></b></font>", name, 720, 315, 50, 20, nil, nil, 0, true)
     p:setXP(0, true)
     tfm.exec.addImage("16f2831a4b1.png", "_10", 60, 210) -- Shop image
     tfm.exec.addImage("16f285ae02c.png", "_18", 500, 100) -- School image (icon made by Dinosoft labs in 'flaticon.com')
@@ -1239,6 +1276,8 @@ function eventTextAreaCallback(id, name, evt)
         players[name]:work()
     elseif evt == "tips" then
         displayTips(name)
+    elseif evt == "version" then
+        displayVersionDialogue(name)
     elseif evt == "cmds" then
         ui.removeTextArea(953, name)
         ui.removeTextArea(954, name)
@@ -1268,39 +1307,7 @@ function eventTextAreaCallback(id, name, evt)
         displayInventory(name)
     elseif evt == "close" then
         ui.removeTextArea(id, name)
-        if id == 400 then
-            ui.removeTextArea(401, name)
-            ui.removeTextArea(402, name)
-            ui.removeTextArea(403, name)
-            ui.removeTextArea(404, name)
-        elseif id == 450 then
-            ui.removeTextArea(451, name)
-            ui.removeTextArea(452, name)
-            ui.removeTextArea(453, name)
-        elseif id == 460 then
-            ui.removeTextArea(461, name)
-            ui.removeTextArea(462, name)
-            ui.removeTextArea(463, name)
-        elseif id == 800 then
-            ui.removeTextArea(801, name)
-            ui.removeTextArea(802, name)
-            ui.removeTextArea(803, name)
-        elseif id == 100 then
-            ui.removeTextArea(101, name)
-            ui.removeTextArea(102, name)
-            ui.removeTextArea(103, name)
-        elseif id == 300 then
-            ui.removeTextArea(301, name)
-            ui.removeTextArea(302, name)
-            ui.removeTextArea(303, name)
-        elseif id == 900 then
-            ui.removeTextArea(900, name)
-            ui.removeTextArea(901, name)
-        elseif id == 952 then
-            for i=950, 956, 1 do
-                ui.removeTextArea(i, name)
-            end
-        end
+        handleCloseButton(id, name)
     elseif evt == "help:icons" then
         ui.updateTextArea(952, iconProviders, name)
     elseif evt == "company" then
