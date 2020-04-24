@@ -16,22 +16,24 @@ tfm.exec.newGame([[<C><P F="0" L="1600"/><Z><S><S X="79" o="aac4d2" L="162" Y="1
 
 tips = {}
 
-local VERSION = "v1.0.4"
-local VERSION_TEXT = "Improvements"
+local VERSION = "v1.0.5"
+local VERSION_TEXT = "UI Improvements"
 local VERSION_DESCRIPTION = [[
     <b><PT>What's new</PT></b>
 
-    • Added version information
-    • Improved the module a bit
+    • Changed the plain-old colors of menus
+    • Added an easel icon near the lottery-kiosk
 
-    <b><PT>What's planned on next version</PT></b>
+    <b><PT>Next majoy update will contain</PT></b>
     • A leaderboard system (since many of you requested)
 ]]
 
 local CONSTANTS = {
-    BAR_WIDTH = 720,
-    BAR_X = 75,
-    STAT_BAR_Y = 30
+    BAR_WIDTH           = 720,
+    BAR_X               = 75,
+    STAT_BAR_Y          = 30,
+    BACKGROUND_COLOR    = 0x285569,
+    BORDER_COLOR        = 0x755f5f
 }
 
 local year = 3000
@@ -50,7 +52,7 @@ local tempData = {} --this table stores temporary data of players when they are 
 local closeSequence = {
     [100] = {101, 102, 103},
     [300] = {301, 302, 303},
-    [400] = {401, 403, 403, 404},
+    [400] = {401, 402, 403, 404},
     [450] = {451, 452, 453},
     [460] = {461, 462, 463},
     [800] = {801, 802, 803},
@@ -689,10 +691,10 @@ function displayShop(target, page)
     for id, medic in next, {healthPacks[((page - 1) * 2) + 1], healthPacks[page * 2]} do
         medicTxt = medicTxt .. "<b><font size='13'>" .. medic.name  .. "</font></b><br><p align='right'><VP><a href='event:buy:" .. medic.uid .."'><b>| Buy |</b></a></VP></p>Price: " .. medic.price .. "  Energy: " .. (medic.regainVal * 100) .. "%<br>" .. medic.desc .. "<br><br>"
     end
-    ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. (medicTxt == "" and nothing or medicTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
-    ui.addTextArea(101, "<p align='center'><a href='event:page:shop:" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
-    ui.addTextArea(102, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
-    ui.addTextArea(103, "<p align='center'><a href='event:page:shop:" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
+    ui.addTextArea(100, closeButton .. "<p align='center'><font size='20'><b><J>Shop</J></b></font></p><br></br>" .. (medicTxt == "" and nothing or medicTxt), target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(101, "<p align='center'><a href='event:page:shop:" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(102, "Page " .. page, target, 523, 310, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(103, "<p align='center'><a href='event:page:shop:" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayCourses(target)
@@ -703,7 +705,7 @@ function displayCourses(target)
             courseTxt = courseTxt .. "<b><font size='13'>" .. course.name .. "</font></b><VP><a href='event:" .. course.uid .. "'><b> | Enroll |</b></a></VP><br><font size='10'>(Fee: " .. course.fee .. " Lessons: " .. course.lessons .. ")</font><br>"
         end
     end
-    ui.addTextArea(200, closeButton .. "<p align='center'><font size='20'><b><J>Courses</J></b></font></p><br></br>" .. (courseTxt == "" and nothing or courseTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(200, closeButton .. "<p align='center'><font size='20'><b><J>Courses</J></b></font></p><br></br>" .. (courseTxt == "" and nothing or courseTxt), target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayJobs(target, page)
@@ -764,11 +766,11 @@ function displayCompanyDialog(target, page)
             end
             entry = entry + 1
         end
-        ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
-        ui.addTextArea(401, "<a href='event:createCompany'>New Company</a>", target, 500, 305, 100, 20, nil, nil, 1, true)
-        ui.addTextArea(402, "<p align='center'><a href='event:page:comp:" .. (page - 1) .. "'>«</a></p>", target, 200, 305, 10, 20, nil, nil, 1, true)
-        ui.addTextArea(403, "Page " .. page, target, 225, 305, 50, 20, nil, nil, 1, true)
-        ui.addTextArea(404, "<p align='center'><a href='event:page:comp:" .. (page + 1) .. "'>»</a></p>", target, 290, 305, 15, 20, nil, nil, 1, true)
+        ui.addTextArea(400, closeButton .. "<p align='center'><font size='20'><b><J>My Companies</J></b></font></p><br><br>" .. companyTxt, target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+        ui.addTextArea(401, "<a href='event:createCompany'>New Company</a>", target, 500, 305, 100, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+        ui.addTextArea(402, "<p align='center'><a href='event:page:comp:" .. (page - 1) .. "'>«</a></p>", target, 200, 305, 10, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+        ui.addTextArea(403, "Page " .. page, target, 225, 305, 50, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+        ui.addTextArea(404, "<p align='center'><a href='event:page:comp:" .. (page + 1) .. "'>»</a></p>", target, 290, 305, 15, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     end
 end
 
@@ -782,16 +784,16 @@ function displayCompany(name, target)
         ui.addTextArea(400, closeButton .. [[<p align='center'><font size='20'><b><J>]] .. name .. [[</J></b></font></p><br>
         <b>Founder</b>: ]] ..  com:getOwner() .. [[<br>
         <b>Total Owners / Shareholders:  </b>]] .. com.totalHolders .. [[<i>  <a href='event:page:owners]] .. com:getName() .. [[:1'>(See all)</a></i>
-        <b>Total Workers:</b>                ]] .. com.totalWorkers .. [[<i>  <a href='event:page:workers]] .. com:getName() .. [[:1'>(See all)</a></i>]], target, 200, 90, 400, 200, nil, nil, 1, true)
+        <b>Total Workers:</b>                ]] .. com.totalWorkers .. [[<i>  <a href='event:page:workers]] .. com:getName() .. [[:1'>(See all)</a></i>]], target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
         for n, _ in next, com:getShareHolders() do
             if n == target then isOwner = true end
         end
         if isOwner then
-            ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 305, 100, 20, nil, nil, 1, true)
-            ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 305, 100, 20, nil, nil, 1, true)
-            ui.addTextArea(403, "<a href='event:issueShares:" .. com:getName() .. "'>Issue Shares</a>", target, 405, 305, 80, 20, nil, nil, 1, true)
+            ui.addTextArea(401, "<a href='event:createJob'>Create Job</a>", target, 500, 305, 100, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+            ui.addTextArea(402, "<a href='event:invest:" .. com:getName() .. "'> Invest!</a>", target, 200, 305, 100, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+            ui.addTextArea(403, "<a href='event:issueShares:" .. com:getName() .. "'>Issue Shares</a>", target, 405, 305, 80, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
         end
-        ui.addTextArea(404, (com:getUnownedShares() == 0 and "<BL>Buy Shares</BL>" or "<a href='event:buyShares:" .. com:getName() .. "'> Buy Shares <font size='10'>(all: " .. com:getUnownedShares() .. ")</font></a>"), target, 315, 305, isOwner and 80 or 170, 20, nil, nil, 1, true)
+        ui.addTextArea(404, (com:getUnownedShares() == 0 and "<BL>Buy Shares</BL>" or "<a href='event:buyShares:" .. com:getName() .. "'> Buy Shares <font size='10'>(all: " .. com:getUnownedShares() .. ")</font></a>"), target, 315, 305, isOwner and 80 or 170, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     else
         ui.addPopup(404, 0, "<p align='center'><b><font color='#CB546B'>Company doesn't exist!", target, 300, 90, 200, true)
     end
@@ -808,10 +810,10 @@ function displayCompanyOwners(comp, target, page)
         end
         entry = entry + 1
     end
-    ui.addTextArea(450, closeButton .. "<p align='center'><font size='20'><b><J>Shareholders of " .. comp .. "</J></b></font></p><br><br><b>Total: </b>" .. companies[comp].totalHolders .. "<br><br>" .. res, target, 200, 90, 400, 200, nil, nil, 1, true)
-    ui.addTextArea(451, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
-    ui.addTextArea(452, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
-    ui.addTextArea(453, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
+    ui.addTextArea(450, closeButton .. "<p align='center'><font size='20'><b><J>Shareholders of " .. comp .. "</J></b></font></p><br><br><b>Total: </b>" .. companies[comp].totalHolders .. "<br><br>" .. res, target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(451, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(452, "Page " .. page, target, 523, 310, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(453, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayCompanyMembers(comp, target, page)
@@ -825,10 +827,10 @@ function displayCompanyMembers(comp, target, page)
         end
     end
     entry = entry + 1
-    ui.addTextArea(460, closeButton .. "<p align='center'><font size='20'><b><J>Workers of " .. comp .. "</J></b></font></p><br><br><b>Total: </b>" .. companies[comp].totalWorkers .. "<br><br>" .. res, target, 200, 90, 400, 200, nil, nil, 1, true)
-    ui.addTextArea(461, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
-    ui.addTextArea(462, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
-    ui.addTextArea(463, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
+    ui.addTextArea(460, closeButton .. "<p align='center'><font size='20'><b><J>Workers of " .. comp .. "</J></b></font></p><br><br><b>Total: </b>" .. companies[comp].totalWorkers .. "<br><br>" .. res, target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(461, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(462, "Page " .. page, target, 523, 310, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(463, "<p align='center'><a href='event:page:owners" .. comp .. ":" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayJobWizard(target)
@@ -838,7 +840,7 @@ function displayJobWizard(target)
     <b>Energy: </b><a href='event:selectJobEnergy'> ]] .. (tempData[target].jobEnergy == nil and "Select" or tempData[target].jobEnergy .. "%") .. [[</a>
     <b>Minimum Level: </b><a href='event:chooseJobMinLvl'>]] .. (tempData[target].minLvl == nil and "Select" or tempData[target].minLvl) .. [[</a>
     <b>Qualifcations: </b><a href='event:chooseJobDegree'>]] .. (tempData[target].qualification == nil and "Select" or tempData[target].qualification) .. [[</a><br>
-    ]], target, 200, 90, 400, 200, nil, nil, 1, true)
+    ]], target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayAllDegrees(target)
@@ -846,7 +848,7 @@ function displayAllDegrees(target)
     for k, v in next, courses do
         degreeTxt = degreeTxt .. "<a href='event:degree:" .. v.name .. "'>" .. v.name .. "</a><br>"
     end
-    ui.addTextArea(600, closeButton .. "<p align='center'><font size='20'><b><J>Choose a Degree</J></b></font></p>" .. degreeTxt, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(600, closeButton .. "<p align='center'><font size='20'><b><J>Choose a Degree</J></b></font></p>" .. degreeTxt, target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayInventory(target)
@@ -854,14 +856,14 @@ function displayInventory(target)
     for k, v in next, players[target]:getInventory() do
         invTxt = invTxt .. "<b><font size='12'>".. k .. "</font><a href='event:use:" .. k .."'><VP> | Use x" .. v .. " |</VP> </a></b> : <font size='10'>(Energy: " .. (find(k, healthPacks).regainVal * 100) .. "%)</font><br>"
     end
-    ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p><br>" .. (invTxt == "" and nothing or invTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(700, closeButton .. "<p align='center'><font size='20'><b><J>Inventory</J></b></font></p><br>" .. (invTxt == "" and nothing or invTxt), target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayTips(target)
-    ui.addTextArea(800, tips[1], target, 6, 120, 120, 150, 0x324650, 0x000000, 1, true)
-    ui.addTextArea(801, "«", target, 10, 285, 10, 15, nil, nil, 1, true)
-    ui.addTextArea(802, "Page 1", target, 35, 285, 50, 15, nil, nil, 1, true)
-    ui.addTextArea(803, "<p align='center'><a href='event:page:tip:2'>»</a></p>", target, 100, 285, 15, 15, nil, nil, 1, true)
+    ui.addTextArea(800, tips[1], target, 6, 120, 120, 150, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(801, "«", target, 10, 285, 10, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(802, "Page 1", target, 35, 285, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(803, "<p align='center'><a href='event:page:tip:2'>»</a></p>", target, 100, 285, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayProfile(name, target)
@@ -872,25 +874,25 @@ function displayProfile(name, target)
         ui.addTextArea(900, closeButton ..
         "<p align='center'><font size='15'><b><BV>" .. p:getName() .."</BV></b></font><br>« " .. p:getTitle() .. " »</p><br><b>Level:</b> " .. tostring(p:getLevel()) .. "<BL><font size='12'> [" .. tostring(p:getXP()) .. "XP / " .. tostring(calculateXP(p:getLevel() + 1)) .. "XP]</font></BL><br><b>Money:</b> $" .. formatNumber(p:getMoney()) .. "<br><br><b>Working as a</b> " .. p:getJob() ..
         "<br><b>Learning</b>: " .. (p:getLearningCourse() == "" and "NA" or p:getLearningCourse())
-        , target, 300, 100, 200, 140, nil, nil, 1, true)
+        , target, 300, 100, 200, 140, CONSTANTS.BACKGROUND_COLOR, 0, 1, true)
     end
 end
 
 function displayHelp(target, mode, page)
-    ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 120, 75, 20, nil, nil, 1, true)
-    ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 85, 75, 20, nil, nil, 1, true)
-    ui.addTextArea(956, "<B><J><a href='event:credits'>Credits</a>", target, 30, 155, 75, 20, nil, nil, 1, true)
-    ui.addTextArea(952, closeButton .. (mode == "game" and gameplay[page or 1] or (mode == "credits" and credits or cmds)), target, 110, 80, 600, 200, 0x324650, 0x000000, 1, true)
+    ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 120, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 85, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(956, "<B><J><a href='event:credits'>Credits</a>", target, 30, 155, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(956, "<B><J><a href='event:credits'>Credits</a>", target, 30, 155, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     if mode == "game" then
-        ui.addTextArea(953, "«",  target, 600, 300, 15, 15, nil, nil, 1, true)
-        ui.addTextArea(954, "Page 1", target, 630, 300, 50, 15, nil, nil, 1, true)
-        ui.addTextArea(955, "<a href='event:page:help:2'>»</a></p>", target, 695, 300, 15, 15, nil, nil, 1, true)
+        ui.addTextArea(953, "«",  target, 600, 300, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+        ui.addTextArea(954, "Page 1", target, 630, 300, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+        ui.addTextArea(955, "<a href='event:page:help:2'>»</a></p>", target, 695, 300, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     end
 end
 
 function displayVersionDialogue(target)
     ui.addTextArea(50001, "", target, -10000, -10000, 20000, 20000, 0x333333, nil, 0.8, true)
-    ui.addTextArea(50000, closeButton .. "<p align='center'><font size='18'><b><VP>" .. VERSION .. "</VP> - " .. VERSION_TEXT .. "</b></font></p><br><br><font size='12'>" .. VERSION_DESCRIPTION .. "</font>", target, 50, 50, 700, 250, nil, nil, 1, true)
+    ui.addTextArea(50000, closeButton .. "<p align='center'><font size='18'><b><VP>" .. VERSION .. "</VP> - " .. VERSION_TEXT .. "</b></font></p><br><br><font size='12'>" .. VERSION_DESCRIPTION .. "</font>", target, 50, 50, 700, 250, CONSTANTS.BACKGROUND_COLOR, 0, 1, true)
 end
 
 function displayTitleList(target)
@@ -904,7 +906,7 @@ end
 function displayLotto(target)
     local txt = "<p align='center'><font size='20'><b><J>Lotto Info</J></b></font><br><br><b>This month's winning lotto: </b>" .. ((#latestLotto == 0) and 'No drawings yet!' or latestLotto[1] .. ", " .. latestLotto[2] ..  ", " .. latestLotto[3] .. ", " .. latestLotto[4]) .. "<br><br>"
     txt = txt .. ((lottoWins[target] == nil or lottoWins[target] == 0) and "You have no wins in the past month!" or "You have won $" .. lottoWins[target] .. " in the past month") .. "</p>"
-    ui.addTextArea(4000, closeButton .. txt, target, 200, 90, 400, 200, nil, nil, 1, true)
+    ui.addTextArea(4000, closeButton .. txt, target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function calculateXP(lvl)
@@ -1170,9 +1172,9 @@ function setUI(name)
     tfm.exec.addImage("16f88de3629.png", ":10", 2, 333)
     ui.addTextArea(0, "<a href='event:work'>\t<br><p align='center'><b><font size='16' color='#000000'>Work!</font></b></p><br>\t<br>\t", name, 3, 338, 60, 60, nil, nil, 0, true)
     --stats
-    ui.addTextArea(10, "<p align='right'>Money: " .. formatNumber(p:getMoney()) .. " </p> ", name, 200, 25, 120, 20, nil, nil, 1, true)
-    ui.addTextArea(11, " Level: " .. p:getLevel(), name, 480, 25, 120, 20, nil, nil, 1, true)
-    ui.addTextArea(1, "<br><p align='center'><b>" .. name .. "</b><br>« " .. p:getTitle() .. " »</p>", name, 325, 20, 150, 45, nil, nil, 1, true )
+    ui.addTextArea(10, "<p align='right'>Money: " .. formatNumber(p:getMoney()) .. " </p> ", name, 200, 25, 120, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(11, " Level: " .. p:getLevel(), name, 480, 25, 120, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(1, "<br><p align='center'><b>" .. name .. "</b><br>« " .. p:getTitle() .. " »</p>", name, 325, 20, 150, 45, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true )
     --health bar area
     ui.addTextArea(2, "<p align='center'>100%</p>", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, nil, nil, 0.5, true)
     --xp bar area
@@ -1199,7 +1201,8 @@ function setUI(name)
     --Clock interface
     ui.addTextArea(12, "<p align='center'><b>YR " .. year .. "</b><br><b>" .. day .. "</b> of <b>" .. months[month] .. "</b></p>", name, 288, 180, 100, 100, nil, nil, 0, false)
     --Lottery board
-    ui.addTextArea(13, "<p align='center'><a href='event:getLottery'>Buy Lottery!</a><br><br><a href='event:checkLotto'>Check</a></p>", name, 1530, 250, 50, 65, nil, nil, 1, false)
+    tfm.exec.addImage("171ab7d78ec.png", "_50", 1510, 222)
+    ui.addTextArea(13, "<font color='#000000' size='10'><p align='center'><b><a href='event:getLottery'>Buy Lottery!</a><br><br><a href='event:checkLotto'>Check</a></b></p></font>", name, 1525, 240, 70, 70, nil, nil, 0, false)
     --Version text
     ui.addTextArea(14, "<font color='#333333'><b><a href='event:version'>" .. VERSION .."</a></b></font>", name, 720, 315, 50, 20, nil, nil, 0, true)
     p:setXP(0, true)
@@ -1484,38 +1487,15 @@ players["shaman"] = Player("shaman", {})
 companies["Atelier801"] = Company("Atelier801", "shaman")
 
 --creating tips
-createTip("You Need $5000 To Start A New Company!", 1)
-createTip("You Gain Money From Your Workers!", 2)
-createTip("Look At The Stats of The Company Before You Apply for it!", 3)
-createTip("The Better The Job The Better The Income!", 4)
-createTip("Buy Items From The Shop To Gain Health!", 5)
-createTip("Some Jobs Needs A Specific Degree", 6)
-createTip("To Level Up You Need To Work!", 7)
-createTip("You Will Spend Less Energy When Working if You have Educational Qualifications", 8)
-createTip("The Stats Of A Company Can Be Seen By Anyone", 9)
-createTip("While Working Your Health Bar Goes Down", 10)
-createTip("Patience is The Key To This Game.", 11)
-createTip("The Stock Market Dashboard Displays how Companies Perform in Each Month", 12)
-createTip("You Can Buy Multiple Companies!", 13)
-createTip("You Can Have Only one Job at a Time", 14)
-createTip("Your Health will be Refreshed when You Level Up", 15)
-createTip("Recruit More Players to Have More Salary!", 16)
-createTip("Try your Best to Own a Company", 17)
-createTip("Make Sure You Consider About Energy and Salary When Choosing a Job", 18)
-createTip("The Red Bar Displays Your Health or Energy, While the Green Bar Displays your XP Percentage", 19)
-createTip("Chat With Your Friends When You Are Out of Health", 20)
-createTip("Use Your Brain and Take Correct Decisions!", 21)
-createTip("If Your Job Seems to Take More Energy, Try to Choose Another!", 22)
-createTip("Consider About Your Health When Working", 23)
-createTip("When Taking A Course, You will Need to Pay Per Lesson Only. So Try to Enroll For the One With Higher Lessons", 24)
-createTip("You Can Apply to Jobs According to Your Level and Degrees", 25)
-createTip("The Better Stats You Have The Better The Job You Can Have!", 26)
-createTip("Report Bugs To Developers", 27)
-createTip("The Game is More Fun with More Players", 28)
-createTip("Click Tips When You Need Help", 29)
-createTip("The Health Refreshes Every Moment <3", 30)
-createTip("There is a Chance for Luck Too! Buy a Lotto and Check Your Luck!", 31)
-createTip("Invest Other Companies to Have an Ownership Share", 32)
+for id, tip in next, ({
+    "You Need $5000 To Start A New Company!", "You Gain Money From Your Workers!", "Look At The Stats of The Company Before You Apply for it!", "The Better The Job The Better The Income!", "Buy Items From The Shop To Gain Health!", "Some Jobs Needs A Specific Degree",
+    "To Level Up You Need To Work!", "You Will Spend Less Energy When Working if You have Educational Qualifications", "The Stats Of A Company Can Be Seen By Anyone", "While Working Your Health Bar Goes Down", "Patience is The Key To This Game.", "The Stock Market Dashboard Displays how Companies Perform in Each Month",
+    "You Can Buy Multiple Companies!", "You Can Have Only one Job at a Time", "Your Health will be Refreshed when You Level Up", "Recruit More Players to Have More Salary!", "Try your Best to Own a Company", "Make Sure You Consider About Energy and Salary When Choosing a Job", "The Red Bar Displays Your Health or Energy, While the Green Bar Displays your XP Percentage",
+    "Chat With Your Friends When You Are Out of Health", "Use Your Brain and Take Correct Decisions!", "If Your Job Seems to Take More Energy, Try to Choose Another!", "Consider About Your Health When Working", "When Taking A Course, You will Need to Pay Per Lesson Only. So Try to Enroll For the One With Higher Lessons",
+    "You Can Apply to Jobs According to Your Level and Degrees", "The Better Stats You Have The Better The Job You Can Have!", "Report Bugs To Developers", "The Game is More Fun with More Players", "Click Tips When You Need Help", "The Health Refreshes Every Moment <3", "There is a Chance for Luck Too! Buy a Lotto and Check Your Luck!", "Invest Other Companies to Have an Ownership Share"
+}) do
+    createTip(tip, id)
+end
 
 --creating and storing HealthPack tables
 table.insert(healthPacks, HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself"))
