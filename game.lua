@@ -268,14 +268,14 @@ local timer = Timer("time-sys", function()
 end, 1000, true)
 
 local saveDataTimer = Timer("dataTimer", function()
-    print("[Stats] Attempting to save player data (" .. tfm.get.room.uniquePlayers .. " / 5)")
+    print("[Stats] Attempting to save player data (Players: " .. tfm.get.room.uniquePlayers .. " / 5)")
     if tfm.get.room.uniquePlayers >= 5 then
         for name, _ in next, tfm.get.room.playerList do
             system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))
         end
         print('Player Data Saved!')
     end
-end, 1000 * 60 * 5, true)
+end, 1000 * 60 * 3, true)
 
 --creating the class Player
 local Player = {}
