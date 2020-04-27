@@ -58,6 +58,7 @@ local closeSequence = {
     [800] = {801, 802, 803},
     [900] = {901},
     [952] = {950, 951, 953, 954, 955, 956},
+    [5000] = {5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010},
     [50000] = {50001}
 }
 
@@ -283,6 +284,7 @@ Player.__index = Player
 Player.__tostring = function(self)
     return "[name=" .. self.name .. ",money=" .. self.money .. ", health=" .. self.health .. "]"
 end
+Player._total = 0
 
 setmetatable(Player, {
     __call = function (cls, name, config)
@@ -312,6 +314,7 @@ function Player.new(name, config)
     self.titles = config.titles
     ui.addTextArea(1000, "", name, CONSTANTS.BAR_X, 340, CONSTANTS.BAR_WIDTH, 20, 0xff0000, 0xee0000, 1, true)
     ui.addTextArea(2000, "", name, CONSTANTS.BAR_X, 370, CONSTANTS.BAR_WIDTH, 17, 0x00ff00, 0x00ee00, 1, true)
+    Player._total = Player._total + 1
     return self
 end
 
@@ -731,10 +734,10 @@ function displayJobs(target, page)
 
     local jobTxt = qualifiedJobTxt .. disqualifedJobTxt
 
-    ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font></p><br><br>" .. (jobTxt == "" and nothing or jobTxt), target, 200, 90, 400, 200, nil, nil, 1, true)
-    ui.addTextArea(301, "<p align='center'><a href='event:page:jobs:" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, nil, nil, 1, true)
-    ui.addTextArea(302, "Page " .. page, target, 523, 310, 50, 15, nil, nil, 1, true)
-    ui.addTextArea(303, "<p align='center'><a href='event:page:jobs:" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, nil, nil, 1, true)
+    ui.addTextArea(300, closeButton .. "<p align='center'><font size='20'><b><J>Jobs</J></b></font></p><br><br>" .. (jobTxt == "" and nothing or jobTxt), target, 200, 90, 400, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(301, "<p align='center'><a href='event:page:jobs:" .. page - 1 .."'>«</a></p>", target, 500, 310, 10, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(302, "Page " .. page, target, 523, 310, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(303, "<p align='center'><a href='event:page:jobs:" .. page + 1 .."'>»</a></p>", target, 585, 310, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayJobInfo(job, target)
@@ -747,7 +750,7 @@ function displayJobInfo(job, target)
         "<b>Minimum level</b>: " .. job.minLvl .. "<br>" ..
         "<b>Qualifications</b>: " .. (job.qualifications or "NA") ..
         "<br><br>Offered by <b>" .. job.owner .. "</b> of <b>" .. job.company .. "</b>",
-    target, 300, 90, 200, 200, nil, nil, 1, true)
+    target, 300, 90, 200, 200, CONSTANTS.BACKGROUND_COLOR, nil, 1, true)
 end
 
 function displayCompanyDialog(target, page)
@@ -883,12 +886,46 @@ function displayHelp(target, mode, page)
     ui.addTextArea(950, "<B><J><a href='event:cmds'>Commands</a>", target, 30, 120, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     ui.addTextArea(951, "<a href='event:game'><B><J>Gameplay", target, 30, 85, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     ui.addTextArea(956, "<B><J><a href='event:credits'>Credits</a>", target, 30, 155, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
-    ui.addTextArea(956, "<B><J><a href='event:credits'>Credits</a>", target, 30, 155, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(952, closeButton .. (mode == "game" and gameplay[page or 1] or (mode == "credits" and credits or cmds)), target, 110, 80, 600, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+
     if mode == "game" then
         ui.addTextArea(953, "«",  target, 600, 300, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
         ui.addTextArea(954, "Page 1", target, 630, 300, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
         ui.addTextArea(955, "<a href='event:page:help:2'>»</a></p>", target, 695, 300, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     end
+end
+
+
+function displayLeaderboard(target, mode, page)
+    print(mode)
+    page = page or 1
+    local ranks, names, money, level, community = "<p align='center'>", "<p align='center'>", "<p align='center'>", "<p align='center'>", "<p align='center'>" 
+    ui.addTextArea(5001, "<B><J><a href='event:room-lboard'>Room</a>", target, 30, 120, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5002, "<B><J><a href='event:g-lboard'>Global</a>", target, 30, 85, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    if mode == "room" then    
+        local top = getTopPlayers((page - 1) * 10 + 1, page * 10) -- todo: change this accordign to the page
+        for k, data in next, top do
+            local p = players[data.name]
+            ranks = ranks .. "# " .. data.rank .. "<br>"
+            names = names .. "<a href='event:profile:" .. data.name .. "'>" .. data.name .. "</a><br>"
+            money = money .. "$" .. formatNumber(p.money) .. "<br>"
+            level = level .. "Level " .. p.level .. "<br>"
+            community = community .. tfm.get.room.playerList[data.name].community .. "<br>"
+        end
+        --ui.addTextArea(5008, , target, )
+        
+    elseif mode == "global" then
+        names = "Work in progress"
+    end
+    ui.addTextArea(5000, closeButton .. "<p align='center'><b><font size='20'><J>Leaderboard</J></font><br>#\t\t\tName\t\t\tMoney\t\tLevel\t\tCommunity\t</b></p><br>", target, 110, 80, 600, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5003, ranks, target, 125, 145, 30, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true) --155
+    ui.addTextArea(5004, names, target, 170, 145, 220, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5005, money, target, 405, 145, 80, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5006, level, target, 500, 145, 80, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5007, community, target, 595, 145, 80, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5008, "<a href='event:page:" .. mode .. "lboard:" .. (page - 1) .. "'>«</a>" ,  target, 600, 300, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5009, "<p align='center'>Page " .. page, target, 630, 300, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5010, "<a href='event:page:" .. mode .. "lboard:" .. (page + 1) .. "'>»</a></p>", target, 695, 300, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
 end
 
 function displayVersionDialogue(target)
@@ -1055,9 +1092,10 @@ function upper(str)
 end
 
 function getTopCompanies(upto)
+    --eww refactor these functions
     local temp = {}
     for name, data in next, companies do
-        table.insert(temp, {name, data.incomePerMonth / data.outstandingShares + 100})
+        temp[#temp + 1] = {name, data.incomePerMonth / data.outstandingShares + 100}
     end
 
     table.sort(temp, function(e1, e2)
@@ -1068,10 +1106,32 @@ function getTopCompanies(upto)
     local top = {}
     for i=1, upto, 1 do
         if temp[i] then
-            table.insert(top, {temp[i][1], temp[i][2]})
+            top[#top + 1] = {temp[i][1], temp[i][2]}
         end
     end
     return top
+end
+
+function getTopPlayers(from, to)
+    --eww refactor these functions
+    local temp = {}
+    for name, data in next, players do
+        if name ~= "shaman" then
+            temp[#temp + 1] = {name, data.money}
+        end
+    end
+
+    table.sort(temp, function(e1, e2)
+        return e1[2] > e2[2]
+    end)
+
+    local res = {}
+    for i = from, to, 1 do
+        if temp[i] then
+            res[#res + 1] = {name = temp[i][1], rank = i}
+        end
+    end
+    return res
 end
 
 function getTotalPages(type, target)
@@ -1085,6 +1145,10 @@ function getTotalPages(type, target)
         return #gameplay
     elseif type == 'comp' then
         return math.ceil(players[target].totalCompanies / 8)
+    elseif type == "roomlboard" then
+        return Player._total / 10 + (Player._total % 10)
+    elseif type == "globallboard" then
+        return 1 -- todo: implement global leaderboard
     elseif type:find("^owners") then
         return math.ceil(companies[type:sub(7)].totalHolders / 6)
     elseif type:find("^workers") then
@@ -1111,6 +1175,10 @@ function updatePages(name, type, page)
             displayJobs(name, page)
         elseif type == 'comp' then
             displayCompanyDialog(name, page)
+        elseif type == "roomlboard" then
+            displayCompany(name, "room", page)
+        elseif type == "globallboard" then
+            displayCompany(name, "global", page)
         elseif type:find("owners.+") then
             displayCompanyOwners(type:sub(7), name, page)
         elseif type:find("workers.+") then
@@ -1227,7 +1295,9 @@ function eventNewPlayer(name)
         setUI(name)
         players[name]:setJob("Cheese collector")
     end
-    system.bindKeyboard(name, 72, true, true)
+    for _, key in next, ({72, 76}) do
+        system.bindKeyboard(name, key, true, true)
+    end
 end
 
 function eventPlayerLeft(name)
@@ -1342,6 +1412,10 @@ function eventTextAreaCallback(id, name, evt)
         ui.addPopup(1000, 2, "<p align='center'>Please enter your choices (3 numbers between 0 and 100 and a letter) separated by spaces. <br><i>eg:15 20 30 B</i><br><br><b><i>Price: $20</i></b></p>", name, 300, 90, 200, true)
     elseif evt == "checkLotto" then
         displayLotto(name)
+    elseif evt == "room-lboard" then
+        displayLeaderboard(name, "room")
+    elseif evt == "g-lboard" then
+        displayLeaderboard(name, "global")
     elseif evt:gmatch("%w+:%w+") then
         local type = split(evt, ":")[1]
         local val = split(evt, ":")[2]
@@ -1468,8 +1542,10 @@ function eventChatCommand(name, msg)
 end
 
 function eventKeyboard(name, key, down, x, y)
-    if key == 72 then
-        displayHelp(name, "game", 1)
+    if key == 72 then -- H
+        displayHelp(name, "game")
+    elseif key == 76 then -- L
+        displayLeaderboard(name, "room")
     end
 end
 
