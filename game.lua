@@ -16,6 +16,7 @@ tfm.exec.newGame([[<C><P F="0" L="1600"/><Z><S><S X="79" o="aac4d2" L="162" Y="1
 
 tips = {}
 
+local OWNER = "King_seniru#5890"
 local VERSION = "v1.0.5"
 local VERSION_TEXT = "UI Improvements"
 local VERSION_DESCRIPTION = [[
@@ -48,6 +49,7 @@ local courses = {}
 local jobs = {}
 local totalJobs = 0
 local companies = {}
+local leaderboard = {}
 local tempData = {} --this table stores temporary data of players when they are creating a new job. Generally contains data in this order: tempPlayer = {jobName = 'MouseClick', jobSalary = 1000, jobEnergy = 0, minLvl = 100, qualification = "a pro"}
 local closeSequence = {
     [100] = {101, 102, 103},
@@ -270,12 +272,7 @@ end, 1000, true)
 
 local saveDataTimer = Timer("dataTimer", function()
     print("[Stats] Attempting to save player data (Players: " .. tfm.get.room.uniquePlayers .. " / 5)")
-    if tfm.get.room.uniquePlayers >= 5 then
-        for name, _ in next, tfm.get.room.playerList do
-            system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))
-        end
-        print('Player Data Saved!')
-    end
+    saveData()
 end, 1000 * 60 * 3, true)
 
 --creating the class Player
@@ -386,9 +383,7 @@ end
 
 function Player:setTitle(newTitle)
     for id, title in next, titles do
-        print(self.titles[id])
         if title == newTitle and find(id, self.titles, true) then
-            print("found")
             self.title = newTitle
             self:updateStatsBar()
             dHandler:set(self.name, "title", id)
@@ -897,13 +892,11 @@ end
 
 
 function displayLeaderboard(target, mode, page)
-    print(mode)
     page = page or 1
-    local ranks, names, money, level, community = "<p align='center'>", "<p align='center'>", "<p align='center'>", "<p align='center'>", "<p align='center'>" 
-    ui.addTextArea(5001, "<B><J><a href='event:room-lboard'>Room</a>", target, 30, 120, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
-    ui.addTextArea(5002, "<B><J><a href='event:g-lboard'>Global</a>", target, 30, 85, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    local temp = "<p align='center'><font size='10'>"
+    local ranks, names, money, level, community = temp, temp, temp, temp, temp
     if mode == "room" then    
-        local top = getTopPlayers((page - 1) * 10 + 1, page * 10) -- todo: change this accordign to the page
+        local top = getTopPlayers((page - 1) * 10 + 1, page * 10)
         for k, data in next, top do
             local p = players[data.name]
             ranks = ranks .. "# " .. data.rank .. "<br>"
@@ -912,17 +905,27 @@ function displayLeaderboard(target, mode, page)
             level = level .. "Level " .. p.level .. "<br>"
             community = community .. tfm.get.room.playerList[data.name].community .. "<br>"
         end
-        --ui.addTextArea(5008, , target, )
-        
     elseif mode == "global" then
-        names = "Work in progress"
+        if #leaderboard == 0 then
+            return tfm.exec.chatMessage("<R>Leaderboard not loaded yet, please wait few minutes!</R>", target)
+        end
+        for i = (page - 1) * 10 + 1, page * 10 do
+            ranks = ranks .. "# " .. i .. "<br>"
+            names = names .. leaderboard[i].name .. "<br>" 
+            money = money .. "$" .. formatNumber(leaderboard[i].money) .. "<br>"
+            level = level .. "Level " .. leaderboard[i].lvl .. "<br>"
+            community = community .. leaderboard[i].commu .. "<br>"
+        end
     end
+    ui.addTextArea(5001, "<B><J><a href='event:room-lboard'>Room</a>", target, 30, 120, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5002, "<B><J><a href='event:g-lboard'>Global</a>", target, 30, 85, 75, 20, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+
     ui.addTextArea(5000, closeButton .. "<p align='center'><b><font size='20'><J>Leaderboard</J></font><br>#\t\t\tName\t\t\tMoney\t\tLevel\t\tCommunity\t</b></p><br>", target, 110, 80, 600, 200, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
-    ui.addTextArea(5003, ranks, target, 125, 145, 30, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true) --155
-    ui.addTextArea(5004, names, target, 170, 145, 220, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
-    ui.addTextArea(5005, money, target, 405, 145, 80, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
-    ui.addTextArea(5006, level, target, 500, 145, 80, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
-    ui.addTextArea(5007, community, target, 595, 145, 80, 120, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5003, ranks, target, 125, 145, 30, 125, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true) --155
+    ui.addTextArea(5004, names, target, 170, 145, 220, 125, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5005, money, target, 405, 145, 80, 125, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5006, level, target, 500, 145, 80, 125, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
+    ui.addTextArea(5007, community, target, 595, 145, 80, 125, CONSTANTS.BORDER_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     ui.addTextArea(5008, "<a href='event:page:" .. mode .. "lboard:" .. (page - 1) .. "'>«</a>" ,  target, 600, 300, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     ui.addTextArea(5009, "<p align='center'>Page " .. page, target, 630, 300, 50, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
     ui.addTextArea(5010, "<a href='event:page:" .. mode .. "lboard:" .. (page + 1) .. "'>»</a></p>", target, 695, 300, 15, 15, CONSTANTS.BACKGROUND_COLOR, CONSTANTS.BORDER_COLOR, 1, true)
@@ -1059,12 +1062,25 @@ function split(s, delimiter)
     return result;
 end
 
-function table.tostring(tbl)
-    s = "["
+function table.tostring(tbl, depth)
+    local res = "{"
+    local prev = 0
     for k, v in next, tbl do
-        s = s .. k .. ":" .. v .. ", "
+        if type(v) == "table" then
+            if depth == nil or depth > 0 then
+                res =
+                    res ..
+                    ((type(k) == "number" and prev and prev + 1 == k) and "" or k .. ": ") ..
+                        table.tostring(v, depth and depth - 1 or nil) .. ", "
+            else
+                res = res .. k .. ":  {...}, "
+            end
+        else
+            res = res .. ((type(k) == "number" and prev and prev + 1 == k) and "" or k .. ": ") .. tostring(v) .. ", "
+        end
+        prev = type(k) == "number" and k or nil
     end
-    return s .. "]"
+    return res:sub(1, res:len() - 2) .. "}"
 end
 
 function float(n, digits)
@@ -1146,9 +1162,9 @@ function getTotalPages(type, target)
     elseif type == 'comp' then
         return math.ceil(players[target].totalCompanies / 8)
     elseif type == "roomlboard" then
-        return Player._total / 10 + (Player._total % 10)
+        return math.ceil(Player._total / 10)
     elseif type == "globallboard" then
-        return 1 -- todo: implement global leaderboard
+        return 5
     elseif type:find("^owners") then
         return math.ceil(companies[type:sub(7)].totalHolders / 6)
     elseif type:find("^workers") then
@@ -1176,9 +1192,9 @@ function updatePages(name, type, page)
         elseif type == 'comp' then
             displayCompanyDialog(name, page)
         elseif type == "roomlboard" then
-            displayCompany(name, "room", page)
+            displayLeaderboard(name, "room", page)
         elseif type == "globallboard" then
-            displayCompany(name, "global", page)
+            displayLeaderboard(name, "global", page)
         elseif type:find("owners.+") then
             displayCompanyOwners(type:sub(7), name, page)
         elseif type:find("workers.+") then
@@ -1192,6 +1208,39 @@ function handleCloseButton(id, name)
         for _, subId in next, closeSequence[id] do
             ui.removeTextArea(subId, name)
         end
+    end
+end
+
+function parseLeaderboardData(chunk)
+    local entries = split(chunk, "|")
+    local least = tonumber(entries[1])
+    local leaderboard = {}
+    local leaders = {} -- cached leaders to improve performance later
+    for i = 2, #entries do
+        local fieldVals = split(entries[i], ",")
+        leaderboard[#leaderboard + 1] = {name = fieldVals[1], money = tonumber(fieldVals[2]), lvl = fieldVals[3], commu = fieldVals[4]}
+        leaders[fieldVals[1]] = #leaderboard
+    end
+    return leaderboard, leaders, least
+end
+
+function dumpLeaderboardData(data, least)
+    local res = least
+    for rank, data in next, data do
+        res = res .. "|" .. data.name .. "," .. data.money .. "," .. data.lvl .. "," .. data.commu
+    end
+    return res
+end
+
+function saveData(force)
+    print("[Stats] Attempting to save data (Players: " .. tfm.get.room.uniquePlayers .. " / 5)")
+    system.loadFile(0) -- requesting leaderboard data
+    if force or tfm.get.room.uniquePlayers >= 5 then
+        -- saving player data
+        for name, _ in next, tfm.get.room.playerList do
+            system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))
+        end
+        print('[Stats] Player Data Saved!')
     end
 end
 
@@ -1338,6 +1387,44 @@ function eventPlayerDataLoaded(name, data)
     tempData[name] = {}
     setUI(name)
     players[name]:setJob("Cheese collector")
+end
+
+function eventFileLoaded(id, chunk)
+    -- writing crappy codes since the start of this module /shrug
+    print("[Stats] File loaded")
+    if id == "0" then -- merchant leaderboard data
+        print("[Stats] Leaderboard data loaded")
+        local lboard, leaders, least = parseLeaderboardData(chunk)
+        if tfm.get.room.uniquePlayers >= 5 then
+            print("Saving data")
+            local updated = false
+            for name, player in next, players do
+                if name ~= "shaman" and player.money > least then
+                    if leaders[name] then
+                        table.remove(lboard, leaders[name])
+                        lboard[#lboard + 1] = {name = name, money = math.floor(player.money), lvl = player.level, commu = tfm.get.room.playerList[name].community}
+                    else
+                        lboard[#lboard] = {name = name, money = math.floor(player.money), lvl = player.level, commu = tfm.get.room.playerList[name].community}
+                    end
+                    table.sort(lboard, function(p1, p2)
+                        return p1.money > p2.money
+                    end)
+                    updated = true              
+                end
+            end
+            if updated then
+                least = lboard[#lboard].money
+                leaderboard = lboard
+                system.saveFile(dumpLeaderboardData(lboard, least), 0)
+            end
+        end
+    end
+end
+
+function eventFileSaved(id)
+    if id == "0" then
+        tfm.exec.chatMessage("Leaderboard updated!")
+    end
 end
 
 function eventPlayerDied(name)
@@ -1536,8 +1623,8 @@ function eventChatCommand(name, msg)
         else
             players[name]:setTitle(string.sub(msg, 7))
         end
-    --[[elseif msg == "save" then
-        system.savePlayerData(name, "v2" .. dHandler:dumpPlayer(name))]]
+    elseif msg == "save" and name == OWNER then
+        saveData(true)
     end
 end
 
@@ -1558,61 +1645,64 @@ end
 
 --event handling ends
 
---game logic
+-- game logic
+do
+    players["shaman"] = Player("shaman", {})
+    companies["Atelier801"] = Company("Atelier801", "shaman")
 
-players["shaman"] = Player("shaman", {})
-companies["Atelier801"] = Company("Atelier801", "shaman")
+    --creating tips
+    for id, tip in next, ({
+        "You Need $5000 To Start A New Company!", "You Gain Money From Your Workers!", "Look At The Stats of The Company Before You Apply for it!", "The Better The Job The Better The Income!", "Buy Items From The Shop To Gain Health!", "Some Jobs Needs A Specific Degree",
+        "To Level Up You Need To Work!", "You Will Spend Less Energy When Working if You have Educational Qualifications", "The Stats Of A Company Can Be Seen By Anyone", "While Working Your Health Bar Goes Down", "Patience is The Key To This Game.", "The Stock Market Dashboard Displays how Companies Perform in Each Month",
+        "You Can Buy Multiple Companies!", "You Can Have Only one Job at a Time", "Your Health will be Refreshed when You Level Up", "Recruit More Players to Have More Salary!", "Try your Best to Own a Company", "Make Sure You Consider About Energy and Salary When Choosing a Job", "The Red Bar Displays Your Health or Energy, While the Green Bar Displays your XP Percentage",
+        "Chat With Your Friends When You Are Out of Health", "Use Your Brain and Take Correct Decisions!", "If Your Job Seems to Take More Energy, Try to Choose Another!", "Consider About Your Health When Working", "When Taking A Course, You will Need to Pay Per Lesson Only. So Try to Enroll For the One With Higher Lessons",
+        "You Can Apply to Jobs According to Your Level and Degrees", "The Better Stats You Have The Better The Job You Can Have!", "Report Bugs To Developers", "The Game is More Fun with More Players", "Click Tips When You Need Help", "The Health Refreshes Every Moment <3", "There is a Chance for Luck Too! Buy a Lotto and Check Your Luck!", "Invest Other Companies to Have an Ownership Share"
+    }) do
+        createTip(tip, id)
+    end
 
---creating tips
-for id, tip in next, ({
-    "You Need $5000 To Start A New Company!", "You Gain Money From Your Workers!", "Look At The Stats of The Company Before You Apply for it!", "The Better The Job The Better The Income!", "Buy Items From The Shop To Gain Health!", "Some Jobs Needs A Specific Degree",
-    "To Level Up You Need To Work!", "You Will Spend Less Energy When Working if You have Educational Qualifications", "The Stats Of A Company Can Be Seen By Anyone", "While Working Your Health Bar Goes Down", "Patience is The Key To This Game.", "The Stock Market Dashboard Displays how Companies Perform in Each Month",
-    "You Can Buy Multiple Companies!", "You Can Have Only one Job at a Time", "Your Health will be Refreshed when You Level Up", "Recruit More Players to Have More Salary!", "Try your Best to Own a Company", "Make Sure You Consider About Energy and Salary When Choosing a Job", "The Red Bar Displays Your Health or Energy, While the Green Bar Displays your XP Percentage",
-    "Chat With Your Friends When You Are Out of Health", "Use Your Brain and Take Correct Decisions!", "If Your Job Seems to Take More Energy, Try to Choose Another!", "Consider About Your Health When Working", "When Taking A Course, You will Need to Pay Per Lesson Only. So Try to Enroll For the One With Higher Lessons",
-    "You Can Apply to Jobs According to Your Level and Degrees", "The Better Stats You Have The Better The Job You Can Have!", "Report Bugs To Developers", "The Game is More Fun with More Players", "Click Tips When You Need Help", "The Health Refreshes Every Moment <3", "There is a Chance for Luck Too! Buy a Lotto and Check Your Luck!", "Invest Other Companies to Have an Ownership Share"
-}) do
-    createTip(tip, id)
+    --creating and storing HealthPack tables
+    healthPacks[#healthPacks + 1] = HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself")
+    healthPacks[#healthPacks + 1] = HealthPack("Candy", 10, 0.02, true, "Halloween Treat!")
+    healthPacks[#healthPacks + 1] = HealthPack("Apple", 15, 0.025, true, "A nutritious diet from shaman")
+    healthPacks[#healthPacks + 1] = HealthPack("Pastry", 30, 0.06, true, "King's favourite food")
+    healthPacks[#healthPacks + 1] = HealthPack("Lasagne", 200, 0.1, true, "Shh!!! Beware of Garfield :D")
+    healthPacks[#healthPacks + 1] = HealthPack("Cheese Pizza", 300, 0.15, true, "Treat from Italy - with lots of cheeese inside !!!")
+    healthPacks[#healthPacks + 1] = HealthPack("Magician`s Portion", 500, 0.25, true, "Restores 1/4 th of your health.")
+    healthPacks[#healthPacks + 1] = HealthPack("Rotten Cheese", 700, 0.35, true, "Gives you the power of vampire <font size='5'>(disclaimer)This won't make you a vampire</font>")
+    healthPacks[#healthPacks + 1] = HealthPack("Cheef`s food", 1000, 0.5, true, "Restores half of your health (Powered by Shaman)")
+    healthPacks[#healthPacks + 1] = HealthPack("Cheese Pizza - Large", 1200, 0.55, true, "More Pizza Power!")
+    healthPacks[#healthPacks + 1] = HealthPack("Vito`s Pizza", 1500, 0.6, true, "World's best pizza!")
+    healthPacks[#healthPacks + 1] = HealthPack("Vito`s Lasagne", 2000, 0.8, true, "World's best lasagne!")
+    healthPacks[#healthPacks + 1] = HealthPack("Ambulance!", 2500, 1, false, "Restores your health back! (Powered by Shaman!)")
+
+    --creating and storing Course tables
+    courses["School"] = Course(1, "School", 20, 2, 1, "")
+    courses["Junior Sports Club"] = Course(2, "Junior Sports Club", 10, 4, 2, "")
+    courses["High School"] = Course(3, "High School", 1000, 20, 3, "")
+    courses["Cheese mining"] = Course(4, "Cheese mining", 3000, 30, 4, "admin")
+    courses["Cheese trading"] = Course(5, "Cheese trading", 5000, 30, 4, "bs")
+    courses["Cheese developing"] = Course(6, "Cheese developing", 5500, 50, 4, "it")
+    courses["Law"] = Course(7, "Law", 100000, 80, 5, "admin")
+    courses["Cheese trading-II"] = Course(8, "Cheese trading-II", 200000, 75, 5, "bs")
+    courses["Fullstack cheese developing"] = Course(9, "Fullstack cheese developing", 150000, 70, 5, "it")
+    --creating and stofing Job tables
+    jobs["Cheese collector"] = Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelier801")
+    jobs["Junior miner"] = Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801")
+    jobs["Cheese producer"] = Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelier801")
+    jobs["Cheese miner"] = Job("Cheese miner", 350, 0.2, 10, "Cheese mining", "shaman", "Atelier801")
+    jobs["Cheese trader"] = Job("Cheese trader", 400, 0.2, 12, "Cheese trading", "shaman", "Atelier801")
+    jobs["Cheese developer"] = Job("Cheese developer", 500, 0.3, 12, "Cheese developing", "shaman", "Atelier801")
+    jobs["Cheese wholesaler"] = Job("Cheese wholesaler", 800, 0.2, 15, "Cheese trading-II", "shaman", "Atelier801")
+    jobs["Fullstack cheese developer"] = Job("Fullstack cheese developer", 10000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801")
+
+    for name, player in next, tfm.get.room.playerList do
+        eventNewPlayer(name)
+    end
+
+    for id, cmd in next, {"company", "p", "profile", "help", "title"} do
+        system.disableChatCommandDisplay(cmd, true)
+    end
+
 end
 
---creating and storing HealthPack tables
-healthPacks[#healthPacks + 1] = HealthPack("Cheese", 5, 0.01, true,  "Just a cheese! to refresh yourself")
-healthPacks[#healthPacks + 1] = HealthPack("Candy", 10, 0.02, true, "Halloween Treat!")
-healthPacks[#healthPacks + 1] = HealthPack("Apple", 15, 0.025, true, "A nutritious diet from shaman")
-healthPacks[#healthPacks + 1] = HealthPack("Pastry", 30, 0.06, true, "King's favourite food")
-healthPacks[#healthPacks + 1] = HealthPack("Lasagne", 200, 0.1, true, "Shh!!! Beware of Garfield :D")
-healthPacks[#healthPacks + 1] = HealthPack("Cheese Pizza", 300, 0.15, true, "Treat from Italy - with lots of cheeese inside !!!")
-healthPacks[#healthPacks + 1] = HealthPack("Magician`s Portion", 500, 0.25, true, "Restores 1/4 th of your health.")
-healthPacks[#healthPacks + 1] = HealthPack("Rotten Cheese", 700, 0.35, true, "Gives you the power of vampire <font size='5'>(disclaimer)This won't make you a vampire</font>")
-healthPacks[#healthPacks + 1] = HealthPack("Cheef`s food", 1000, 0.5, true, "Restores half of your health (Powered by Shaman)")
-healthPacks[#healthPacks + 1] = HealthPack("Cheese Pizza - Large", 1200, 0.55, true, "More Pizza Power!")
-healthPacks[#healthPacks + 1] = HealthPack("Vito`s Pizza", 1500, 0.6, true, "World's best pizza!")
-healthPacks[#healthPacks + 1] = HealthPack("Vito`s Lasagne", 2000, 0.8, true, "World's best lasagne!")
-healthPacks[#healthPacks + 1] = HealthPack("Ambulance!", 2500, 1, false, "Restores your health back! (Powered by Shaman!)")
-
---creating and storing Course tables
-courses["School"] = Course(1, "School", 20, 2, 1, "")
-courses["Junior Sports Club"] = Course(2, "Junior Sports Club", 10, 4, 2, "")
-courses["High School"] = Course(3, "High School", 1000, 20, 3, "")
-courses["Cheese mining"] = Course(4, "Cheese mining", 3000, 30, 4, "admin")
-courses["Cheese trading"] = Course(5, "Cheese trading", 5000, 30, 4, "bs")
-courses["Cheese developing"] = Course(6, "Cheese developing", 5500, 50, 4, "it")
-courses["Law"] = Course(7, "Law", 100000, 80, 5, "admin")
-courses["Cheese trading-II"] = Course(8, "Cheese trading-II", 200000, 75, 5, "bs")
-courses["Fullstack cheese developing"] = Course(9, "Fullstack cheese developing", 150000, 70, 5, "it")
---creating and stofing Job tables
-jobs["Cheese collector"] = Job("Cheese collector", 10, 0.05, 1, nil, "shaman", "Atelier801")
-jobs["Junior miner"] = Job("Junior miner", 25, 0.1, 3, nil, "shaman", "Atelier801")
-jobs["Cheese producer"] = Job("Cheese producer", 50, 0.15, 7, nil, "shaman", "Atelier801")
-jobs["Cheese miner"] = Job("Cheese miner", 350, 0.2, 10, "Cheese mining", "shaman", "Atelier801")
-jobs["Cheese trader"] = Job("Cheese trader", 400, 0.2, 12, "Cheese trading", "shaman", "Atelier801")
-jobs["Cheese developer"] = Job("Cheese developer", 500, 0.3, 12, "Cheese developing", "shaman", "Atelier801")
-jobs["Cheese wholesaler"] = Job("Cheese wholesaler", 800, 0.2, 15, "Cheese trading-II", "shaman", "Atelier801")
-jobs["Fullstack cheese developer"] = Job("Fullstack cheese developer", 10000, 0.4, 15, "Fullstack cheese developing", "shaman", "Atelier801")
-
-for name, player in next, tfm.get.room.playerList do
-    eventNewPlayer(name)
-end
-
-for id, cmd in next, {"company", "p", "profile", "help", "title"} do
-    system.disableChatCommandDisplay(cmd, true)
-end
