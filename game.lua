@@ -1414,10 +1414,10 @@ function eventFileLoaded(id, chunk)
             end
             if updated then
                 least = lboard[#lboard].money
-                leaderboard = lboard
                 system.saveFile(dumpLeaderboardData(lboard, least), 0)
             end
         end
+        leaderboard = lboard
     end
 end
 
@@ -1703,6 +1703,8 @@ do
     for id, cmd in next, {"company", "p", "profile", "help", "title"} do
         system.disableChatCommandDisplay(cmd, true)
     end
+
+    system.loadFile(0)
 
 end
 
