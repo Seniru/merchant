@@ -1401,8 +1401,7 @@ function eventFileLoaded(id, chunk)
             for name, player in next, players do
                 if name ~= "shaman" and player.money > least then
                     if leaders[name] then
-                        table.remove(lboard, leaders[name])
-                        lboard[#lboard + 1] = {name = name, money = math.floor(player.money), lvl = player.level, commu = tfm.get.room.playerList[name].community}
+                        lboard[leaders[name]] = {name = name, money = math.floor(player.money), lvl = player.level, commu = tfm.get.room.playerList[name].community}
                     else
                         lboard[#lboard] = {name = name, money = math.floor(player.money), lvl = player.level, commu = tfm.get.room.playerList[name].community}
                     end
