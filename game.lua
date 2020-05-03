@@ -17,16 +17,16 @@ tfm.exec.newGame([[<C><P F="0" L="1600"/><Z><S><S X="79" o="aac4d2" L="162" Y="1
 tips = {}
 
 local OWNER = "King_seniru#5890"
-local VERSION = "v1.0.5"
-local VERSION_TEXT = "UI Improvements"
+local VERSION = "v1.1.0"
+local VERSION_TEXT = "Leaderboard release!!!"
 local VERSION_DESCRIPTION = [[
     <b><PT>What's new</PT></b>
 
-    • Changed the plain-old colors of menus
-    • Added an easel icon near the lottery-kiosk
+    • As I've promised, I added a leaderboard system to the game. Access it by pressing <b>L</b>
+    • Updated help menu
 
-    <b><PT>Next majoy update will contain</PT></b>
-    • A leaderboard system (since many of you requested)
+    Hope you can beat all the other capitalists ;)
+
 ]]
 
 local CONSTANTS = {
@@ -71,6 +71,10 @@ local cmds = [[
   <b>!help:</b>  Displays this dialogue
   <b>!company <i>[company name]:</i></b> Displays the specified compnay
   <b>!p <i>[player name]</i> or !profile <i>[player name]</i></b> Displays information about the specified player
+
+  <p align='center'><font size='20'><b><J>Keys</J></b></font></p>
+  <b>H</b> Displays this dialogue
+  <b>L</b> Displays the leaderboard
 ]]
 
 local credits = [[
