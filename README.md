@@ -1,5 +1,7 @@
 # #merchant
 
+> Me moved the repo [here](https://github.com/a801-luadev/merchant/settings/installations). This repo is archived
+
 <p align='center'><img width=95% src='https://i.ibb.co/phCCD7Z/Capture.png' alt='merchant'></p>
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors)
